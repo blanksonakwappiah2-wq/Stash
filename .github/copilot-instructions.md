@@ -1,0 +1,13 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created. - Created the file with provided content.
+- [x] Clarify Project Requirements - Requirements provided in user query.
+- [x] Scaffold the Project - Created multi-module Maven project with backend Spring Boot, desktop JavaFX, database schema, entities, repositories, services, controllers, and sample GUIs.
+- [x] Customize the Project - Implemented key features: user management, order placement, status updates, delivery tracking.
+- [x] Install Required Extensions - No extensions required.
+- [x] Compile the Project - Project structure created; requires Maven and Java 17 to compile and run.
+- [x] Create and Run Task - Not needed for basic setup.
+- [x] Launch the Project - Instructions provided in README.md.
+- [x] Ensure Documentation is Complete - README.md created, copilot-instructions.md cleaned.
+
+- Work through each checklist item systematically.
+- Keep communication concise and focused.
+- Follow development best practices.

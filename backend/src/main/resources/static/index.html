@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBite - Modern Food Ordering</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Scene -->
+        <div id="login-scene" class="scene active">
+            <div class="grid-pane">
+                <h1 class="title-label">Welcome to QuickBite</h1>
+                
+                <div class="form-group">
+                    <label class="label">Email:</label>
+                    <input type="text" id="login-email" class="text-field" placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="login-password" class="password-field" placeholder="Enter your password">
+                    </div>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="show-password-check">
+                        <input type="checkbox" id="login-show-password"> Show Password
+                    </label>
+                </div>
+                
+                <div class="button-group">
+                    <button id="login-btn" class="login-button">Login</button>
+                    <button id="go-to-register-btn" class="register-button">Register</button>
+                </div>
+                
+                <div id="login-message" class="message-label" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Register Scene -->
+        <div id="register-scene" class="scene">
+            <div class="grid-pane">
+                <h1 class="title-label">Register New Account</h1>
+                
+                <div class="form-group">
+                    <label class="label">Name:</label>
+                    <input type="text" id="reg-name" class="text-field" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Email:</label>
+                    <input type="text" id="reg-email" class="text-field" placeholder="Enter a valid email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Password:</label>
+                    <input type="password" id="reg-password" class="password-field" placeholder="Password (min 8 chars, upper, lower, digit)">
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="show-password-check">
+                        <input type="checkbox" id="reg-show-password"> Show Password
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Confirm Password:</label>
+                    <input type="password" id="reg-confirm-password" class="password-field" placeholder="Confirm your password">
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Role:</label>
+                    <select id="reg-role" class="combo-box">
+                        <option value="CUSTOMER">CUSTOMER</option>
+                        <option value="RESTAURANT_OWNER">RESTAURANT_OWNER</option>
+                        <option value="DELIVERY_AGENT">DELIVERY_AGENT</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button id="register-btn" class="register-button">Register</button>
+                    <button id="back-to-login-btn" class="back-button">Back to Login</button>
+                </div>
+                
+                <div id="reg-message" class="message-label" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Menu Scene -->
+        <div id="menu-scene" class="scene">
+            <div class="menu-vbox">
+                <h1 class="menu-title">QuickBite Menu</h1>
+                
+                <button id="browse-btn" class="menu-button">Browse Restaurants</button>
+                <button id="order-btn" class="menu-button">Place Order</button>
+                <button id="track-btn" class="menu-button">Track Delivery</button>
+                <button id="logout-btn" class="logout-button">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+apache-maven-*/
+maven.zip
+desktop/apache-maven-*/
+desktop/maven.zip
+backend/target/
+desktop/target/
+desktop/out/
+desktop/maven-temp/
+**/*.class

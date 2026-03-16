@@ -1,0 +1,236 @@
+/* Modern Website-like CSS Styling for QuickBite Web App */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(to bottom right, rgba(102,126,234,0.8), rgba(118,75,162,0.8)),
+                url("https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80") center center / cover no-repeat,
+                url("https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80") bottom right / 200px 200px no-repeat;
+    background-attachment: fixed;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#app {
+    width: 100%;
+    max-width: 600px;
+}
+
+.scene {
+    display: none;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.scene.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.grid-pane {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    padding: 30px;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.title-label {
+    font-size: 28px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 2px rgba(102,126,234,0.3);
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #4a5568;
+    padding: 5px 0;
+}
+
+.text-field, .password-field, .combo-box {
+    width: 100%;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    padding: 12px 16px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.text-field:focus, .password-field:focus, .combo-box:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102,126,234,0.2);
+    background-color: #f8fafc;
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+}
+
+.show-password-check {
+    font-size: 14px;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button {
+    border: none;
+    font-family: inherit;
+    outline: none;
+}
+
+.login-button, .register-button, .back-button {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 25px;
+    padding: 12px 30px;
+    flex: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 3px 8px rgba(102,126,234,0.3);
+}
+
+.login-button:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+}
+
+.register-button {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    box-shadow: 0 3px 8px rgba(72,187,120,0.3);
+}
+
+.register-button:hover {
+    background: linear-gradient(135deg, #38a169, #2f855a);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(72,187,120,0.4);
+}
+
+.back-button {
+    background: linear-gradient(135deg, #a0aec0, #718096);
+    box-shadow: 0 3px 8px rgba(160,174,192,0.3);
+}
+
+.back-button:hover {
+    background: linear-gradient(135deg, #718096, #4a5568);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(160,174,192,0.4);
+}
+
+.message-label {
+    color: #e53e3e;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: rgba(229, 62, 62, 0.1);
+    border-radius: 5px;
+    padding: 8px 12px;
+    border: 1px solid rgba(229, 62, 62, 0.2);
+    margin-top: 10px;
+    text-align: center;
+}
+
+.menu-vbox {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    padding: 40px;
+    border: 1px solid rgba(255,255,255,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.menu-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 3px rgba(102,126,234,0.3);
+    text-align: center;
+}
+
+.menu-button, .logout-button {
+    width: 250px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 18px 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menu-button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 4px 10px rgba(102,126,234,0.3);
+}
+
+.menu-button:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    transform: scale(1.08);
+    box-shadow: 0 6px 15px rgba(102,126,234,0.4);
+}
+
+.logout-button {
+    background: linear-gradient(135deg, #f56565, #e53e3e);
+    box-shadow: 0 4px 10px rgba(245,101,101,0.3);
+}
+
+.logout-button:hover {
+    background: linear-gradient(135deg, #e53e3e, #c53030);
+    transform: scale(1.08);
+    box-shadow: 0 6px 15px rgba(245,101,101,0.4);
+}
