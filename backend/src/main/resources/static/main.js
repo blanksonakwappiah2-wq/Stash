@@ -170,7 +170,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
             showMessage('login-message', "Login successful!", true);
             
             // Role-based sidebar items
-            managerNavBtn.style.display = (user.role === 'MANAGER') ? 'flex' : 'none';
+            managerNavBtn.style.display = (user.role === 'MANAGER' || user.role === 'ADMIN') ? 'flex' : 'none';
             
             setTimeout(() => {
                 switchOuterLayout(mainLayout);
