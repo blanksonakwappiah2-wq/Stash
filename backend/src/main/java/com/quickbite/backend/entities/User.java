@@ -6,10 +6,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {@Index(name = "idx_user_email", columnList = "email")})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +22,9 @@ public class User {
     private String phone;
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    private Double latitude;
+    private Double longitude;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -38,9 +42,15 @@ public class User {
     public UserRole getRole() { return role; }
     public void setRole(UserRole role) { this.role = role; }
 
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+
     public enum UserRole {
         CUSTOMER,
         RESTAURANT_OWNER,
-        DELIVERY_AGENT
+        DELIVERY_AGENT,
+        MANAGER
     }
 }

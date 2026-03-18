@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: quickbite-backend
+    env: docker
+    dockerContext: .
+    dockerfilePath: backend/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: quickbite-db
+          property: connectionString
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false # Set this in the Render Dashboard
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+
+databases:
+  - name: quickbite-db
+    databaseName: quickbite
+    user: quickbite_user
+    plan: free

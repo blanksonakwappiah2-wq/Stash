@@ -1,5 +1,5 @@
 package com.quickbite.backend.entities;
 
 public enum UserRole {
-    CUSTOMER, RESTAURANT, ADMIN, DELIVERY_AGENT
+    CUSTOMER, RESTAURANT, ADMIN, DELIVERY_AGENT, MANAGER
 }

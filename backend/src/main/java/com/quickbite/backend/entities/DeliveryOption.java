@@ -12,6 +12,7 @@ public class DeliveryOption {
     private Long id;
 
     private String method;
+    private String category;
     private Double baseFee;
     private Double perKmFee;
     private Integer estimatedTime; // in minutes
@@ -34,6 +35,14 @@ public class DeliveryOption {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Double getBaseFee() {

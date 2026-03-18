@@ -7,3 +7,7 @@ desktop/target/
 desktop/out/
 desktop/maven-temp/
 **/*.class
+backend/*.txt
+DbTest.java
+.gemini/
+.agents/

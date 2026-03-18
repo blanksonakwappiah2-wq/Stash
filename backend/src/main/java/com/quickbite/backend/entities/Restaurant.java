@@ -1,9 +1,10 @@
 package com.quickbite.backend.entities;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
 
 @Entity
-@Table(name = "restaurants")
+@Table(name = "restaurants", indexes = {@Index(name = "idx_restaurant_category", columnList = "category")})
 public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -11,6 +12,8 @@ public class Restaurant {
     private String name;
     private String address;
     private String contact;
+    private String category;
+    private String website;
     @OneToOne
     private User owner;
 
@@ -19,10 +22,14 @@ public class Restaurant {
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     public String getContact() { return contact; }
     public void setContact(String contact) { this.contact = contact; }
     public User getOwner() { return owner; }
     public void setOwner(User owner) { this.owner = owner; }
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
 }

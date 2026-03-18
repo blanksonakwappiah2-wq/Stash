@@ -40,10 +40,16 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody Map<String, String> credentials) {
+    public org.springframework.http.ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");
         String password = credentials.get("password");
-        return userService.login(email, password);
+        User user = userService.login(email, password);
+        if (user != null) {
+            return org.springframework.http.ResponseEntity.ok(user);
+        } else {
+            return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid email or password"));
+        }
     }
 
     @PostMapping("/register")
@@ -51,7 +57,8 @@ public class UserController {
         String name = userData.get("name");
         String email = userData.get("email");
         String password = userData.get("password");
-        String role = userData.get("role");
+        // Force CUSTOMER role for public registration
+        String role = "CUSTOMER"; 
         return userService.register(name, email, password, role);
     }
 }
