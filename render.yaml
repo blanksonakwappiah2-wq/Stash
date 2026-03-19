@@ -3,7 +3,6 @@ services:
     name: quickbite-backend
     env: docker
     dockerContext: .
-    dockerfilePath: backend/Dockerfile
     plan: free
     envVars:
       - key: SPRING_PROFILES_ACTIVE
