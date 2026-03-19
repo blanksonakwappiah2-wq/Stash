@@ -18,6 +18,24 @@ import org.springframework.context.annotation.Bean;
 @EnableCaching
 public class QuickbiteApplication {
     public static void main(String[] args) {
+        String dbUrl = System.getenv("DATABASE_URL");
+        if (dbUrl != null && dbUrl.startsWith("postgres://")) {
+            String cleanUrl = dbUrl.substring(11);
+            String[] userPassAndHostPortDb = cleanUrl.split("@");
+            String[] userPass = userPassAndHostPortDb[0].split(":");
+            String hostPortDb = userPassAndHostPortDb[1];
+
+            System.setProperty("spring.datasource.url", "jdbc:postgresql://" + hostPortDb);
+            System.setProperty("spring.datasource.username", userPass[0]);
+            if (userPass.length > 1) {
+                System.setProperty("spring.datasource.password", userPass[1]);
+            }
+            System.setProperty("spring.datasource.driver-class-name", "org.postgresql.Driver");
+            
+            // Also override the old DB_HOST variables in case the user has manual overrides causing issues
+            System.clearProperty("DB_HOST");
+        }
+
         SpringApplication.run(QuickbiteApplication.class, args);
     }
 
