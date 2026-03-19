@@ -18,7 +18,7 @@ services:
       - key: DB_HOST
         fromDatabase:
           name: quickbite-db
-          property: internalHost
+          property: host
       - key: DB_PORT
         fromDatabase:
           name: quickbite-db
