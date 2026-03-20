@@ -28,11 +28,7 @@ public class UserController {
         return userService.saveUser(user);
     }
 
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        user.setId(id);
-        return userService.saveUser(user);
-    }
+
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
@@ -67,6 +63,21 @@ public class UserController {
             String role = userData.getOrDefault("role", "CUSTOMER"); 
             
             User user = userService.register(name, email, password, role);
+            return org.springframework.http.ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public org.springframework.http.ResponseEntity<?> update(@PathVariable Long id, @RequestBody Map<String, String> userData) {
+        try {
+            String name = userData.get("name");
+            String email = userData.get("email");
+            String password = userData.get("password");
+            
+            User user = userService.updateUser(id, name, email, password);
             return org.springframework.http.ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             return org.springframework.http.ResponseEntity.badRequest()

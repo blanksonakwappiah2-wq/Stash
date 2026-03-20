@@ -329,6 +329,62 @@ document.getElementById('add-agent-btn').addEventListener('click', async () => {
     }
 });
 
+// Manager Action: Update Own Account
+document.getElementById('update-manager-btn').addEventListener('click', async () => {
+    if (!currentUser) return;
+    
+    const name = document.getElementById('mgr-update-name').value.trim();
+    const email = document.getElementById('mgr-update-email').value.trim();
+    const password = document.getElementById('mgr-update-password').value;
+
+    if (!name && !email && !password) {
+        showMessage('mgr-update-message', "Please provide at least one field to update.", false);
+        return;
+    }
+
+    const payload = {};
+    if (name) payload.name = name;
+    if (email) {
+        if (!EMAIL_PATTERN.test(email)) {
+            showMessage('mgr-update-message', "Invalid email format.", false);
+            return;
+        }
+        payload.email = email;
+    }
+    if (password) {
+        if (password.length < 8) {
+            showMessage('mgr-update-message', "Password must be at least 8 characters.", false);
+            return;
+        }
+        payload.password = password;
+    }
+
+    try {
+        const response = await fetch(`/api/users/${currentUser.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            const updatedUser = await response.json();
+            currentUser = updatedUser;
+            showMessage('mgr-update-message', "Account updated successfully! Use new credentials next time.", true);
+            document.getElementById('mgr-update-name').value = '';
+            document.getElementById('mgr-update-email').value = '';
+            document.getElementById('mgr-update-password').value = '';
+            
+            const welcomeTitle = document.querySelector('.welcome-title');
+            if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${updatedUser.name}!`;
+        } else {
+            const error = await response.json();
+            showMessage('mgr-update-message', error.message || "Update failed.", false);
+        }
+    } catch (e) {
+        showMessage('mgr-update-message', "Error connecting to server.", false);
+    }
+});
+
 async function fetchAndShowAgents() {
     try {
         const response = await fetch(DELIVERY_URL + 'agents');

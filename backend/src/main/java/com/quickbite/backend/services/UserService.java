@@ -46,15 +46,43 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
+        User.UserRole targetRole;
+        try {
+            targetRole = User.UserRole.valueOf(role.toUpperCase());
+        } catch (Exception e) {
+            targetRole = User.UserRole.CUSTOMER; 
+        }
+
+        // Restrict Manager Role to a single account
+        if (targetRole == User.UserRole.MANAGER) {
+            List<User> existingManagers = userRepository.findByRole(User.UserRole.MANAGER);
+            if (!existingManagers.isEmpty()) {
+                throw new RuntimeException("A Manager already exists. To update credentials, please use the Manager Portal.");
+            }
+        }
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPassword(password); // In real app, hash password
+        user.setRole(targetRole);
         
-        try {
-            user.setRole(User.UserRole.valueOf(role.toUpperCase()));
-        } catch (Exception e) {
-            user.setRole(User.UserRole.CUSTOMER); // Default to CUSTOMER if role is invalid
+        return userRepository.save(user);
+    }
+
+    public User updateUser(Long id, String name, String email, String password) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (name != null && !name.trim().isEmpty()) user.setName(name);
+        if (email != null && email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            User existing = userRepository.findByEmail(email);
+            if (existing != null && !existing.getId().equals(id)) {
+                throw new RuntimeException("Email already taken");
+            }
+            user.setEmail(email);
+        }
+        if (password != null && password.length() >= 8) {
+            user.setPassword(password);
         }
         
         return userRepository.save(user);
