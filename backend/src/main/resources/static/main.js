@@ -19,6 +19,12 @@ const trackingContent = document.getElementById('tracking-content');
 // Nav Buttons
 const navItems = document.querySelectorAll('.nav-item');
 const managerNavBtn = document.getElementById('nav-manager-btn');
+const ownerNavBtn = document.getElementById('nav-owner-btn');
+const agentNavBtn = document.getElementById('nav-agent-btn');
+const browseNavBtn = document.getElementById('nav-browse-btn');
+const ordersNavBtn = document.getElementById('nav-orders-btn');
+const trackingNavBtn = document.getElementById('nav-tracking-btn');
+const homeNavBtn = document.getElementById('nav-menu-btn');
 
 let currentUser = null;
 
@@ -89,6 +95,8 @@ function switchPane(paneId, navBtnId) {
 // Sidebar Navigation Listeners
 document.getElementById('nav-menu-btn').addEventListener('click', () => switchPane('home-content', 'nav-menu-btn'));
 document.getElementById('nav-browse-btn').addEventListener('click', () => switchPane('restaurants-content', 'nav-browse-btn'));
+document.getElementById('nav-owner-btn').addEventListener('click', () => switchPane('owner-content', 'nav-owner-btn'));
+document.getElementById('nav-agent-btn').addEventListener('click', () => switchPane('agent-content', 'nav-agent-btn'));
 document.getElementById('nav-manager-btn').addEventListener('click', () => switchPane('manager-content', 'nav-manager-btn'));
 document.getElementById('nav-orders-btn').addEventListener('click', () => switchPane('orders-content', 'nav-orders-btn'));
 document.getElementById('nav-tracking-btn').addEventListener('click', () => switchPane('tracking-content', 'nav-tracking-btn'));
@@ -210,11 +218,21 @@ document.getElementById('login-btn').addEventListener('click', async () => {
             showMessage('login-message', "Login successful! Welcome back.", true);
             
             // Role-based sidebar items
-            managerNavBtn.style.display = (user.role === 'MANAGER' || user.role === 'ADMIN') ? 'flex' : 'none';
+            updateNavigationForRole(user.role);
             
             setTimeout(() => {
                 switchOuterLayout(mainLayout);
-                switchPane('home-content', 'nav-menu-btn');
+                // Redirect to role-specific default pane
+                if (user.role === 'MANAGER' || user.role === 'ADMIN') {
+                    switchPane('manager-content', 'nav-manager-btn');
+                } else if (user.role === 'RESTAURANT_OWNER') {
+                    switchPane('owner-content', 'nav-owner-btn');
+                } else if (user.role === 'DELIVERY_AGENT') {
+                    switchPane('agent-content', 'nav-agent-btn');
+                } else {
+                    switchPane('home-content', 'nav-menu-btn');
+                }
+                
                 const welcomeTitle = document.querySelector('.welcome-title');
                 if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${user.name}!`;
             }, 600);
@@ -437,6 +455,29 @@ async function fetchAndShowAgents() {
         }
     } catch (e) {
         console.error("Failed to load agents", e);
+    }
+}
+
+function updateNavigationForRole(role) {
+    // Hide everything first
+    navItems.forEach(btn => btn.style.display = 'none');
+    
+    // Always show Logout (it's separate, but let's be sure)
+    homeNavBtn.style.display = 'flex'; // Home is common for all
+    
+    if (role === 'CUSTOMER') {
+        browseNavBtn.style.display = 'flex';
+        ordersNavBtn.style.display = 'flex';
+        trackingNavBtn.style.display = 'flex';
+    } else if (role === 'MANAGER' || role === 'ADMIN') {
+        managerNavBtn.style.display = 'flex';
+        trackingNavBtn.style.display = 'flex';
+    } else if (role === 'RESTAURANT_OWNER') {
+        ownerNavBtn.style.display = 'flex';
+        ordersNavBtn.style.display = 'flex';
+    } else if (role === 'DELIVERY_AGENT') {
+        agentNavBtn.style.display = 'flex';
+        trackingNavBtn.style.display = 'flex';
     }
 }
 

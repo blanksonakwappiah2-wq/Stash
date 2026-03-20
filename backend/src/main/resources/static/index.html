@@ -111,9 +111,11 @@
                 <div class="sidebar-nav">
                     <button id="nav-menu-btn" class="nav-item active">🏠 Dashboard</button>
                     <button id="nav-browse-btn" class="nav-item">🍴 Browse Restaurants</button>
+                    <button id="nav-owner-btn" class="nav-item" style="display: none;">🏪 My Restaurant</button>
+                    <button id="nav-agent-btn" class="nav-item" style="display: none;">🚴 Active Tasks</button>
                     <button id="nav-manager-btn" class="nav-item" style="display: none;">⚙️ Manager Portal</button>
                     <button id="nav-orders-btn" class="nav-item">📋 My Orders</button>
-                    <button id="nav-tracking-btn" class="nav-item">🚴 Delivery Tracking</button>
+                    <button id="nav-tracking-btn" class="nav-item">📍 Delivery Tracking</button>
                 </div>
                 <div class="sidebar-footer">
                     <button id="sidebar-logout-btn" class="sidebar-logout">🚪 Logout</button>
@@ -248,7 +250,51 @@
                 <div id="orders-content" class="content-pane">
                     <div class="content-card full-width">
                         <h1 class="title-label" style="text-align: left; color: #1e1b4b;">My Orders</h1>
-                        <p class="label" style="color: #64748b;">You haven't placed any orders yet. Start exploring now!</p>
+                        <p id="orders-message" class="label" style="color: #64748b;">You haven't placed any orders yet. Start exploring now!</p>
+                        <div id="orders-list" class="restaurant-grid" style="margin-top: 20px;">
+                            <!-- Orders will be listed here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restaurant Owner Portal -->
+                <div id="owner-content" class="content-pane">
+                    <div class="content-card section-card">
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🏪 My Restaurant Dashboard</h1>
+                        <p class="label" style="margin-bottom: 20px; color: #64748b;">Manage your menu, view incoming orders, and track your performance.</p>
+                        
+                        <div class="quick-stats" style="margin-bottom: 30px;">
+                            <div class="stat-card">
+                                <span class="stat-value">0</span>
+                                <span class="stat-label">Today's Orders</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-value">$0.00</span>
+                                <span class="stat-label">Daily Revenue</span>
+                            </div>
+                        </div>
+
+                        <div class="content-card" style="background: #f8fafc; border: 1px dashed #cbd5e1; box-shadow: none;">
+                            <h3 class="label" style="font-weight: 700; color: #1e1b4b;">Manage Menu</h3>
+                            <p class="label" style="font-size: 0.9em; color: #64748b;">(Coming Soon: Add/Edit products for your restaurant)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Agent Portal -->
+                <div id="agent-content" class="content-pane">
+                    <div class="content-card section-card">
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🚴 My Delivery Tasks</h1>
+                        <p class="label" style="margin-bottom: 20px; color: #64748b;">View and manage your current deliveries and set your status.</p>
+                        
+                        <div id="assigned-orders-list" class="restaurant-grid">
+                            <p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>
+                        </div>
+
+                        <div class="button-group" style="margin-top: 30px;">
+                            <button class="login-button" style="background: #10b981; max-width: 200px;">I'm Online & Ready</button>
+                            <button class="register-button" style="max-width: 200px;">Go Offline</button>
+                        </div>
                     </div>
                 </div>
 
