@@ -33,14 +33,30 @@ public class UserService {
     }
 
     public User register(String name, String email, String password, String role) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new RuntimeException("Name is required");
+        }
+        if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new RuntimeException("Valid email is required");
+        }
+        if (password == null || password.length() < 8) {
+            throw new RuntimeException("Password must be at least 8 characters long");
+        }
         if (userRepository.findByEmail(email) != null) {
             throw new RuntimeException("Email already exists");
         }
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPassword(password); // In real app, hash password
-        user.setRole(User.UserRole.valueOf(role));
+        
+        try {
+            user.setRole(User.UserRole.valueOf(role.toUpperCase()));
+        } catch (Exception e) {
+            user.setRole(User.UserRole.CUSTOMER); // Default to CUSTOMER if role is invalid
+        }
+        
         return userRepository.save(user);
     }
 

@@ -69,13 +69,27 @@ document.getElementById('nav-orders-btn').addEventListener('click', () => switch
 document.getElementById('nav-tracking-btn').addEventListener('click', () => switchPane('tracking-content', 'nav-tracking-btn'));
 
 // Login/Register Links
-document.getElementById('go-to-register-btn').addEventListener('click', () => switchOuterLayout(registerScene));
-document.getElementById('back-to-login-btn').addEventListener('click', () => switchOuterLayout(loginScene));
+document.getElementById('go-to-register-btn').addEventListener('click', () => {
+    switchOuterLayout(registerScene);
+    document.getElementById('reg-message').style.display = 'none';
+});
+document.getElementById('back-to-login-btn').addEventListener('click', () => {
+    switchOuterLayout(loginScene);
+    document.getElementById('login-message').style.display = 'none';
+});
 
 const clearLoginInputs = () => {
     document.getElementById('login-email').value = '';
     document.getElementById('login-password').value = '';
     document.getElementById('login-message').style.display = 'none';
+};
+
+const clearRegisterInputs = () => {
+    document.getElementById('reg-name').value = '';
+    document.getElementById('reg-email').value = '';
+    document.getElementById('reg-password').value = '';
+    document.getElementById('reg-confirm-password').value = '';
+    document.getElementById('reg-message').style.display = 'none';
 };
 
 // Logout
@@ -133,6 +147,7 @@ async function fetchAndShowRestaurants() {
 
 function showMessage(elementId, text, isSuccess) {
     const el = document.getElementById(elementId);
+    if (!el) return;
     el.textContent = text;
     el.style.display = 'block';
     
@@ -152,8 +167,8 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
 
-    if (!EMAIL_PATTERN.test(email) || !PASSWORD_PATTERN.test(password)) {
-        showMessage('login-message', "Invalid email or password format.", false);
+    if (!email || !password) {
+        showMessage('login-message', "Both email and password are required.", false);
         return;
     }
 
@@ -167,7 +182,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
         if (response.ok) {
             const user = await response.json();
             currentUser = user;
-            showMessage('login-message', "Login successful!", true);
+            showMessage('login-message', "Login successful! Welcome back.", true);
             
             // Role-based sidebar items
             managerNavBtn.style.display = (user.role === 'MANAGER' || user.role === 'ADMIN') ? 'flex' : 'none';
@@ -175,9 +190,12 @@ document.getElementById('login-btn').addEventListener('click', async () => {
             setTimeout(() => {
                 switchOuterLayout(mainLayout);
                 switchPane('home-content', 'nav-menu-btn');
+                const welcomeTitle = document.querySelector('.welcome-title');
+                if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${user.name}!`;
             }, 600);
         } else {
-            showMessage('login-message', "Invalid credentials or server error.", false);
+            const error = await response.json();
+            showMessage('login-message', error.message || "Invalid credentials. Please try again.", false);
         }
     } catch (e) {
         showMessage('login-message', "Network error. Make sure backend is running.", false);
@@ -192,8 +210,23 @@ document.getElementById('register-btn').addEventListener('click', async () => {
     const confirm = document.getElementById('reg-confirm-password').value;
     const role = document.getElementById('reg-role').value;
 
-    if (!name || !EMAIL_PATTERN.test(email) || !PASSWORD_PATTERN.test(password) || password !== confirm) {
-        showMessage('reg-message', "Invalid entry: Check all fields and password match.", false);
+    if (!name || !email || !password || !confirm) {
+        showMessage('reg-message', "Please fill in all fields.", false);
+        return;
+    }
+
+    if (password !== confirm) {
+        showMessage('reg-message', "Passwords do not match.", false);
+        return;
+    }
+
+    if (!EMAIL_PATTERN.test(email)) {
+        showMessage('reg-message', "Invalid email format.", false);
+        return;
+    }
+
+    if (password.length < 8) {
+        showMessage('reg-message', "Password must be at least 8 characters.", false);
         return;
     }
 
@@ -205,10 +238,14 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         });
 
         if (response.ok) {
-            showMessage('reg-message', "Registration successful! Redirecting...", true);
-            setTimeout(() => switchOuterLayout(loginScene), 1500);
+            showMessage('reg-message', "Registration successful! Redirecting to login...", true);
+            setTimeout(() => {
+                clearRegisterInputs();
+                switchOuterLayout(loginScene);
+            }, 1500);
         } else {
-            showMessage('reg-message', "Registration failed. Email may already exist.", false);
+            const error = await response.json();
+            showMessage('reg-message', error.message || "Registration failed. Email may already exist.", false);
         }
     } catch (e) {
         showMessage('reg-message', "Network error. Make sure backend is running.", false);
