@@ -363,16 +363,20 @@ button:hover {
 
     .sidebar {
         position: fixed;
-        left: -280px; /* Hidden by default */
+        left: 0;
         top: 0;
         bottom: 0;
+        width: 280px;
         z-index: 3000;
-        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(-100%); /* Hidden by default */
+        visibility: hidden;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
         box-shadow: 15px 0 40px rgba(0,0,0,0.3);
     }
 
     .sidebar.mobile-active {
-        left: 0;
+        transform: translateX(0);
+        visibility: visible;
     }
 
     /* Mobile Header/Toggle */
@@ -397,11 +401,13 @@ button:hover {
         padding: 8px 12px;
         border-radius: 8px;
         font-size: 20px;
+        cursor: pointer;
     }
 
     .content-area {
         padding: 15px;
         padding-top: 10px;
+        height: calc(100vh - 60px); /* Adjust for mobile nav height */
     }
 
     /* Grids & Forms */
@@ -439,8 +445,6 @@ button:hover {
     .sidebar-overlay.active {
         display: block;
     }
-
-    /* Hide Desktop-only elements if any */
 }
 
 /* Responsive Overrides for Utility Classes */
