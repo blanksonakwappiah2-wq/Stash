@@ -321,6 +321,9 @@ button:hover {
     text-transform: uppercase;
 }
 
+/* Utility Classes */
+.mobile-nav-bar { display: none; }
+
 /* --- Responsive Design Media Queries --- */
 
 /* Tablet View (up to 1024px) */
@@ -441,4 +444,3 @@ button:hover {
 }
 
 /* Responsive Overrides for Utility Classes */
-.mobile-nav-bar { display: none; }
