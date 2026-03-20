@@ -38,6 +38,7 @@ public class RestaurantController {
         restaurant.setAddress(address);
         restaurant.setContact(contact);
         restaurant.setWebsite(website);
+        restaurant.setCategory((String) payload.getOrDefault("category", "General"));
 
         // Handle Owner Creation if provided
         if (payload.containsKey("ownerName") && payload.containsKey("ownerEmail")) {

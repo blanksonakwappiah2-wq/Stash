@@ -35,7 +35,8 @@ function switchPane(paneId, navBtnId) {
     // Hide all panes
     document.querySelectorAll('.content-pane').forEach(p => p.classList.remove('active'));
     // Show target pane
-    document.getElementById(paneId).classList.add('active');
+    const targetPane = document.getElementById(paneId);
+    if (targetPane) targetPane.classList.add('active');
     
     // Update nav item active state
     navItems.forEach(item => item.classList.remove('active'));
@@ -48,16 +49,14 @@ function switchPane(paneId, navBtnId) {
         fetchAndShowRestaurants();
     }
 
+    // Special logic for manager pane
+    if (paneId === 'manager-content') {
+        fetchAndShowAgents();
+    }
+
     // Special logic for tracking pane
     if (paneId === 'tracking-content') {
-        const agentSection = document.getElementById('agent-management-section');
         initMap();
-        if (currentUser && currentUser.role === 'MANAGER') {
-            agentSection.style.display = 'block';
-            fetchAndShowAgents();
-        } else {
-            agentSection.style.display = 'none';
-        }
     }
 }
 
@@ -123,7 +122,7 @@ async function fetchAndShowRestaurants() {
         listContainer.innerHTML = '';
         
         if (restaurants.length === 0) {
-            listContainer.innerHTML = '<p class="label" style="text-align:center; grid-column: 1/-1;">No restaurants available yet.</p>';
+            listContainer.innerHTML = '<p class="label" style="text-align:center; grid-column: 1/-1; color: #64748b;">No restaurants available yet.</p>';
         } else {
             restaurants.forEach(rest => {
                 const card = document.createElement('div');
@@ -141,7 +140,7 @@ async function fetchAndShowRestaurants() {
             });
         }
     } catch (e) {
-        showAlert("Failed to load restaurants.");
+        console.error("Failed to load restaurants", e);
     }
 }
 
@@ -245,7 +244,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
             }, 1500);
         } else {
             const error = await response.json();
-            showMessage('reg-message', error.message || "Registration failed. Email may already exist.", false);
+            showMessage('reg-message', error.message || "Registration failed.", false);
         }
     } catch (e) {
         showMessage('reg-message', "Network error. Make sure backend is running.", false);
@@ -255,6 +254,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
 // Manager Action: Add Restaurant
 document.getElementById('add-rest-btn').addEventListener('click', async () => {
     const name = document.getElementById('rest-name').value.trim();
+    const category = document.getElementById('rest-category').value.trim();
     const address = document.getElementById('rest-address').value.trim();
     const contact = document.getElementById('rest-contact').value.trim();
     const website = document.getElementById('rest-website').value.trim();
@@ -272,14 +272,15 @@ document.getElementById('add-rest-btn').addEventListener('click', async () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                name, address, contact, website, 
+                name, category, address, contact, website, 
                 ownerName, ownerEmail, ownerPassword 
             })
         });
 
         if (response.ok) {
-            showMessage('manager-message', "Restaurant and Owner account created!", true);
+            showMessage('manager-message', "Restaurant and Owner account created successfully!", true);
             document.getElementById('rest-name').value = '';
+            document.getElementById('rest-category').value = '';
             document.getElementById('rest-address').value = '';
             document.getElementById('rest-contact').value = '';
             document.getElementById('rest-website').value = '';
@@ -287,7 +288,8 @@ document.getElementById('add-rest-btn').addEventListener('click', async () => {
             document.getElementById('owner-email').value = '';
             document.getElementById('owner-password').value = '';
         } else {
-            showMessage('manager-message', "Failed to add restaurant.", false);
+            const error = await response.json();
+            showMessage('manager-message', error.message || "Failed to add restaurant.", false);
         }
     } catch (e) {
         showMessage('manager-message', "Error connecting to server.", false);
@@ -313,13 +315,14 @@ document.getElementById('add-agent-btn').addEventListener('click', async () => {
         });
 
         if (response.ok) {
-            showMessage('agent-message', "Delivery agent registered!", true);
+            showMessage('agent-message', "Delivery agent registered successfully!", true);
             document.getElementById('agent-name').value = '';
             document.getElementById('agent-email').value = '';
             document.getElementById('agent-password').value = '';
             fetchAndShowAgents();
         } else {
-            showMessage('agent-message', "Failed to register agent.", false);
+            const error = await response.json();
+            showMessage('agent-message', error.message || "Failed to register agent.", false);
         }
     } catch (e) {
         showMessage('agent-message', "Error connecting to server.", false);
@@ -331,10 +334,11 @@ async function fetchAndShowAgents() {
         const response = await fetch(DELIVERY_URL + 'agents');
         const agents = await response.json();
         const list = document.getElementById('agent-list');
+        if (!list) return;
         list.innerHTML = '';
 
         if (agents.length === 0) {
-            list.innerHTML = '<p class="label">No agents registered yet.</p>';
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; color: #64748b;">No agents registered yet.</p>';
         } else {
             agents.forEach(agent => {
                 const card = document.createElement('div');

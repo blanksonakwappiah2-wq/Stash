@@ -31,7 +31,7 @@ public class DeliveryController {
     public ResponseEntity<?> addAgent(@RequestBody User agent) {
         agent.setRole(User.UserRole.DELIVERY_AGENT);
         if (userRepository.findByEmail(agent.getEmail()) != null) {
-            return ResponseEntity.badRequest().body("Agent with this email already exists.");
+            return ResponseEntity.badRequest().body(Map.of("message", "Agent with this email already exists."));
         }
         return ResponseEntity.ok(userRepository.save(agent));
     }
