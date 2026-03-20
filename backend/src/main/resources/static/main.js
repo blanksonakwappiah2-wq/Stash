@@ -26,7 +26,32 @@ const ordersNavBtn = document.getElementById('nav-orders-btn');
 const trackingNavBtn = document.getElementById('nav-tracking-btn');
 const homeNavBtn = document.getElementById('nav-menu-btn');
 
-let currentUser = null;
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let authToken = localStorage.getItem('authToken') || null;
+
+// Secure Fetch Wrapper
+async function secureFetch(url, options = {}) {
+    const headers = options.headers || {};
+    if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...headers
+        }
+    });
+
+    if (response.status === 401) {
+        // Token expired or invalid
+        logout();
+        return null;
+    }
+    
+    return response;
+}
 
 // Switch between Top-Level Outer Containers
 function switchOuterLayout(layout) {
@@ -126,11 +151,16 @@ const clearRegisterInputs = () => {
 };
 
 // Logout
-document.getElementById('sidebar-logout-btn').addEventListener('click', () => {
+function logout() {
     currentUser = null;
+    authToken = null;
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
     clearLoginInputs();
     switchOuterLayout(loginScene);
-});
+}
+
+document.getElementById('sidebar-logout-btn').addEventListener('click', logout);
 
 // Show password toggles
 document.getElementById('login-show-password').addEventListener('change', (e) => {
@@ -150,6 +180,7 @@ function showAlert(message) {
 async function fetchAndShowRestaurants() {
     try {
         const response = await fetch(RESTAURANT_URL);
+        if (!response) return;
         const restaurants = await response.json();
         
         const listContainer = document.getElementById('restaurants-list');
@@ -213,28 +244,38 @@ document.getElementById('login-btn').addEventListener('click', async () => {
         });
         
         if (response.ok) {
-            const user = await response.json();
-            currentUser = user;
+            const data = await response.json();
+            currentUser = {
+                id: data.id,
+                name: data.name,
+                email: data.email,
+                role: data.role
+            };
+            authToken = data.token;
+            
+            // Save to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('authToken', authToken);
+
             showMessage('login-message', "Login successful! Welcome back.", true);
             
-            // Role-based sidebar items
-            updateNavigationForRole(user.role);
+            updateNavigationForRole(currentUser.role);
             
             setTimeout(() => {
                 switchOuterLayout(mainLayout);
                 // Redirect to role-specific default pane
-                if (user.role === 'MANAGER' || user.role === 'ADMIN') {
+                if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
                     switchPane('manager-content', 'nav-manager-btn');
-                } else if (user.role === 'RESTAURANT_OWNER') {
+                } else if (currentUser.role === 'RESTAURANT_OWNER') {
                     switchPane('owner-content', 'nav-owner-btn');
-                } else if (user.role === 'DELIVERY_AGENT') {
+                } else if (currentUser.role === 'DELIVERY_AGENT') {
                     switchPane('agent-content', 'nav-agent-btn');
                 } else {
                     switchPane('home-content', 'nav-menu-btn');
                 }
                 
                 const welcomeTitle = document.querySelector('.welcome-title');
-                if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${user.name}!`;
+                if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
             }, 600);
         } else {
             const error = await response.json();
@@ -281,11 +322,40 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         });
 
         if (response.ok) {
-            showMessage('reg-message', "Registration successful! Redirecting to login...", true);
+            const data = await response.json();
+            currentUser = {
+                id: data.id,
+                name: data.name,
+                email: data.email,
+                role: data.role
+            };
+            authToken = data.token;
+            
+            // Save to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('authToken', authToken);
+
+            showMessage('reg-message', "Registration successful! Welcome to QuickBite.", true);
+            
+            updateNavigationForRole(currentUser.role);
+            
             setTimeout(() => {
+                switchOuterLayout(mainLayout);
+                // Redirect to role-specific default pane
+                if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
+                    switchPane('manager-content', 'nav-manager-btn');
+                } else if (currentUser.role === 'RESTAURANT_OWNER') {
+                    switchPane('owner-content', 'nav-owner-btn');
+                } else if (currentUser.role === 'DELIVERY_AGENT') {
+                    switchPane('agent-content', 'nav-agent-btn');
+                } else {
+                    switchPane('home-content', 'nav-menu-btn');
+                }
+                
+                const welcomeTitle = document.querySelector('.welcome-title');
+                if (welcomeTitle) welcomeTitle.textContent = `Welcome, ${currentUser.name}!`;
                 clearRegisterInputs();
-                switchOuterLayout(loginScene);
-            }, 1500);
+            }, 1000);
         } else {
             const error = await response.json();
             showMessage('reg-message', error.message || "Registration failed.", false);
@@ -312,16 +382,15 @@ document.getElementById('add-rest-btn').addEventListener('click', async () => {
     }
 
     try {
-        const response = await fetch(RESTAURANT_URL, {
+        const response = await secureFetch(RESTAURANT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 name, category, address, contact, website, 
                 ownerName, ownerEmail, ownerPassword 
             })
         });
 
-        if (response.ok) {
+        if (response && response.ok) {
             showMessage('manager-message', "Restaurant and Owner account created successfully!", true);
             document.getElementById('rest-name').value = '';
             document.getElementById('rest-category').value = '';
@@ -352,13 +421,12 @@ document.getElementById('add-agent-btn').addEventListener('click', async () => {
     }
 
     try {
-        const response = await fetch(DELIVERY_URL + 'agents', {
+        const response = await secureFetch(DELIVERY_URL + 'agents', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })
         });
 
-        if (response.ok) {
+        if (response && response.ok) {
             showMessage('agent-message', "Delivery agent registered successfully!", true);
             document.getElementById('agent-name').value = '';
             document.getElementById('agent-email').value = '';
@@ -404,16 +472,17 @@ document.getElementById('update-manager-btn').addEventListener('click', async ()
     }
 
     try {
-        const response = await fetch(`/api/users/${currentUser.id}`, {
+        const response = await secureFetch(`/api/users/${currentUser.id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
+        if (response && response.ok) {
             const updatedUser = await response.json();
-            currentUser = updatedUser;
-            showMessage('mgr-update-message', "Account updated successfully! Use new credentials next time.", true);
+            currentUser = { ...currentUser, ...updatedUser };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            showMessage('mgr-update-message', "Account updated successfully!", true);
             document.getElementById('mgr-update-name').value = '';
             document.getElementById('mgr-update-email').value = '';
             document.getElementById('mgr-update-password').value = '';
@@ -431,7 +500,8 @@ document.getElementById('update-manager-btn').addEventListener('click', async ()
 
 async function fetchAndShowAgents() {
     try {
-        const response = await fetch(DELIVERY_URL + 'agents');
+        const response = await secureFetch(DELIVERY_URL + 'agents');
+        if (!response || !response.ok) return;
         const agents = await response.json();
         const list = document.getElementById('agent-list');
         if (!list) return;
@@ -494,3 +564,17 @@ function initMap() {
         `;
     }
 }
+// Session Initialization
+function initSession() {
+    if (authToken && currentUser) {
+        updateNavigationForRole(currentUser.role);
+        switchOuterLayout(mainLayout);
+        const welcomeTitle = document.querySelector('.welcome-title');
+        if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
+    } else {
+        switchOuterLayout(loginScene);
+    }
+}
+
+// Initial Call
+initSession();

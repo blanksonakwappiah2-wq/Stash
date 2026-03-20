@@ -3,6 +3,7 @@ package com.quickbite.backend.services;
 import com.quickbite.backend.entities.User;
 import com.quickbite.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,9 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -28,8 +32,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User login(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password);
+    public boolean validatePassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
     public User register(String name, String email, String password, String role) {
@@ -50,30 +54,32 @@ public class UserService {
         try {
             targetRole = User.UserRole.valueOf(role.toUpperCase());
         } catch (Exception e) {
-            targetRole = User.UserRole.CUSTOMER; 
+            targetRole = User.UserRole.CUSTOMER;
         }
 
         // Restrict Manager Role to a single account
         if (targetRole == User.UserRole.MANAGER) {
             List<User> existingManagers = userRepository.findByRole(User.UserRole.MANAGER);
             if (!existingManagers.isEmpty()) {
-                throw new RuntimeException("A Manager already exists. To update credentials, please use the Manager Portal.");
+                throw new RuntimeException(
+                        "A Manager already exists. To update credentials, please use the Manager Portal.");
             }
         }
 
         User user = new User();
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(password); // In real app, hash password
+        user.setPassword(passwordEncoder.encode(password));
         user.setRole(targetRole);
-        
+
         return userRepository.save(user);
     }
 
     public User updateUser(Long id, String name, String email, String password) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        
-        if (name != null && !name.trim().isEmpty()) user.setName(name);
+
+        if (name != null && !name.trim().isEmpty())
+            user.setName(name);
         if (email != null && email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
             User existing = userRepository.findByEmail(email);
             if (existing != null && !existing.getId().equals(id)) {
@@ -82,9 +88,9 @@ public class UserService {
             user.setEmail(email);
         }
         if (password != null && password.length() >= 8) {
-            user.setPassword(password);
+            user.setPassword(passwordEncoder.encode(password));
         }
-        
+
         return userRepository.save(user);
     }
 

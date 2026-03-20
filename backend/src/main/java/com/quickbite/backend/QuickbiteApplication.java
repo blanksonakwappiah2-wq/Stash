@@ -13,6 +13,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 @EnableCaching
@@ -21,9 +23,9 @@ public class QuickbiteApplication {
         String dbUrl = System.getenv("DATABASE_URL");
         if (dbUrl != null && dbUrl.startsWith("postgres://")) {
             String cleanUrl = dbUrl.substring(11);
-            String[] userPassAndHostPortDb = cleanUrl.split("@");
-            String[] userPass = userPassAndHostPortDb[0].split(":");
-            String hostPortDb = userPassAndHostPortDb[1];
+            String[] userPassAndHostAndDb = cleanUrl.split("@");
+            String[] userPass = userPassAndHostAndDb[0].split(":");
+            String hostPortDb = userPassAndHostAndDb[1];
 
             System.setProperty("spring.datasource.url", "jdbc:postgresql://" + hostPortDb);
             System.setProperty("spring.datasource.username", userPass[0]);
@@ -31,8 +33,9 @@ public class QuickbiteApplication {
                 System.setProperty("spring.datasource.password", userPass[1]);
             }
             System.setProperty("spring.datasource.driver-class-name", "org.postgresql.Driver");
-            
-            // Also override the old DB_HOST variables in case the user has manual overrides causing issues
+
+            // Also override the old DB_HOST variables in case the user has manual overrides
+            // causing issues
             System.clearProperty("DB_HOST");
         }
 
@@ -40,16 +43,18 @@ public class QuickbiteApplication {
     }
 
     @Bean
-    CommandLineRunner initDatabase(DeliveryOptionRepository deliveryOptionRepository, 
-                                 UserRepository userRepository,
-                                 RestaurantRepository restaurantRepository,
-                                 MenuItemRepository menuItemRepository) {
+    CommandLineRunner initDatabase(DeliveryOptionRepository deliveryOptionRepository,
+            UserRepository userRepository,
+            RestaurantRepository restaurantRepository,
+            MenuItemRepository menuItemRepository) {
         return args -> {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
             if (userRepository.findByEmail("manager@quickbite.com") == null) {
                 User manager = new User();
                 manager.setName("Admin Manager");
                 manager.setEmail("manager@quickbite.com");
-                manager.setPassword("Manager123");
+                manager.setPassword(passwordEncoder.encode("Manager123"));
                 manager.setRole(User.UserRole.MANAGER);
                 userRepository.save(manager);
             }
@@ -58,7 +63,7 @@ public class QuickbiteApplication {
                 User customer = new User();
                 customer.setName("Test Customer");
                 customer.setEmail("customer@quickbite.com");
-                customer.setPassword("Customer123");
+                customer.setPassword(passwordEncoder.encode("Customer123"));
                 customer.setRole(User.UserRole.CUSTOMER);
                 userRepository.save(customer);
             }
@@ -67,7 +72,7 @@ public class QuickbiteApplication {
                 User owner = new User();
                 owner.setName("Restaurant Owner");
                 owner.setEmail("owner@quickbite.com");
-                owner.setPassword("Owner123");
+                owner.setPassword(passwordEncoder.encode("Owner123"));
                 owner.setRole(User.UserRole.RESTAURANT_OWNER);
                 userRepository.save(owner);
             }
@@ -76,14 +81,14 @@ public class QuickbiteApplication {
                 User agent = new User();
                 agent.setName("Delivery Agent");
                 agent.setEmail("agent@quickbite.com");
-                agent.setPassword("Agent123");
+                agent.setPassword(passwordEncoder.encode("Agent123"));
                 agent.setRole(User.UserRole.DELIVERY_AGENT);
                 userRepository.save(agent);
             }
 
             if (restaurantRepository.count() == 0) {
                 User owner = userRepository.findByEmail("owner@quickbite.com");
-                
+
                 Restaurant pizza = new Restaurant();
                 pizza.setName("Pepperoni Palace");
                 pizza.setCategory("Pizza");
