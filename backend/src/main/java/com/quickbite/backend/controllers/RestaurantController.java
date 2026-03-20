@@ -1,18 +1,23 @@
 package com.quickbite.backend.controllers;
 
+import com.quickbite.backend.dto.RestaurantDTO;
+import com.quickbite.backend.dto.RestaurantRequest;
 import com.quickbite.backend.entities.Restaurant;
 import com.quickbite.backend.entities.User;
+import com.quickbite.backend.exception.ResourceNotFoundException;
 import com.quickbite.backend.services.RestaurantService;
 import com.quickbite.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/restaurants")
-@CrossOrigin(origins = "*")
 public class RestaurantController {
 
     @Autowired
@@ -22,42 +27,103 @@ public class RestaurantController {
     private UserService userService;
 
     @GetMapping
-    public List<Restaurant> getAllRestaurants() {
-        return restaurantService.getAllRestaurants();
+    public List<RestaurantDTO> getAllRestaurants() {
+        return restaurantService.getAllRestaurants().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getRestaurantById(@PathVariable Long id) {
+        try {
+            Restaurant restaurant = restaurantService.getRestaurantById(id);
+            return ResponseEntity.ok(convertToDTO(restaurant));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public Restaurant createRestaurant(@RequestBody Map<String, Object> payload) {
-        String name = (String) payload.get("name");
-        String address = (String) payload.get("address");
-        String contact = (String) payload.get("contact");
-        String website = (String) payload.get("website");
-        
-        Restaurant restaurant = new Restaurant();
-        restaurant.setName(name);
-        restaurant.setAddress(address);
-        restaurant.setContact(contact);
-        restaurant.setWebsite(website);
-        restaurant.setCategory((String) payload.getOrDefault("category", "General"));
+    @PreAuthorize("hasAnyRole('MANAGER')")
+    public ResponseEntity<?> createRestaurant(@RequestBody RestaurantRequest request) {
+        try {
+            Restaurant restaurant = new Restaurant();
+            restaurant.setName(request.getName());
+            restaurant.setAddress(request.getAddress());
+            restaurant.setContact(request.getContact());
+            restaurant.setWebsite(request.getWebsite());
+            restaurant.setCategory(request.getCategory() != null ? request.getCategory() : "General");
 
-        // Handle Owner Creation if provided
-        if (payload.containsKey("ownerName") && payload.containsKey("ownerEmail")) {
-            String ownerName = (String) payload.get("ownerName");
-            String ownerEmail = (String) payload.get("ownerEmail");
-            String ownerPassword = (String) payload.get("ownerPassword");
-            
-            User owner = userService.register(ownerName, ownerEmail, ownerPassword, "RESTAURANT_OWNER");
-            restaurant.setOwner(owner);
-        } else if (payload.containsKey("owner")) {
-            // Handle existing owner ID if passed as object
-            Map<String, Object> ownerData = (Map<String, Object>) payload.get("owner");
-            if (ownerData.containsKey("id")) {
-                Long ownerId = ((Number) ownerData.get("id")).longValue();
-                User existingOwner = userService.getUserById(ownerId).orElse(null);
+            // Handle Owner
+            if (request.getOwnerId() != null) {
+                User existingOwner = userService.getUserById(request.getOwnerId())
+                        .orElseThrow(() -> new ResourceNotFoundException("User", request.getOwnerId()));
                 restaurant.setOwner(existingOwner);
             }
-        }
 
-        return restaurantService.createRestaurant(restaurant);
+            Restaurant created = restaurantService.createRestaurant(restaurant);
+            return ResponseEntity.ok(convertToDTO(created));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MANAGER', 'RESTAURANT_OWNER')")
+    public ResponseEntity<?> updateRestaurant(@PathVariable Long id, @RequestBody RestaurantRequest request) {
+        try {
+            Restaurant existing = restaurantService.getRestaurantById(id);
+
+            if (request.getName() != null) {
+                existing.setName(request.getName());
+            }
+            if (request.getAddress() != null) {
+                existing.setAddress(request.getAddress());
+            }
+            if (request.getContact() != null) {
+                existing.setContact(request.getContact());
+            }
+            if (request.getWebsite() != null) {
+                existing.setWebsite(request.getWebsite());
+            }
+            if (request.getCategory() != null) {
+                existing.setCategory(request.getCategory());
+            }
+
+            Restaurant updated = restaurantService.updateRestaurant(existing);
+            return ResponseEntity.ok(convertToDTO(updated));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MANAGER')")
+    public ResponseEntity<?> deleteRestaurant(@PathVariable Long id) {
+        try {
+            restaurantService.deleteRestaurant(id);
+            return ResponseEntity.ok(Map.of("message", "Restaurant deleted successfully"));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private RestaurantDTO convertToDTO(Restaurant restaurant) {
+        RestaurantDTO dto = new RestaurantDTO();
+        dto.setId(restaurant.getId());
+        dto.setName(restaurant.getName());
+        dto.setAddress(restaurant.getAddress());
+        dto.setContact(restaurant.getContact());
+        dto.setCategory(restaurant.getCategory());
+        dto.setWebsite(restaurant.getWebsite());
+        if (restaurant.getOwner() != null) {
+            dto.setOwnerId(restaurant.getOwner().getId());
+            dto.setOwnerName(restaurant.getOwner().getName());
+        }
+        return dto;
     }
 }
