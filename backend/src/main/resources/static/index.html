@@ -93,6 +93,16 @@
 
         <!-- Main App Layout (Hidden by default, shown after login) -->
         <div id="main-layout" class="layout-container">
+            <!-- Mobile Navigation Bar (Only for small screens) -->
+            <div class="mobile-nav-bar">
+                <button id="mobile-menu-btn" class="menu-toggle-btn">☰</button>
+                <div class="sidebar-brand" style="margin-bottom: 0; font-size: 20px;">QuickBite</div>
+                <div style="width: 42px;"></div> <!-- Spacer for symmetry -->
+            </div>
+
+            <!-- Sidebar Overlay Backdrop -->
+            <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
             <!-- Persistent Sidebar -->
             <nav id="sidebar" class="sidebar">
                 <div class="sidebar-header">
@@ -255,10 +265,10 @@
                             </div>
                         </div>
                     </div>
-                </div>    </div>
                 </div>
             </main>
         </div>
+    </div>
     
     <script type="module" src="main.js"></script>
 </body>

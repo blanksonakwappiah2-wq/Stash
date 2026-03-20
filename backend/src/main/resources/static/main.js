@@ -30,6 +30,29 @@ function switchOuterLayout(layout) {
     layout.classList.add('active');
 }
 
+// Sidebar Mobile Toggle Logic
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+function toggleMobileSidebar(show) {
+    if (show) {
+        sidebar.classList.add('mobile-active');
+        sidebarOverlay.classList.add('active');
+    } else {
+        sidebar.classList.remove('mobile-active');
+        sidebarOverlay.classList.remove('active');
+    }
+}
+
+if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => toggleMobileSidebar(true));
+}
+
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => toggleMobileSidebar(false));
+}
+
 // Switch between Inner Dashboard Panes
 function switchPane(paneId, navBtnId) {
     // Hide all panes
@@ -43,6 +66,9 @@ function switchPane(paneId, navBtnId) {
     if (navBtnId) {
         document.getElementById(navBtnId).classList.add('active');
     }
+
+    // Mobile: Close sidebar after selection
+    toggleMobileSidebar(false);
 
     // Special logic for restaurants pane
     if (paneId === 'restaurants-content') {
