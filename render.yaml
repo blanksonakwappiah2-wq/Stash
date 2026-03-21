@@ -7,10 +7,26 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: DATABASE_URL
+      - key: DB_HOST
         fromDatabase:
           name: quickbite-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: quickbite-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: quickbite-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: quickbite-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: quickbite-db
+          property: password
       - key: GOOGLE_MAPS_API_KEY
         sync: false
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
