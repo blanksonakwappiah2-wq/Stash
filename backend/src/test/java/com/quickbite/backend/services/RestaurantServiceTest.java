@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -94,7 +94,7 @@ class RestaurantServiceTest {
 
     @Test
     void testDeleteRestaurant() {
-        when(restaurantRepository.findById(1L)).thenReturn(Optional.of(testRestaurant));
+        when(restaurantRepository.findById(1L)).thenReturn(java.util.Optional.of(testRestaurant));
         doNothing().when(restaurantRepository).delete(testRestaurant);
 
         restaurantService.deleteRestaurant(1L);
@@ -104,7 +104,7 @@ class RestaurantServiceTest {
 
     @Test
     void testDeleteRestaurant_NotFound() {
-        when(restaurantRepository.findById(1L)).thenReturn(Optional.empty());
+        when(restaurantRepository.findById(1L)).thenReturn(java.util.Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
             restaurantService.deleteRestaurant(1L);
