@@ -54,18 +54,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Updated Byte Buddy for Java 25 support -->
+        <!-- Byte Buddy required by Hibernate at runtime for bytecode enhancement -->
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
             <version>1.17.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy-agent</artifactId>
             <version>1.17.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
