@@ -23,9 +23,8 @@ public class RestaurantService {
         return restaurantRepository.save(restaurant);
     }
 
-    public Restaurant getRestaurantById(Long id) {
-        return restaurantRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", id));
+    public Optional<Restaurant> getRestaurantById(Long id) {
+        return restaurantRepository.findById(id);
     }
 
     public Restaurant updateRestaurant(Restaurant restaurant) {

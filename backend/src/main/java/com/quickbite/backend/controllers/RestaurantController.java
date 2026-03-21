@@ -35,12 +35,9 @@ public class RestaurantController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getRestaurantById(@PathVariable Long id) {
-        try {
-            Restaurant restaurant = restaurantService.getRestaurantById(id);
-            return ResponseEntity.ok(convertToDTO(restaurant));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return restaurantService.getRestaurantById(id)
+                .<ResponseEntity<?>>map(restaurant -> ResponseEntity.ok(convertToDTO(restaurant)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -73,7 +70,8 @@ public class RestaurantController {
     @PreAuthorize("hasAnyRole('MANAGER', 'RESTAURANT_OWNER')")
     public ResponseEntity<?> updateRestaurant(@PathVariable Long id, @RequestBody RestaurantRequest request) {
         try {
-            Restaurant existing = restaurantService.getRestaurantById(id);
+            Restaurant existing = restaurantService.getRestaurantById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Restaurant", id));
 
             if (request.getName() != null) {
                 existing.setName(request.getName());
