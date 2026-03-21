@@ -1,6 +1,7 @@
 package com.quickbite.backend.services;
 
 import com.quickbite.backend.entities.User;
+import com.quickbite.backend.entities.UserRole;
 import com.quickbite.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,11 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // Setter for testing
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -30,6 +36,14 @@ public class UserService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            return user;
+        }
+        return null;
     }
 
     public boolean validatePassword(String rawPassword, String encodedPassword) {
@@ -50,16 +64,16 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
-        User.UserRole targetRole;
+        UserRole targetRole;
         try {
-            targetRole = User.UserRole.valueOf(role.toUpperCase());
+            targetRole = UserRole.valueOf(role.toUpperCase());
         } catch (Exception e) {
-            targetRole = User.UserRole.CUSTOMER;
+            targetRole = UserRole.CUSTOMER;
         }
 
         // Restrict Manager Role to a single account
-        if (targetRole == User.UserRole.MANAGER) {
-            List<User> existingManagers = userRepository.findByRole(User.UserRole.MANAGER);
+        if (targetRole == UserRole.MANAGER) {
+            List<User> existingManagers = userRepository.findByRole(UserRole.MANAGER);
             if (!existingManagers.isEmpty()) {
                 throw new RuntimeException(
                         "A Manager already exists. To update credentials, please use the Manager Portal.");

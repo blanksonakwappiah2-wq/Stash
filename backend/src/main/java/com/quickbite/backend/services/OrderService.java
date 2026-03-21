@@ -10,8 +10,11 @@ import com.quickbite.backend.entities.Order;
 import com.quickbite.backend.entities.OrderItem;
 import com.quickbite.backend.entities.OrderStatus;
 import com.quickbite.backend.entities.User;
+import com.quickbite.backend.repositories.DeliveryOptionRepository;
+import com.quickbite.backend.repositories.MenuItemRepository;
 import com.quickbite.backend.repositories.OrderItemRepository;
 import com.quickbite.backend.repositories.OrderRepository;
+import com.quickbite.backend.repositories.RestaurantRepository;
 
 @Service
 public class OrderService {
@@ -22,6 +25,26 @@ public class OrderService {
     @Autowired
     private DistanceService distanceService;
 
+    // Expose repositories for controller use
+    @Autowired
+    private DeliveryOptionRepository deliveryOptionRepository;
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+    @Autowired
+    private MenuItemRepository menuItemRepository;
+
+    public DeliveryOptionRepository getDeliveryOptionRepository() {
+        return deliveryOptionRepository;
+    }
+
+    public RestaurantRepository getRestaurantRepository() {
+        return restaurantRepository;
+    }
+
+    public MenuItemRepository getMenuItemRepository() {
+        return menuItemRepository;
+    }
+
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
@@ -31,9 +54,12 @@ public class OrderService {
     }
 
     public Order placeOrder(Order order) {
+        // Calculate total from items
         double total = 0;
-        for (OrderItem item : order.getItems()) {
-            total += item.getMenuItem().getPrice() * item.getQuantity();
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                total += item.getMenuItem().getPrice() * item.getQuantity();
+            }
         }
         order.setTotalAmount(total);
 

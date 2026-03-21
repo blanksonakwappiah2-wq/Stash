@@ -2,6 +2,7 @@ package com.quickbite.backend.controllers;
 
 import com.quickbite.backend.entities.Order;
 import com.quickbite.backend.entities.User;
+import com.quickbite.backend.entities.UserRole;
 import com.quickbite.backend.repositories.OrderRepository;
 import com.quickbite.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/delivery")
-@CrossOrigin(origins = "*")
 public class DeliveryController {
 
     @Autowired
@@ -24,12 +24,12 @@ public class DeliveryController {
 
     @GetMapping("/agents")
     public List<User> getAgents() {
-        return userRepository.findByRole(User.UserRole.DELIVERY_AGENT);
+        return userRepository.findByRole(UserRole.DELIVERY_AGENT);
     }
 
     @PostMapping("/agents")
     public ResponseEntity<?> addAgent(@RequestBody User agent) {
-        agent.setRole(User.UserRole.DELIVERY_AGENT);
+        agent.setRole(UserRole.DELIVERY_AGENT);
         if (userRepository.findByEmail(agent.getEmail()) != null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Agent with this email already exists."));
         }
@@ -43,7 +43,7 @@ public class DeliveryController {
         Double lng = ((Number) locationData.get("longitude")).doubleValue();
 
         User agent = userRepository.findById(agentId).orElse(null);
-        if (agent == null || agent.getRole() != User.UserRole.DELIVERY_AGENT) {
+        if (agent == null || agent.getRole() != UserRole.DELIVERY_AGENT) {
             return ResponseEntity.badRequest().body("Invalid delivery agent.");
         }
 
@@ -63,18 +63,16 @@ public class DeliveryController {
         User agent = order.getDeliveryAgent();
         if (agent == null) {
             return ResponseEntity.ok(Map.of(
-                "status", order.getStatus(),
-                "message", "Agent not yet assigned"
-            ));
+                    "status", order.getStatus().toString(),
+                    "message", "Agent not yet assigned"));
         }
 
         return ResponseEntity.ok(Map.of(
-            "orderId", order.getId(),
-            "status", order.getStatus(),
-            "agentName", agent.getName(),
-            "latitude", agent.getLatitude() != null ? agent.getLatitude() : 0.0,
-            "longitude", agent.getLongitude() != null ? agent.getLongitude() : 0.0,
-            "destination", order.getDeliveryAddress()
-        ));
+                "orderId", order.getId(),
+                "status", order.getStatus().toString(),
+                "agentName", agent.getName(),
+                "latitude", agent.getLatitude() != null ? agent.getLatitude() : 0.0,
+                "longitude", agent.getLongitude() != null ? agent.getLongitude() : 0.0,
+                "destination", order.getDeliveryAddress()));
     }
 }

@@ -4,6 +4,7 @@ import com.quickbite.backend.entities.DeliveryOption;
 import com.quickbite.backend.entities.MenuItem;
 import com.quickbite.backend.entities.Restaurant;
 import com.quickbite.backend.entities.User;
+import com.quickbite.backend.entities.UserRole;
 import com.quickbite.backend.repositories.DeliveryOptionRepository;
 import com.quickbite.backend.repositories.MenuItemRepository;
 import com.quickbite.backend.repositories.RestaurantRepository;
@@ -55,7 +56,7 @@ public class QuickbiteApplication {
                 manager.setName("Admin Manager");
                 manager.setEmail("manager@quickbite.com");
                 manager.setPassword(passwordEncoder.encode("Manager123"));
-                manager.setRole(User.UserRole.MANAGER);
+                manager.setRole(UserRole.MANAGER);
                 userRepository.save(manager);
             }
 
@@ -64,7 +65,7 @@ public class QuickbiteApplication {
                 customer.setName("Test Customer");
                 customer.setEmail("customer@quickbite.com");
                 customer.setPassword(passwordEncoder.encode("Customer123"));
-                customer.setRole(User.UserRole.CUSTOMER);
+                customer.setRole(UserRole.CUSTOMER);
                 userRepository.save(customer);
             }
 
@@ -73,7 +74,7 @@ public class QuickbiteApplication {
                 owner.setName("Restaurant Owner");
                 owner.setEmail("owner@quickbite.com");
                 owner.setPassword(passwordEncoder.encode("Owner123"));
-                owner.setRole(User.UserRole.RESTAURANT_OWNER);
+                owner.setRole(UserRole.RESTAURANT_OWNER);
                 userRepository.save(owner);
             }
 
@@ -82,7 +83,7 @@ public class QuickbiteApplication {
                 agent.setName("Delivery Agent");
                 agent.setEmail("agent@quickbite.com");
                 agent.setPassword(passwordEncoder.encode("Agent123"));
-                agent.setRole(User.UserRole.DELIVERY_AGENT);
+                agent.setRole(UserRole.DELIVERY_AGENT);
                 userRepository.save(agent);
             }
 
