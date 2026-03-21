@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">QuickBite</string>
+    
+    <!-- Login -->
+    <string name="login_welcome">Welcome to QuickBite</string>
+    <string name="login_email_hint">Email</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_button">Login</string>
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_register">Register</string>
+    
+    <!-- Register -->
+    <string name="register_title">Create Account</string>
+    <string name="register_name_hint">Full Name</string>
+    <string name="register_email_hint">Email</string>
+    <string name="register_password_hint">Password</string>
+    <string name="register_confirm_password_hint">Confirm Password</string>
+    <string name="register_role_hint">Select Role</string>
+    <string name="register_button">Register</string>
+    <string name="register_back_to_login">Back to Login</string>
+    
+    <!-- Roles -->
+    <string-array name="user_roles">
+        <item>CUSTOMER</item>
+        <item>RESTAURANT_OWNER</item>
+        <item>DELIVERY_AGENT</item>
+    </string-array>
+    
+    <!-- Customer -->
+    <string name="customer_browse_restaurants">Browse Restaurants</string>
+    <string name="customer_my_orders">My Orders</string>
+    <string name="customer_track_order">Track Order</string>
+    <string name="customer_logout">Logout</string>
+    
+    <!-- Restaurant -->
+    <string name="restaurant_menu">Menu</string>
+    <string name="restaurant_orders">Orders</string>
+    <string name="restaurant_settings">Settings</string>
+    
+    <!-- Order Status -->
+    <string name="order_status_pending">Pending</string>
+    <string name="order_status_confirmed">Confirmed</string>
+    <string name="order_status_preparing">Preparing</string>
+    <string name="order_status_ready">Ready</string>
+    <string name="order_status_delivering">Delivering</string>
+    <string name="order_status_delivered">Delivered</string>
+    
+    <!-- Errors -->
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_empty_field">Please fill all fields</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+</resources>
