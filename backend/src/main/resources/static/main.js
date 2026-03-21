@@ -566,9 +566,22 @@ function initMap() {
 }
 // Session Initialization
 function initSession() {
+    console.log("Checking session...", { authToken: !!authToken, currentUser: !!currentUser });
     if (authToken && currentUser) {
         updateNavigationForRole(currentUser.role);
         switchOuterLayout(mainLayout);
+        
+        // Land on default pane based on role
+        if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
+            switchPane('manager-content', 'nav-manager-btn');
+        } else if (currentUser.role === 'RESTAURANT_OWNER') {
+            switchPane('owner-content', 'nav-owner-btn');
+        } else if (currentUser.role === 'DELIVERY_AGENT') {
+            switchPane('agent-content', 'nav-agent-btn');
+        } else {
+            switchPane('home-content', 'nav-menu-btn');
+        }
+
         const welcomeTitle = document.querySelector('.welcome-title');
         if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
     } else {
