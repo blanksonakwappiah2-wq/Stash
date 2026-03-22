@@ -7,8 +7,18 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://${quickbite-db.host}:${quickbite-db.port}/${quickbite-db.database}
+      - key: DB_HOST
+        fromDatabase:
+          name: quickbite-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: quickbite-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: quickbite-db
+          property: database
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: quickbite-db
