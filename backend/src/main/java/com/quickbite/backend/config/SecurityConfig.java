@@ -80,7 +80,9 @@ public class SecurityConfig {
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/", "/index.html", "/main.js", "/style.css").permitAll()
-                .requestMatchers("/static/**").permitAll()
+                .requestMatchers("/static/**", "/**/*.html", "/**/*.css", "/**/*.js", "/**/*.ico", "/**/*.png", "/**/*.jpg").permitAll()
+                .requestMatchers("/error").permitAll()
+                .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.FORWARD, jakarta.servlet.DispatcherType.ERROR).permitAll()
                 // Any other requests require authentication
                 .anyRequest().authenticated()
             )
