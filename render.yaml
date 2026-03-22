@@ -8,9 +8,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: SPRING_DATASOURCE_URL
-        fromDatabase:
-          name: quickbite-db
-          property: connectionString
+        value: jdbc:postgresql://${quickbite-db.host}:${quickbite-db.port}/${quickbite-db.database}
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: quickbite-db
