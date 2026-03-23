@@ -26,6 +26,7 @@ const ordersNavBtn = document.getElementById('nav-orders-btn');
 const trackingNavBtn = document.getElementById('nav-tracking-btn');
 const feedbackNavBtn = document.getElementById('nav-feedback-btn');
 const accountNavBtn = document.getElementById('nav-account-btn');
+const availabilitiesNavBtn = document.getElementById('nav-availabilities-btn');
 const homeNavBtn = document.getElementById('nav-menu-btn');
 
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
@@ -129,6 +130,7 @@ document.getElementById('nav-orders-btn').addEventListener('click', () => switch
 document.getElementById('nav-tracking-btn').addEventListener('click', () => switchPane('tracking-content', 'nav-tracking-btn'));
 document.getElementById('nav-feedback-btn').addEventListener('click', () => switchPane('feedback-content', 'nav-feedback-btn'));
 document.getElementById('nav-account-btn').addEventListener('click', () => switchPane('account-content', 'nav-account-btn'));
+document.getElementById('nav-availabilities-btn').addEventListener('click', () => switchPane('availabilities-content', 'nav-availabilities-btn'));
 
 // Login/Register Links
 document.getElementById('go-to-register-btn').addEventListener('click', () => {
@@ -553,7 +555,8 @@ function updateNavigationForRole(role) {
         ordersNavBtn.style.display = 'flex';
     } else if (role === 'DELIVERY_AGENT') {
         agentNavBtn.style.display = 'flex';
-        trackingNavBtn.style.display = 'flex';
+        availabilitiesNavBtn.style.display = 'flex';
+        feedbackNavBtn.style.display = 'flex';
     }
 }
 

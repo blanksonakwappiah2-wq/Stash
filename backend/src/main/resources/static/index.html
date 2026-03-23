@@ -112,7 +112,8 @@
                     <button id="nav-menu-btn" class="nav-item active">🏠 Dashboard</button>
                     <button id="nav-browse-btn" class="nav-item">🍴 Browse Restaurants</button>
                     <button id="nav-owner-btn" class="nav-item" style="display: none;">🏪 My Restaurant</button>
-                    <button id="nav-agent-btn" class="nav-item" style="display: none;">🚴 Active Tasks</button>
+                    <button id="nav-agent-btn" class="nav-item" style="display: none;">📦 Deliveries</button>
+                    <button id="nav-availabilities-btn" class="nav-item" style="display: none;">⏳ Availabilities</button>
                     <button id="nav-manager-btn" class="nav-item" style="display: none;">⚙️ Manager Portal</button>
                     <button id="nav-orders-btn" class="nav-item">📋 My Orders</button>
                     <button id="nav-tracking-btn" class="nav-item">📍 Delivery Tracking</button>
@@ -286,14 +287,23 @@
                 <!-- Delivery Agent Portal -->
                 <div id="agent-content" class="content-pane">
                     <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🚴 My Delivery Tasks</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">View and manage your current deliveries and set your status.</p>
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">📦 My Deliveries</h1>
+                        <p class="label" style="margin-bottom: 20px; color: #64748b;">View and manage your current deliveries.</p>
                         
                         <div id="assigned-orders-list" class="restaurant-grid">
                             <p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>
                         </div>
 
-                        <div class="button-group" style="margin-top: 30px;">
+                    </div>
+                </div>
+
+                <!-- Availabilities Section (Placeholder) -->
+                <div id="availabilities-content" class="content-pane">
+                    <div class="content-card section-card">
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">⏳ My Availabilities</h1>
+                        <p class="label" style="margin-bottom: 20px; color: #64748b;">Set your active status and working hours.</p>
+                        
+                        <div class="button-group" style="margin-top: 30px; justify-content: flex-start;">
                             <button class="login-button" style="background: #10b981; max-width: 200px;">I'm Online & Ready</button>
                             <button class="register-button" style="max-width: 200px;">Go Offline</button>
                         </div>
