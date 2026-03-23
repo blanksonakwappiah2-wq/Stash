@@ -538,8 +538,10 @@ function updateNavigationForRole(role) {
     // Hide everything first
     navItems.forEach(btn => btn.style.display = 'none');
     
-    // Always show Logout (it's separate, but let's be sure)
-    homeNavBtn.style.display = 'flex'; // Home is common for all
+    // Home is hidden for agents as they don't need introductory dashboard
+    if (role !== 'DELIVERY_AGENT') {
+        homeNavBtn.style.display = 'flex';
+    }
     
     if (role === 'CUSTOMER') {
         browseNavBtn.style.display = 'flex';
