@@ -27,4 +27,14 @@ COPY --from=build /app/backend/target/*.jar app.jar
 EXPOSE 8080
 
 # Run with the production profile by default
-ENTRYPOINT ["java", "-Xmx384m", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+# Use aggressive memory and startup optimizations for Render Free Tier (512MB)
+ENTRYPOINT ["java", \
+    "-Xmx200m", \
+    "-Xms200m", \
+    "-XX:MaxMetaspaceSize=96m", \
+    "-XX:ReservedCodeCacheSize=48m", \
+    "-Xss256k", \
+    "-XX:TieredStopAtLevel=1", \
+    "-Dspring.main.lazy-initialization=true", \
+    "-Dspring.profiles.active=prod", \
+    "-jar", "app.jar"]
