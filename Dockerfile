@@ -26,9 +26,9 @@ COPY --from=build /app/backend/target/*.jar app.jar
 # Run with the production profile by default
 # Use aggressive memory and startup optimizations for Render Free Tier (512MB)
 ENTRYPOINT ["java", \
-    "-Xmx350m", \
-    "-Xms350m", \
-    "-XX:ReservedCodeCacheSize=48m", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-XX:InitialRAMPercentage=75.0", \
+    "-XX:ReservedCodeCacheSize=60m", \
     "-Xss256k", \
     "-XX:TieredStopAtLevel=1", \
     "-Dspring.main.lazy-initialization=true", \

@@ -28,8 +28,12 @@ public class QuickbiteApplication {
     CommandLineRunner initDatabase(DeliveryOptionRepository deliveryOptionRepository,
             UserRepository userRepository,
             RestaurantRepository restaurantRepository,
-            MenuItemRepository menuItemRepository) {
+            MenuItemRepository menuItemRepository,
+            org.springframework.core.env.Environment env) {
         return args -> {
+            boolean shouldSeed = env.getProperty("quickbite.seed-db", Boolean.class, true);
+            if (!shouldSeed) return;
+
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
             if (userRepository.findByEmail("manager@quickbite.com") == null) {
