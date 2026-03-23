@@ -27,4 +27,4 @@ COPY --from=build /app/backend/target/*.jar app.jar
 EXPOSE 8080
 
 # Run with the production profile by default
-ENTRYPOINT ["java", "-XX:+UseSerialGC", "-Xmx256m", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx384m", "-Dspring.profiles.active=prod", "-jar", "app.jar"]

@@ -657,6 +657,7 @@ function updateNavigationForRole(role) {
         agentNavBtn.style.display = 'flex';
         availabilitiesNavBtn.style.display = 'flex';
         feedbackNavBtn.style.display = 'flex';
+        homeNavBtn.style.display = 'none'; // Ensure Dashboard is explicitly hidden
     }
 }
 
