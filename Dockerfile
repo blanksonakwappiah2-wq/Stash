@@ -23,9 +23,6 @@ USER spring:spring
 # Copy the jar from the build stage
 COPY --from=build /app/backend/target/*.jar app.jar
 
-# Expose the port
-EXPOSE 8080
-
 # Run with the production profile by default
 # Use aggressive memory and startup optimizations for Render Free Tier (512MB)
 ENTRYPOINT ["java", \
@@ -35,6 +32,6 @@ ENTRYPOINT ["java", \
     "-XX:ReservedCodeCacheSize=48m", \
     "-Xss256k", \
     "-XX:TieredStopAtLevel=1", \
-    "-Dspring.main.lazy-initialization=true", \
+    "-Dspring.main.lazy-initialization=false", \
     "-Dspring.profiles.active=prod", \
     "-jar", "app.jar"]
