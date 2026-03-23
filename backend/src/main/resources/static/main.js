@@ -538,8 +538,8 @@ function updateNavigationForRole(role) {
     // Hide everything first
     navItems.forEach(btn => btn.style.display = 'none');
     
-    // Home is hidden for agents as they don't need introductory dashboard
-    if (role !== 'DELIVERY_AGENT') {
+    // Home is hidden for agents and owners as they don't need introductory dashboard
+    if (role !== 'DELIVERY_AGENT' && role !== 'RESTAURANT_OWNER') {
         homeNavBtn.style.display = 'flex';
     }
     
@@ -555,6 +555,7 @@ function updateNavigationForRole(role) {
     } else if (role === 'RESTAURANT_OWNER') {
         ownerNavBtn.style.display = 'flex';
         ordersNavBtn.style.display = 'flex';
+        feedbackNavBtn.style.display = 'flex';
     } else if (role === 'DELIVERY_AGENT') {
         agentNavBtn.style.display = 'flex';
         availabilitiesNavBtn.style.display = 'flex';
