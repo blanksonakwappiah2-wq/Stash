@@ -14,6 +14,8 @@ public class Restaurant {
     private String contact;
     private String category;
     private String website;
+    private Double latitude;
+    private Double longitude;
     @OneToOne
     private User owner;
 
@@ -32,4 +34,8 @@ public class Restaurant {
     public void setOwner(User owner) { this.owner = owner; }
     public String getWebsite() { return website; }
     public void setWebsite(String website) { this.website = website; }
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
 }

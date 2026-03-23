@@ -36,6 +36,9 @@ const homeNavBtn = document.getElementById('nav-menu-btn');
 
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let authToken = localStorage.getItem('authToken') || null;
+let mgrMap = null;
+let simulationInterval = null;
+let agentMarkers = {}; // To track and move agent markers
 
 // Secure Fetch Wrapper
 async function secureFetch(url, options = {}) {
@@ -121,6 +124,14 @@ function switchPane(paneId, navBtnId) {
         fetchAndShowAgents();
     } else if (paneId === 'mgr-feedback-content') {
         fetchAndShowFeedbacks();
+    } else if (paneId === 'mgr-locations-content') {
+        initManagerMap();
+    }
+
+    // Clear simulation if not on map
+    if (paneId !== 'mgr-locations-content' && simulationInterval) {
+        clearInterval(simulationInterval);
+        simulationInterval = null;
     }
 
     // Special logic for tracking pane
@@ -649,19 +660,118 @@ function updateNavigationForRole(role) {
     }
 }
 
-// Map Simulation
-function initMap() {
-    console.log("Initializing map placeholder...");
-    const mapDiv = document.getElementById('map');
-    if (mapDiv) {
-        mapDiv.innerHTML = `
-            <div style="text-align: center;">
-                <p class="label" style="color: #6366f1; font-weight: 700;">📍 Tracking Active Orders...</p>
-                <div style="margin-top: 10px; font-size: 0.8em; color: #64748b;">(Real-time simulation active)</div>
-            </div>
-        `;
+// Manager Map & Real-time Simulation
+function initManagerMap() {
+    if (mgrMap) {
+        mgrMap.remove();
+    }
+
+    // Default center (can be refined based on data)
+    mgrMap = L.map('mgr-map').setView([51.505, -0.09], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(mgrMap);
+
+    fetchMapData();
+}
+
+async function fetchMapData() {
+    try {
+        const [usersRes, restsRes] = await Promise.all([
+            secureFetch(BACKEND_URL + 'users'),
+            fetch(RESTAURANT_URL)
+        ]);
+
+        if (!usersRes.ok || !restsRes.ok) return;
+
+        const allUsers = await usersRes.json();
+        const restaurants = await restsRes.json();
+
+        // 1. Plot Restaurants (Blue markers)
+        restaurants.forEach(rest => {
+            const lat = rest.latitude || 51.505 + (Math.random() - 0.5) * 0.05;
+            const lng = rest.longitude || -0.09 + (Math.random() - 0.5) * 0.05;
+            
+            L.circleMarker([lat, lng], {
+                color: '#6366f1',
+                fillColor: '#6366f1',
+                fillOpacity: 0.8,
+                radius: 8
+            }).addTo(mgrMap)
+              .bindPopup(`<strong>🏪 ${rest.name}</strong><br>${rest.address}<br><span style="font-size:0.8em; color:#64748b;">Category: ${rest.category}</span>`)
+              .bindTooltip(rest.name, { permanent: false, direction: 'top' });
+        });
+
+        // 2. Plot Customers (Amber markers)
+        allUsers.filter(u => u.role === 'CUSTOMER').forEach(cust => {
+            const lat = cust.latitude || 51.505 + (Math.random() - 0.5) * 0.08;
+            const lng = cust.longitude || -0.09 + (Math.random() - 0.5) * 0.08;
+            
+            L.circleMarker([lat, lng], {
+                color: '#f59e0b',
+                fillColor: '#f59e0b',
+                fillOpacity: 0.8,
+                radius: 6
+            }).addTo(mgrMap)
+              .bindPopup(`<strong>👤 Customer: ${cust.name}</strong><br>${cust.email}`)
+              .bindTooltip(cust.name, { permanent: false, direction: 'top' });
+        });
+
+        // 3. Plot Agents (Green markers) + Start Simulation
+        agentMarkers = {};
+        const agents = allUsers.filter(u => u.role === 'DELIVERY_AGENT');
+        
+        agents.forEach(agent => {
+            const lat = agent.latitude || 51.505 + (Math.random() - 0.5) * 0.1;
+            const lng = agent.longitude || -0.09 + (Math.random() - 0.5) * 0.1;
+            
+            const marker = L.circleMarker([lat, lng], {
+                color: '#10b981',
+                fillColor: '#10b981',
+                fillOpacity: 1,
+                radius: 10,
+                weight: 2
+            }).addTo(mgrMap)
+              .bindPopup(`<strong>🚴 Agent: ${agent.name}</strong><br>Status: <span style="color:#10b981; font-weight:bold;">Busy (On Route)</span><br><span style="font-size:0.8em; color:#64748b;">Real-time tracking active</span>`)
+              .bindTooltip(`🚴 ${agent.name}`, { permanent: true, direction: 'right', className: 'agent-tooltip' });
+              
+            agentMarkers[agent.id] = {
+                marker: marker,
+                lat: lat,
+                lng: lng,
+                dx: (Math.random() - 0.5) * 0.001, // Movement speed
+                dy: (Math.random() - 0.5) * 0.001
+            };
+        });
+
+        startSimulation();
+
+    } catch (e) {
+        console.error("Map data fetch failed", e);
     }
 }
+
+function startSimulation() {
+    if (simulationInterval) clearInterval(simulationInterval);
+    
+    simulationInterval = setInterval(() => {
+        Object.keys(agentMarkers).forEach(id => {
+            const data = agentMarkers[id];
+            
+            // Simulating a path toward a destination (slightly randomized)
+            data.lat += data.dx;
+            data.lng += data.dy;
+            
+            // Bounce off boundaries (simulation only)
+            if (Math.abs(data.lat - 51.505) > 0.1) data.dx *= -1;
+            if (Math.abs(data.lng + 0.09) > 0.1) data.dy *= -1;
+            
+            data.marker.setLatLng([data.lat, data.lng]);
+        });
+    }, 1000); // Update every second for smoothness
+}
+
 // Session Initialization
 function initSession() {
     console.log("Checking session...", { authToken: !!authToken, currentUser: !!currentUser });
