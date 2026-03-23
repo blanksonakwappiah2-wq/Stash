@@ -40,6 +40,8 @@ let authToken = localStorage.getItem('authToken') || null;
 let mgrMap = null;
 let simulationInterval = null;
 let agentMarkers = {}; // To track and move agent markers
+let cart = []; // Shopping cart: [{menuItemId, name, price, quantity}]
+let selectedRestaurantId = null;
 
 // Secure Fetch Wrapper
 async function secureFetch(url, options = {}) {
@@ -130,7 +132,7 @@ function switchPane(paneId, navBtnId) {
     }
 
     // Clear simulation if not on map
-    if (paneId !== 'mgr-locations-content' && paneId !== 'owner-tracking-content' && simulationInterval) {
+    if (paneId !== 'mgr-locations-content' && paneId !== 'owner-tracking-content' && paneId !== 'tracking-content' && simulationInterval) {
         clearInterval(simulationInterval);
         simulationInterval = null;
     }
@@ -143,6 +145,11 @@ function switchPane(paneId, navBtnId) {
     // Special logic for tracking pane
     if (paneId === 'tracking-content') {
         initMap();
+    }
+
+    // Special logic for orders pane
+    if (paneId === 'orders-content') {
+        fetchAndShowOrders();
     }
 }
 
@@ -637,8 +644,8 @@ function updateNavigationForRole(role) {
     // Hide everything first
     navItems.forEach(btn => btn.style.display = 'none');
     
-    // Home is hidden for agents and owners as they don't need introductory dashboard
-    if (role !== 'DELIVERY_AGENT' && role !== 'RESTAURANT_OWNER') {
+    // Home is hidden for managers, agents and owners
+    if (role === 'CUSTOMER') {
         homeNavBtn.style.display = 'flex';
     }
     
@@ -655,7 +662,6 @@ function updateNavigationForRole(role) {
         mgrLocationsBtn.style.display = 'flex';
         mgrFeedbackBtn.style.display = 'flex';
         mgrAccountBtn.style.display = 'flex';
-        trackingNavBtn.style.display = 'flex';
     } else if (role === 'RESTAURANT_OWNER') {
         ownerNavBtn.style.display = 'flex';
         ownerTrackingNavBtn.style.display = 'flex';
@@ -804,6 +810,235 @@ async function fetchMapData(targetMap, role) {
     } catch (e) {
         console.error("Map data fetch failed", e);
     }
+}
+
+// --- Customer Portal Functionalization ---
+
+async function fetchAndShowRestaurants() {
+    try {
+        const response = await fetch(RESTAURANT_URL);
+        const restaurants = await response.json();
+        
+        const list = document.getElementById('restaurants-list');
+        list.innerHTML = restaurants.map(rest => `
+            <div class="restaurant-card" onclick="showRestaurantMenu(${rest.id}, '${rest.name}')">
+                <div class="restaurant-image" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80')"></div>
+                <div class="restaurant-info">
+                    <h3 class="restaurant-name">${rest.name}</h3>
+                    <p class="restaurant-category">${rest.category}</p>
+                    <div class="restaurant-meta">
+                        <span>⭐ 4.8</span>
+                        <span>$${rest.deliveryFee || '2.99'} Delivery</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Show cart if logged as CUSTOMER
+        const cartSidebar = document.getElementById('customer-cart-sidebar');
+        if (currentUser && currentUser.role === 'CUSTOMER') {
+            cartSidebar.style.display = 'flex';
+            updateCartUI();
+        } else {
+            cartSidebar.style.display = 'none';
+        }
+    } catch (e) {
+        console.error("Failed to load restaurants", e);
+    }
+}
+
+async function showRestaurantMenu(restaurantId, restaurantName) {
+    selectedRestaurantId = restaurantId;
+    switchPane('restaurant-menu-content', 'nav-browse-btn');
+    
+    // Header
+    const header = document.getElementById('menu-header');
+    header.innerHTML = `
+        <h1 class="title-label" style="text-align: left; color: #1e1b4b; margin: 0;">${restaurantName}</h1>
+        <p class="label" style="color: #64748b;">Browse our fresh menu items and build your order.</p>
+    `;
+
+    try {
+        const response = await fetch(`/api/menu/restaurant/${restaurantId}`);
+        const items = await response.json();
+        
+        const list = document.getElementById('menu-items-list');
+        if (items.length === 0) {
+            list.innerHTML = `<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No items found for this restaurant yet. 🥙</p>`;
+            return;
+        }
+
+        list.innerHTML = items.map(item => `
+            <div class="restaurant-card" style="cursor: default;">
+                <div class="restaurant-image" style="background-image: url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80')"></div>
+                <div class="restaurant-info">
+                    <h3 class="restaurant-name">${item.name}</h3>
+                    <p class="restaurant-category" style="height: 40px; overflow: hidden;">${item.description || 'Delicious meal prepared with fresh ingredients.'}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        <span style="font-weight: 700; color: #1e1b4b; font-size: 1.1em;">$${item.price.toFixed(2)}</span>
+                        <button class="login-button" style="padding: 8px 15px; font-size: 0.8em; margin: 0;" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error("Failed to load menu", e);
+    }
+}
+
+function addToCart(id, name, price) {
+    const existing = cart.find(i => i.menuItemId === id);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({ menuItemId: id, name, price, quantity: 1 });
+    }
+    updateCartUI();
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(i => i.menuItemId !== id);
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const list = document.getElementById('cart-items');
+    const totalEl = document.getElementById('cart-total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+
+    if (cart.length === 0) {
+        list.innerHTML = `<p class="label" style="text-align: center; color: #94a3b8; padding-top: 20px;">Your cart is empty.</p>`;
+        totalEl.innerText = '$0.00';
+        checkoutBtn.disabled = true;
+        return;
+    }
+
+    let total = 0;
+    list.innerHTML = cart.map(item => {
+        total += item.price * item.quantity;
+        return `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div>
+                    <p style="font-weight: 600; font-size: 0.9em; color: #1e1b4b; margin: 0;">${item.name}</p>
+                    <p style="font-size: 0.8em; color: #64748b; margin: 0;">$${item.price.toFixed(2)} x ${item.quantity}</p>
+                </div>
+                <button onclick="removeFromCart(${item.menuItemId})" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.1em;">×</button>
+            </div>
+        `;
+    }).join('');
+
+    totalEl.innerText = `$${total.toFixed(2)}`;
+    checkoutBtn.disabled = false;
+}
+
+// Global exposure for onclick handlers
+window.addToCart = addToCart;
+window.removeFromCart = removeFromCart;
+window.showRestaurantMenu = showRestaurantMenu;
+
+document.getElementById('checkout-btn').addEventListener('click', placeOrder);
+
+async function placeOrder() {
+    if (!currentUser || cart.length === 0 || !selectedRestaurantId) return;
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    checkoutBtn.disabled = true;
+    checkoutBtn.innerText = 'Processing...';
+
+    const orderRequest = {
+        restaurantId: selectedRestaurantId,
+        deliveryAddress: currentUser.address || 'Standard Delivery Address',
+        deliveryOptionId: 1, // Default option
+        items: cart.map(i => ({ menuItemId: i.menuItemId, quantity: i.quantity }))
+    };
+
+    try {
+        const response = await secureFetch('/api/orders', {
+            method: 'POST',
+            body: JSON.stringify(orderRequest)
+        });
+
+        if (response.ok) {
+            alert('🎉 Order placed successfully!');
+            cart = [];
+            updateCartUI();
+            switchPane('orders-content', 'nav-orders-btn');
+            fetchAndShowOrders();
+        } else {
+            const err = await response.json();
+            alert('Failed to place order: ' + (err.message || 'Unknown error'));
+        }
+    } catch (e) {
+        console.error("Order placement failed", e);
+        alert('An error occurred while placing your order.');
+    } finally {
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerText = 'Place Order';
+    }
+}
+
+async function fetchAndShowOrders() {
+    try {
+        let url = '/api/orders';
+        if (currentUser.role === 'CUSTOMER') {
+            url = `/api/orders/customer/${currentUser.id}`;
+        } else if (currentUser.role === 'RESTAURANT_OWNER') {
+             // We'd need to find the restaurant belonging to this owner
+             // For now, this placeholder remains as simple as before
+             return; 
+        }
+
+        const response = await secureFetch(url);
+        if (!response.ok) return;
+        const orders = await response.json();
+        
+        const list = document.getElementById('orders-list');
+        const message = document.getElementById('orders-message');
+        
+        if (orders.length === 0) {
+            message.style.display = 'block';
+            list.innerHTML = '';
+            return;
+        }
+
+        message.style.display = 'none';
+        list.innerHTML = orders.map(order => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 15px;">
+                    <span style="font-weight: 700; color: #1e1b4b;">Order #${order.id}</span>
+                    <span class="category-badge" style="background: ${getStatusColor(order.status).bg}; color: ${getStatusColor(order.status).text};">${order.status}</span>
+                </div>
+                <div style="font-size: 0.9em; color: #64748b;">
+                    <p style="margin: 5px 0;">🏪 From: <strong>${order.restaurantName}</strong></p>
+                    <p style="margin: 5px 0;">💰 Total: <strong>$${order.totalAmount.toFixed(2)}</strong></p>
+                    <p style="margin: 5px 0;">🕒 Placed: ${new Date(order.orderTime).toLocaleString()}</p>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="login-button" style="margin: 0; padding: 8px 15px; font-size: 0.8em; flex: 1;" onclick="initTrackingForOrder(${order.id})">Track Order</button>
+                    <button class="register-button" style="margin: 0; padding: 8px 15px; font-size: 0.8em; flex: 1; border-color: #cbd5e1;">Review</button>
+                </div>
+            </div>
+        `).reverse().join('');
+
+    } catch (e) {
+        console.error("Failed to load orders", e);
+    }
+}
+
+function getStatusColor(status) {
+    switch (status) {
+        case 'PLACED': return { bg: '#e0e7ff', text: '#4338ca' };
+        case 'PREPARING': return { bg: '#fffbeb', text: '#d97706' };
+        case 'READY_FOR_PICKUP': return { bg: '#dcfce7', text: '#166534' };
+        case 'OUT_FOR_DELIVERY': return { bg: '#fdf2f2', text: '#dc2626' };
+        case 'DELIVERED': return { bg: '#f1f5f9', text: '#475569' };
+        default: return { bg: '#f1f5f9', text: '#475569' };
+    }
+}
+
+function initTrackingForOrder(orderId) {
+    switchPane('tracking-content', 'nav-tracking-btn');
+    // For now, the generic map initializes via startSimulation/initMap
 }
 
 function startSimulation() {
