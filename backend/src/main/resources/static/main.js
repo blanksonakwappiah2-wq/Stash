@@ -662,6 +662,12 @@ function updateNavigationForRole(role) {
         mgrLocationsBtn.style.display = 'flex';
         mgrFeedbackBtn.style.display = 'flex';
         mgrAccountBtn.style.display = 'flex';
+        
+        // Explicitly hide customer-specific redundant items for manager
+        homeNavBtn.style.display = 'none';
+        trackingNavBtn.style.display = 'none';
+        ordersNavBtn.style.display = 'none';
+        browseNavBtn.style.display = 'none';
     } else if (role === 'RESTAURANT_OWNER') {
         ownerNavBtn.style.display = 'flex';
         ownerTrackingNavBtn.style.display = 'flex';
