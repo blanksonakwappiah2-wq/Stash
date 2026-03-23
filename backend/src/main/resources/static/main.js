@@ -24,6 +24,8 @@ const agentNavBtn = document.getElementById('nav-agent-btn');
 const browseNavBtn = document.getElementById('nav-browse-btn');
 const ordersNavBtn = document.getElementById('nav-orders-btn');
 const trackingNavBtn = document.getElementById('nav-tracking-btn');
+const feedbackNavBtn = document.getElementById('nav-feedback-btn');
+const accountNavBtn = document.getElementById('nav-account-btn');
 const homeNavBtn = document.getElementById('nav-menu-btn');
 
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
@@ -125,6 +127,8 @@ document.getElementById('nav-agent-btn').addEventListener('click', () => switchP
 document.getElementById('nav-manager-btn').addEventListener('click', () => switchPane('manager-content', 'nav-manager-btn'));
 document.getElementById('nav-orders-btn').addEventListener('click', () => switchPane('orders-content', 'nav-orders-btn'));
 document.getElementById('nav-tracking-btn').addEventListener('click', () => switchPane('tracking-content', 'nav-tracking-btn'));
+document.getElementById('nav-feedback-btn').addEventListener('click', () => switchPane('feedback-content', 'nav-feedback-btn'));
+document.getElementById('nav-account-btn').addEventListener('click', () => switchPane('account-content', 'nav-account-btn'));
 
 // Login/Register Links
 document.getElementById('go-to-register-btn').addEventListener('click', () => {
@@ -539,6 +543,8 @@ function updateNavigationForRole(role) {
         browseNavBtn.style.display = 'flex';
         ordersNavBtn.style.display = 'flex';
         trackingNavBtn.style.display = 'flex';
+        feedbackNavBtn.style.display = 'flex';
+        accountNavBtn.style.display = 'flex';
     } else if (role === 'MANAGER' || role === 'ADMIN') {
         managerNavBtn.style.display = 'flex';
         trackingNavBtn.style.display = 'flex';
