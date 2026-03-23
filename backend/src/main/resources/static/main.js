@@ -32,6 +32,7 @@ const trackingNavBtn = document.getElementById('nav-tracking-btn');
 const feedbackNavBtn = document.getElementById('nav-feedback-btn');
 const accountNavBtn = document.getElementById('nav-account-btn');
 const availabilitiesNavBtn = document.getElementById('nav-availabilities-btn');
+const ownerTrackingNavBtn = document.getElementById('nav-owner-tracking-btn');
 const homeNavBtn = document.getElementById('nav-menu-btn');
 
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
@@ -129,9 +130,14 @@ function switchPane(paneId, navBtnId) {
     }
 
     // Clear simulation if not on map
-    if (paneId !== 'mgr-locations-content' && simulationInterval) {
+    if (paneId !== 'mgr-locations-content' && paneId !== 'owner-tracking-content' && simulationInterval) {
         clearInterval(simulationInterval);
         simulationInterval = null;
+    }
+
+    // Special logic for owner tracking
+    if (paneId === 'owner-tracking-content') {
+        initOwnerMap();
     }
 
     // Special logic for tracking pane
@@ -144,6 +150,7 @@ function switchPane(paneId, navBtnId) {
 document.getElementById('nav-menu-btn').addEventListener('click', () => switchPane('home-content', 'nav-menu-btn'));
 document.getElementById('nav-browse-btn').addEventListener('click', () => switchPane('restaurants-content', 'nav-browse-btn'));
 document.getElementById('nav-owner-btn').addEventListener('click', () => switchPane('owner-content', 'nav-owner-btn'));
+document.getElementById('nav-owner-tracking-btn').addEventListener('click', () => switchPane('owner-tracking-content', 'nav-owner-tracking-btn'));
 document.getElementById('nav-agent-btn').addEventListener('click', () => switchPane('agent-content', 'nav-agent-btn'));
 document.getElementById('nav-mgr-customers-btn').addEventListener('click', () => switchPane('mgr-customers-content', 'nav-mgr-customers-btn'));
 document.getElementById('nav-mgr-owners-btn').addEventListener('click', () => switchPane('mgr-owners-content', 'nav-mgr-owners-btn'));
@@ -651,8 +658,10 @@ function updateNavigationForRole(role) {
         trackingNavBtn.style.display = 'flex';
     } else if (role === 'RESTAURANT_OWNER') {
         ownerNavBtn.style.display = 'flex';
+        ownerTrackingNavBtn.style.display = 'flex';
         ordersNavBtn.style.display = 'flex';
         feedbackNavBtn.style.display = 'flex';
+        homeNavBtn.style.display = 'none';
     } else if (role === 'DELIVERY_AGENT') {
         agentNavBtn.style.display = 'flex';
         availabilitiesNavBtn.style.display = 'flex';
@@ -667,17 +676,58 @@ function initManagerMap() {
         mgrMap.remove();
     }
 
-    // Default center (can be refined based on data)
     mgrMap = L.map('mgr-map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mgrMap);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(mgrMap);
+    // Sidebar: Delivery Progress List
+    const deliveryList = document.getElementById('mgr-live-delivery-list');
+    if (deliveryList) {
+        deliveryList.innerHTML = `
+            <div style="background: #fdf2f2; border: 1px solid #fee2e2; padding: 12px; border-radius: 10px; margin-bottom: 12px;">
+                <p class="label" style="font-weight:700; color:#991b1b; margin-bottom:5px;">📦 Order #7821</p>
+                <p class="label" style="font-size:0.75em; color:#64748b; margin-bottom:8px;">Grandma's Kitchen → Sarah J.</p>
+                <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                    <div style="width:65%; height:100%; background:#ef4444;"></div>
+                </div>
+                <p class="label" style="font-size:0.7em; margin-top:5px; color:#ef4444; font-weight:600;">🚴 On Route (Estimated 4m)</p>
+            </div>
+            <div style="background: #f0fdf4; border: 1px solid #dcfce7; padding: 12px; border-radius: 10px; margin-bottom: 12px;">
+                <p class="label" style="font-weight:700; color:#166534; margin-bottom:5px;">📦 Order #7823</p>
+                <p class="label" style="font-size:0.75em; color:#64748b; margin-bottom:8px;">Burger King → Mark R.</p>
+                <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                    <div style="width:30%; height:100%; background:#22c55e;"></div>
+                </div>
+                <p class="label" style="font-size:0.7em; margin-top:5px; color:#22c55e; font-weight:600;">👨‍🍳 Preparing</p>
+            </div>
+            <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 12px; border-radius: 10px;">
+                <p class="label" style="font-weight:700; color:#92400e; margin-bottom:5px;">📦 Order #7822</p>
+                <p class="label" style="font-size:0.75em; color:#64748b; margin-bottom:8px;">Sushi Master → Linda W.</p>
+                <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                    <div style="width:90%; height:100%; background:#f59e0b;"></div>
+                </div>
+                <p class="label" style="font-size:0.7em; margin-top:5px; color:#f59e0b; font-weight:600;">📍 Arriving (Estimated 1m)</p>
+            </div>
+        `;
+    }
 
-    fetchMapData();
+    fetchMapData(mgrMap, 'MANAGER');
 }
 
-async function fetchMapData() {
+function initOwnerMap() {
+    const mapDiv = document.getElementById('owner-map');
+    if (!mapDiv) return;
+
+    if (mgrMap) {
+        mgrMap.remove();
+    }
+
+    mgrMap = L.map('owner-map').setView([51.505, -0.09], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mgrMap);
+
+    fetchMapData(mgrMap, 'RESTAURANT_OWNER');
+}
+
+async function fetchMapData(targetMap, role) {
     try {
         const [usersRes, restsRes] = await Promise.all([
             secureFetch(BACKEND_URL + 'users'),
@@ -689,8 +739,16 @@ async function fetchMapData() {
         const allUsers = await usersRes.json();
         const restaurants = await restsRes.json();
 
-        // 1. Plot Restaurants (Blue markers)
-        restaurants.forEach(rest => {
+        // Filter data if Owner
+        let filteredRests = restaurants;
+        let filteredAgents = allUsers.filter(u => u.role === 'DELIVERY_AGENT');
+        let filteredCusts = allUsers.filter(u => u.role === 'CUSTOMER');
+
+        // Note: For real filtering, we'd need to know which agents/customers belong to this owner's orders.
+        // For demonstration, we'll show a subset.
+
+        // Plot Restaurants
+        filteredRests.forEach(rest => {
             const lat = rest.latitude || 51.505 + (Math.random() - 0.5) * 0.05;
             const lng = rest.longitude || -0.09 + (Math.random() - 0.5) * 0.05;
             
@@ -699,31 +757,13 @@ async function fetchMapData() {
                 fillColor: '#6366f1',
                 fillOpacity: 0.8,
                 radius: 8
-            }).addTo(mgrMap)
-              .bindPopup(`<strong>🏪 ${rest.name}</strong><br>${rest.address}<br><span style="font-size:0.8em; color:#64748b;">Category: ${rest.category}</span>`)
-              .bindTooltip(rest.name, { permanent: false, direction: 'top' });
+            }).addTo(targetMap)
+              .bindPopup(`<strong>🏪 ${rest.name}</strong>`);
         });
 
-        // 2. Plot Customers (Amber markers)
-        allUsers.filter(u => u.role === 'CUSTOMER').forEach(cust => {
-            const lat = cust.latitude || 51.505 + (Math.random() - 0.5) * 0.08;
-            const lng = cust.longitude || -0.09 + (Math.random() - 0.5) * 0.08;
-            
-            L.circleMarker([lat, lng], {
-                color: '#f59e0b',
-                fillColor: '#f59e0b',
-                fillOpacity: 0.8,
-                radius: 6
-            }).addTo(mgrMap)
-              .bindPopup(`<strong>👤 Customer: ${cust.name}</strong><br>${cust.email}`)
-              .bindTooltip(cust.name, { permanent: false, direction: 'top' });
-        });
-
-        // 3. Plot Agents (Green markers) + Start Simulation
+        // Plot Agents + Start Simulation
         agentMarkers = {};
-        const agents = allUsers.filter(u => u.role === 'DELIVERY_AGENT');
-        
-        agents.forEach(agent => {
+        filteredAgents.forEach(agent => {
             const lat = agent.latitude || 51.505 + (Math.random() - 0.5) * 0.1;
             const lng = agent.longitude || -0.09 + (Math.random() - 0.5) * 0.1;
             
@@ -733,17 +773,30 @@ async function fetchMapData() {
                 fillOpacity: 1,
                 radius: 10,
                 weight: 2
-            }).addTo(mgrMap)
-              .bindPopup(`<strong>🚴 Agent: ${agent.name}</strong><br>Status: <span style="color:#10b981; font-weight:bold;">Busy (On Route)</span><br><span style="font-size:0.8em; color:#64748b;">Real-time tracking active</span>`)
-              .bindTooltip(`🚴 ${agent.name}`, { permanent: true, direction: 'right', className: 'agent-tooltip' });
-              
+            }).addTo(targetMap)
+              .bindPopup(`<strong>🚴 Agent: ${agent.name}</strong>`);
+               
             agentMarkers[agent.id] = {
                 marker: marker,
                 lat: lat,
                 lng: lng,
-                dx: (Math.random() - 0.5) * 0.001, // Movement speed
-                dy: (Math.random() - 0.5) * 0.001
+                dx: (Math.random() - 0.5) * 0.0005,
+                dy: (Math.random() - 0.5) * 0.0005
             };
+        });
+
+        // Plot Customers
+        filteredCusts.forEach(cust => {
+            const lat = cust.latitude || 51.505 + (Math.random() - 0.5) * 0.08;
+            const lng = cust.longitude || -0.09 + (Math.random() - 0.5) * 0.08;
+            
+            L.circleMarker([lat, lng], {
+                color: '#f59e0b',
+                fillColor: '#f59e0b',
+                fillOpacity: 0.8,
+                radius: 6
+            }).addTo(targetMap)
+              .bindPopup(`<strong>👤 Customer: ${cust.name}</strong>`);
         });
 
         startSimulation();
@@ -759,18 +812,15 @@ function startSimulation() {
     simulationInterval = setInterval(() => {
         Object.keys(agentMarkers).forEach(id => {
             const data = agentMarkers[id];
-            
-            // Simulating a path toward a destination (slightly randomized)
             data.lat += data.dx;
             data.lng += data.dy;
             
-            // Bounce off boundaries (simulation only)
             if (Math.abs(data.lat - 51.505) > 0.1) data.dx *= -1;
             if (Math.abs(data.lng + 0.09) > 0.1) data.dy *= -1;
             
             data.marker.setLatLng([data.lat, data.lng]);
         });
-    }, 1000); // Update every second for smoothness
+    }, 1000); 
 }
 
 // Session Initialization
