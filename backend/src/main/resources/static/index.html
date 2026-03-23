@@ -163,49 +163,72 @@
                 <!-- Manager: Customers Section -->
                 <div id="mgr-customers-content" class="content-pane">
                     <div class="content-card full-width">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">👥 Customer Management</h1>
-                        <p class="label" style="color: #64748b;">View and manage all registered customers. (Coming soon)</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;">
+                            <h1 class="title-label" style="text-align: left; color: #1e1b4b; margin: 0;">👥 Customer Information</h1>
+                            <span class="category-badge" style="background: #e0e7ff; color: #4338ca; font-size: 0.8em;">All Registered Users</span>
+                        </div>
+                        <p class="label" style="margin-bottom: 20px; color: #64748b;">History of every customer that has ever logged into the system.</p>
+                        
+                        <div id="customer-list" class="restaurant-grid">
+                            <!-- Customers will be listed here -->
+                        </div>
                     </div>
                 </div>
 
                 <!-- Manager: Restaurant Owners Section -->
                 <div id="mgr-owners-content" class="content-pane">
                     <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">🍽️ Restaurant Management</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">Register a New Restaurant and its Owner account.</p>
+                        <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px;">
+                            <h1 class="title-label" style="text-align: left; color: #1e1b4b; margin: 0;">🍽️ New Restaurant Onboarding</h1>
+                            <p class="label" style="margin-top: 5px; color: #64748b;">Register a new restaurant and its administrative owner account.</p>
+                        </div>
                         
-                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
                             <div class="form-group">
-                                <label class="label" style="color: #1e1b4b;">Restaurant Name:</label>
-                                <input type="text" id="rest-name" class="text-field" placeholder="Restaurant Name" style="color: #1e1b4b; border-color: #cbd5e1;">
+                                <label class="label" style="color: #1e1b4b; font-weight: 600; font-size: 0.9em; margin-bottom: 8px;">1. Restaurant Name</label>
+                                <input type="text" id="rest-name" class="text-field" placeholder="e.g. Grandma's Kitchen" style="color: #1e1b4b; border-color: #cbd5e1; padding: 12px; border-radius: 10px;">
                             </div>
                             <div class="form-group">
-                                <label class="label" style="color: #1e1b4b;">Category:</label>
-                                <input type="text" id="rest-category" class="text-field" placeholder="e.g. Italian, Fast Food" style="color: #1e1b4b; border-color: #cbd5e1;">
+                                <label class="label" style="color: #1e1b4b; font-weight: 600; font-size: 0.9em; margin-bottom: 8px;">2. Category</label>
+                                <input type="text" id="rest-category" class="text-field" placeholder="e.g. Italian, Thai, Fast Food" style="color: #1e1b4b; border-color: #cbd5e1; padding: 12px; border-radius: 10px;">
                             </div>
                             <div class="form-group">
-                                <label class="label" style="color: #1e1b4b;">Address:</label>
-                                <input type="text" id="rest-address" class="text-field" placeholder="123 Example St" style="color: #1e1b4b; border-color: #cbd5e1;">
+                                <label class="label" style="color: #1e1b4b; font-weight: 600; font-size: 0.9em; margin-bottom: 8px;">3. Street Address</label>
+                                <input type="text" id="rest-address" class="text-field" placeholder="Full business address" style="color: #1e1b4b; border-color: #cbd5e1; padding: 12px; border-radius: 10px;">
                             </div>
                             <div class="form-group">
-                                <label class="label" style="color: #1e1b4b;">Contact Info:</label>
-                                <input type="text" id="rest-contact" class="text-field" placeholder="123-456-7890" style="color: #1e1b4b; border-color: #cbd5e1;">
+                                <label class="label" style="color: #1e1b4b; font-weight: 600; font-size: 0.9em; margin-bottom: 8px;">4. Contact Phone</label>
+                                <input type="text" id="rest-contact" class="text-field" placeholder="Official business number" style="color: #1e1b4b; border-color: #cbd5e1; padding: 12px; border-radius: 10px;">
                             </div>
-                            <div class="form-group">
-                                <label class="label" style="color: #1e1b4b;">Website (URL):</label>
-                                <input type="text" id="rest-website" class="text-field" placeholder="https://example.com" style="color: #1e1b4b; border-color: #cbd5e1;">
+                            <div class="form-group" style="grid-column: 1/-1;">
+                                <label class="label" style="color: #1e1b4b; font-weight: 600; font-size: 0.9em; margin-bottom: 8px;">5. Website URL</label>
+                                <input type="text" id="rest-website" class="text-field" placeholder="https://www.example.com" style="color: #1e1b4b; border-color: #cbd5e1; padding: 12px; border-radius: 10px;">
                             </div>
                         </div>
-                        <div class="form-group" style="margin-top: 25px; border-top: 2px dashed #f1f5f9; padding-top: 20px;">
-                            <h3 class="label" style="font-weight: 700; margin-bottom: 15px; color: #1e1b4b;">👤 Create Owner Account</h3>
-                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                                <input type="text" id="owner-name" class="text-field" placeholder="Owner Full Name" style="color: #1e1b4b; border-color: #cbd5e1;">
-                                <input type="text" id="owner-email" class="text-field" placeholder="Owner Email" style="color: #1e1b4b; border-color: #cbd5e1;">
-                                <input type="password" id="owner-password" class="text-field" placeholder="Owner Password" style="color: #1e1b4b; border-color: #cbd5e1;">
+
+                        <div style="margin-top: 35px; background: #f8fafc; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0;">
+                            <h3 class="label" style="font-weight: 700; margin-bottom: 20px; color: #1e1b4b; display: flex; align-items: center;">
+                                <span style="background: #6366f1; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7em; margin-right: 10px;">👤</span>
+                                Owner Account Credentials
+                            </h3>
+                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label class="label" style="font-size: 0.8em; color: #64748b; margin-bottom: 5px;">Owner Full Name</label>
+                                    <input type="text" id="owner-name" class="text-field" placeholder="Full Name" style="color: #1e1b4b; border-color: #cbd5e1;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label" style="font-size: 0.8em; color: #64748b; margin-bottom: 5px;">Primary Email</label>
+                                    <input type="text" id="owner-email" class="text-field" placeholder="email@example.com" style="color: #1e1b4b; border-color: #cbd5e1;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label" style="font-size: 0.8em; color: #64748b; margin-bottom: 5px;">Secure Password</label>
+                                    <input type="password" id="owner-password" class="text-field" placeholder="••••••••" style="color: #1e1b4b; border-color: #cbd5e1;">
+                                </div>
                             </div>
                         </div>
-                        <div class="button-group" style="justify-content: flex-start; margin-top: 20px;">
-                            <button id="add-rest-btn" class="login-button" style="max-width: 250px;">Create Restaurant & Owner</button>
+
+                        <div class="button-group" style="justify-content: flex-start; margin-top: 30px;">
+                            <button id="add-rest-btn" class="login-button" style="max-width: 250px; padding: 14px 28px;">Authorize & Create Onboarding</button>
                         </div>
                         <div id="manager-message" class="message-label" style="display: none;"></div>
                     </div>
@@ -214,22 +237,36 @@
                 <!-- Manager: Delivery Agents Section -->
                 <div id="mgr-agents-content" class="content-pane">
                     <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">🚴 Delivery Agent Management</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">Oversee active agents and register new ones.</p>
+                        <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px;">
+                            <h1 class="title-label" style="text-align: left; color: #1e1b4b; margin: 0;">🚴 Delivery Agent Roster</h1>
+                            <p class="label" style="margin-top: 5px; color: #64748b;">Manage fleet of delivery professionals and onboard new carriers.</p>
+                        </div>
                         
-                        <div id="agent-list" class="restaurant-grid" style="margin-bottom: 30px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                        <div id="agent-list" class="restaurant-grid" style="margin-bottom: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
                             <!-- Agents will be listed here -->
                         </div>
 
-                        <div class="content-card section-card" style="background: #f8fafc; border: 1px dashed #cbd5e1; box-shadow: none;">
-                            <h3 class="label" style="font-weight: 700; margin-bottom: 15px; color: #1e1b4b;">Register New Agent</h3>
-                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                                <input type="text" id="agent-name" class="text-field" placeholder="Full Name" style="color: #1e1b4b; border-color: #cbd5e1;">
-                                <input type="text" id="agent-email" class="text-field" placeholder="Email Address" style="color: #1e1b4b; border-color: #cbd5e1;">
-                                <input type="password" id="agent-password" class="text-field" placeholder="Password" style="color: #1e1b4b; border-color: #cbd5e1;">
+                        <div class="content-card section-card" style="background: #fdf2f2; border: 1px dashed #f87171; box-shadow: none;">
+                            <h3 class="label" style="font-weight: 700; margin-bottom: 20px; color: #991b1b; display: flex; align-items: center;">
+                                <span style="background: #ef4444; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7em; margin-right: 10px;">➕</span>
+                                Onboard New Delivery Agent
+                            </h3>
+                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label class="label" style="font-size: 0.8em; color: #1e1b4b; font-weight: 600;">Agent Full Name</label>
+                                    <input type="text" id="agent-name" class="text-field" placeholder="John Doe" style="color: #1e1b4b; border-color: #f87171; border-radius: 8px;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label" style="font-size: 0.8em; color: #1e1b4b; font-weight: 600;">Agent Email</label>
+                                    <input type="text" id="agent-email" class="text-field" placeholder="agent@quickbite.com" style="color: #1e1b4b; border-color: #f87171; border-radius: 8px;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label" style="font-size: 0.8em; color: #1e1b4b; font-weight: 600;">Set Password</label>
+                                    <input type="password" id="agent-password" class="text-field" placeholder="••••••••" style="color: #1e1b4b; border-color: #f87171; border-radius: 8px;">
+                                </div>
                             </div>
-                            <div class="button-group" style="justify-content: flex-start; margin-top: 20px;">
-                                <button id="add-agent-btn" class="login-button" style="max-width: 180px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Add Agent</button>
+                            <div class="button-group" style="justify-content: flex-start; margin-top: 25px;">
+                                <button id="add-agent-btn" class="login-button" style="max-width: 200px; background: #ef4444;">Onboard Agent</button>
                             </div>
                             <div id="agent-message" class="message-label" style="display: none;"></div>
                         </div>
@@ -246,9 +283,16 @@
 
                 <!-- Manager: Feedbacks Section -->
                 <div id="mgr-feedback-content" class="content-pane">
-                    <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">💬 All Feedbacks</h1>
-                        <p class="label" style="color: #64748b;">View and analyze feedbacks from all users. (Coming soon)</p>
+                    <div class="content-card full-width">
+                        <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;">
+                            <h1 class="title-label" style="text-align: left; color: #1e1b4b; margin: 0;">💬 Service Feedback & Reviews</h1>
+                            <p class="label" style="margin-top: 5px; color: #64748b;">Centralized repository of all feedbacks received from Customers, Agents, and Owners.</p>
+                        </div>
+                        
+                        <div id="feedback-list" class="restaurant-grid">
+                            <!-- Feedback items will be listed here -->
+                            <p class="label" style="grid-column: 1/-1; text-align: center; padding: 50px; color: #94a3b8;">Scanning for recent feedback... 🔍</p>
+                        </div>
                     </div>
                 </div>
 

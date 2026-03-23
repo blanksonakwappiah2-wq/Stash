@@ -115,8 +115,12 @@ function switchPane(paneId, navBtnId) {
     }
 
     // Special logic for manager sub-panes
-    if (paneId === 'mgr-agents-content') {
+    if (paneId === 'mgr-customers-content') {
+        fetchAndShowCustomers();
+    } else if (paneId === 'mgr-agents-content') {
         fetchAndShowAgents();
+    } else if (paneId === 'mgr-feedback-content') {
+        fetchAndShowFeedbacks();
     }
 
     // Special logic for tracking pane
@@ -191,6 +195,73 @@ document.getElementById('reg-show-password').addEventListener('change', (e) => {
 
 function showAlert(message) {
     alert("QuickBite\n\n" + message);
+}
+
+async function fetchAndShowCustomers() {
+    try {
+        const response = await secureFetch(BACKEND_URL + 'users');
+        if (!response || !response.ok) return;
+        const allUsers = await response.json();
+        const customers = allUsers.filter(u => u.role === 'CUSTOMER');
+        
+        const list = document.getElementById('customer-list');
+        if (!list) return;
+        list.innerHTML = '';
+        
+        if (customers.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; color: #64748b;">No customers registered yet.</p>';
+        } else {
+            customers.forEach(cust => {
+                const card = document.createElement('div');
+                card.className = 'agent-card';
+                card.innerHTML = `
+                    <div class="agent-avatar">👤</div>
+                    <div>
+                        <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${cust.name}</p>
+                        <p class="label" style="font-size: 0.8em; color: #64748b; margin: 0;">${cust.email}</p>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+    } catch (e) {
+        console.error("Failed to load customers", e);
+    }
+}
+
+async function fetchAndShowFeedbacks() {
+    try {
+        const response = await secureFetch('/api/reviews');
+        if (!response || !response.ok) return;
+        const reviews = await response.json();
+        
+        const list = document.getElementById('feedback-list');
+        if (!list) return;
+        list.innerHTML = '';
+        
+        if (reviews.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 50px;">No feedback received yet.</p>';
+        } else {
+            reviews.forEach(rev => {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                card.style.padding = '20px';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 800; color: #4338ca;">${rev.customer ? rev.customer.name : 'Anonymous'}</span>
+                        <span style="color: #f59e0b;">${'⭐'.repeat(rev.rating)}</span>
+                    </div>
+                    <p class="label" style="font-size: 0.9em; color: #1e1b4b; line-height: 1.5; font-style: italic;">"${rev.comment}"</p>
+                    <div style="margin-top: 15px; font-size: 0.75em; color: #64748b; border-top: 1px solid #f1f5f9; pt: 10px;">
+                        To: <span style="font-weight: 600;">${rev.restaurant ? rev.restaurant.name : 'System'}</span>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+    } catch (e) {
+        console.error("Failed to load feedbacks", e);
+    }
 }
 
 async function fetchAndShowRestaurants() {
