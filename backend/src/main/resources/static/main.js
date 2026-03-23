@@ -18,7 +18,12 @@ const trackingContent = document.getElementById('tracking-content');
 
 // Nav Buttons
 const navItems = document.querySelectorAll('.nav-item');
-const managerNavBtn = document.getElementById('nav-manager-btn');
+const mgrCustomersBtn = document.getElementById('nav-mgr-customers-btn');
+const mgrOwnersBtn = document.getElementById('nav-mgr-owners-btn');
+const mgrAgentsBtn = document.getElementById('nav-mgr-agents-btn');
+const mgrLocationsBtn = document.getElementById('nav-mgr-locations-btn');
+const mgrFeedbackBtn = document.getElementById('nav-mgr-feedback-btn');
+const mgrAccountBtn = document.getElementById('nav-mgr-account-btn');
 const ownerNavBtn = document.getElementById('nav-owner-btn');
 const agentNavBtn = document.getElementById('nav-agent-btn');
 const browseNavBtn = document.getElementById('nav-browse-btn');
@@ -109,8 +114,8 @@ function switchPane(paneId, navBtnId) {
         fetchAndShowRestaurants();
     }
 
-    // Special logic for manager pane
-    if (paneId === 'manager-content') {
+    // Special logic for manager sub-panes
+    if (paneId === 'mgr-agents-content') {
         fetchAndShowAgents();
     }
 
@@ -125,7 +130,12 @@ document.getElementById('nav-menu-btn').addEventListener('click', () => switchPa
 document.getElementById('nav-browse-btn').addEventListener('click', () => switchPane('restaurants-content', 'nav-browse-btn'));
 document.getElementById('nav-owner-btn').addEventListener('click', () => switchPane('owner-content', 'nav-owner-btn'));
 document.getElementById('nav-agent-btn').addEventListener('click', () => switchPane('agent-content', 'nav-agent-btn'));
-document.getElementById('nav-manager-btn').addEventListener('click', () => switchPane('manager-content', 'nav-manager-btn'));
+document.getElementById('nav-mgr-customers-btn').addEventListener('click', () => switchPane('mgr-customers-content', 'nav-mgr-customers-btn'));
+document.getElementById('nav-mgr-owners-btn').addEventListener('click', () => switchPane('mgr-owners-content', 'nav-mgr-owners-btn'));
+document.getElementById('nav-mgr-agents-btn').addEventListener('click', () => switchPane('mgr-agents-content', 'nav-mgr-agents-btn'));
+document.getElementById('nav-mgr-locations-btn').addEventListener('click', () => switchPane('mgr-locations-content', 'nav-mgr-locations-btn'));
+document.getElementById('nav-mgr-feedback-btn').addEventListener('click', () => switchPane('mgr-feedback-content', 'nav-mgr-feedback-btn'));
+document.getElementById('nav-mgr-account-btn').addEventListener('click', () => switchPane('mgr-account-content', 'nav-mgr-account-btn'));
 document.getElementById('nav-orders-btn').addEventListener('click', () => switchPane('orders-content', 'nav-orders-btn'));
 document.getElementById('nav-tracking-btn').addEventListener('click', () => switchPane('tracking-content', 'nav-tracking-btn'));
 document.getElementById('nav-feedback-btn').addEventListener('click', () => switchPane('feedback-content', 'nav-feedback-btn'));
@@ -271,7 +281,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
                 switchOuterLayout(mainLayout);
                 // Redirect to role-specific default pane
                 if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
-                    switchPane('manager-content', 'nav-manager-btn');
+                    switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
                 } else if (currentUser.role === 'RESTAURANT_OWNER') {
                     switchPane('owner-content', 'nav-owner-btn');
                 } else if (currentUser.role === 'DELIVERY_AGENT') {
@@ -349,7 +359,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
                 switchOuterLayout(mainLayout);
                 // Redirect to role-specific default pane
                 if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
-                    switchPane('manager-content', 'nav-manager-btn');
+                    switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
                 } else if (currentUser.role === 'RESTAURANT_OWNER') {
                     switchPane('owner-content', 'nav-owner-btn');
                 } else if (currentUser.role === 'DELIVERY_AGENT') {
@@ -550,7 +560,12 @@ function updateNavigationForRole(role) {
         feedbackNavBtn.style.display = 'flex';
         accountNavBtn.style.display = 'flex';
     } else if (role === 'MANAGER' || role === 'ADMIN') {
-        managerNavBtn.style.display = 'flex';
+        mgrCustomersBtn.style.display = 'flex';
+        mgrOwnersBtn.style.display = 'flex';
+        mgrAgentsBtn.style.display = 'flex';
+        mgrLocationsBtn.style.display = 'flex';
+        mgrFeedbackBtn.style.display = 'flex';
+        mgrAccountBtn.style.display = 'flex';
         trackingNavBtn.style.display = 'flex';
     } else if (role === 'RESTAURANT_OWNER') {
         ownerNavBtn.style.display = 'flex';
@@ -585,7 +600,7 @@ function initSession() {
         
         // Land on default pane based on role
         if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
-            switchPane('manager-content', 'nav-manager-btn');
+            switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
         } else if (currentUser.role === 'RESTAURANT_OWNER') {
             switchPane('owner-content', 'nav-owner-btn');
         } else if (currentUser.role === 'DELIVERY_AGENT') {

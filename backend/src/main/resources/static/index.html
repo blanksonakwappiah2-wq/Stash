@@ -114,7 +114,12 @@
                     <button id="nav-owner-btn" class="nav-item" style="display: none;">🏪 My Restaurant</button>
                     <button id="nav-agent-btn" class="nav-item" style="display: none;">📦 Deliveries</button>
                     <button id="nav-availabilities-btn" class="nav-item" style="display: none;">⏳ Availabilities</button>
-                    <button id="nav-manager-btn" class="nav-item" style="display: none;">⚙️ Manager Portal</button>
+                    <button id="nav-mgr-customers-btn" class="nav-item" style="display: none;">👥 Customers</button>
+                    <button id="nav-mgr-owners-btn" class="nav-item" style="display: none;">🏪 Restaurant Owners</button>
+                    <button id="nav-mgr-agents-btn" class="nav-item" style="display: none;">🚴 Delivery Agents</button>
+                    <button id="nav-mgr-locations-btn" class="nav-item" style="display: none;">📍 Locations</button>
+                    <button id="nav-mgr-feedback-btn" class="nav-item" style="display: none;">💬 Feedbacks</button>
+                    <button id="nav-mgr-account-btn" class="nav-item" style="display: none;">⚙️ Account</button>
                     <button id="nav-orders-btn" class="nav-item">📋 My Orders</button>
                     <button id="nav-tracking-btn" class="nav-item">📍 Delivery Tracking</button>
                     <button id="nav-feedback-btn" class="nav-item" style="display: none;">💬 Feedback</button>
@@ -155,8 +160,16 @@
                     </div>
                 </div>
 
-                <!-- Manager Portal Section -->
-                <div id="manager-content" class="content-pane">
+                <!-- Manager: Customers Section -->
+                <div id="mgr-customers-content" class="content-pane">
+                    <div class="content-card full-width">
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">👥 Customer Management</h1>
+                        <p class="label" style="color: #64748b;">View and manage all registered customers. (Coming soon)</p>
+                    </div>
+                </div>
+
+                <!-- Manager: Restaurant Owners Section -->
+                <div id="mgr-owners-content" class="content-pane">
                     <div class="content-card section-card">
                         <h1 class="title-label" style="text-align: left; color: #1e1b4b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">🍽️ Restaurant Management</h1>
                         <p class="label" style="margin-bottom: 20px; color: #64748b;">Register a New Restaurant and its Owner account.</p>
@@ -166,28 +179,23 @@
                                 <label class="label" style="color: #1e1b4b;">Restaurant Name:</label>
                                 <input type="text" id="rest-name" class="text-field" placeholder="Restaurant Name" style="color: #1e1b4b; border-color: #cbd5e1;">
                             </div>
-                            
                             <div class="form-group">
                                 <label class="label" style="color: #1e1b4b;">Category:</label>
                                 <input type="text" id="rest-category" class="text-field" placeholder="e.g. Italian, Fast Food" style="color: #1e1b4b; border-color: #cbd5e1;">
                             </div>
-
                             <div class="form-group">
                                 <label class="label" style="color: #1e1b4b;">Address:</label>
                                 <input type="text" id="rest-address" class="text-field" placeholder="123 Example St" style="color: #1e1b4b; border-color: #cbd5e1;">
                             </div>
-
                             <div class="form-group">
                                 <label class="label" style="color: #1e1b4b;">Contact Info:</label>
                                 <input type="text" id="rest-contact" class="text-field" placeholder="123-456-7890" style="color: #1e1b4b; border-color: #cbd5e1;">
                             </div>
-
                             <div class="form-group">
                                 <label class="label" style="color: #1e1b4b;">Website (URL):</label>
                                 <input type="text" id="rest-website" class="text-field" placeholder="https://example.com" style="color: #1e1b4b; border-color: #cbd5e1;">
                             </div>
                         </div>
-                        
                         <div class="form-group" style="margin-top: 25px; border-top: 2px dashed #f1f5f9; padding-top: 20px;">
                             <h3 class="label" style="font-weight: 700; margin-bottom: 15px; color: #1e1b4b;">👤 Create Owner Account</h3>
                             <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
@@ -196,14 +204,16 @@
                                 <input type="password" id="owner-password" class="text-field" placeholder="Owner Password" style="color: #1e1b4b; border-color: #cbd5e1;">
                             </div>
                         </div>
-
                         <div class="button-group" style="justify-content: flex-start; margin-top: 20px;">
                             <button id="add-rest-btn" class="login-button" style="max-width: 250px;">Create Restaurant & Owner</button>
                         </div>
                         <div id="manager-message" class="message-label" style="display: none;"></div>
                     </div>
+                </div>
 
-                    <div class="content-card section-card" style="margin-top: 40px;">
+                <!-- Manager: Delivery Agents Section -->
+                <div id="mgr-agents-content" class="content-pane">
+                    <div class="content-card section-card">
                         <h1 class="title-label" style="text-align: left; color: #1e1b4b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">🚴 Delivery Agent Management</h1>
                         <p class="label" style="margin-bottom: 20px; color: #64748b;">Oversee active agents and register new ones.</p>
                         
@@ -222,9 +232,29 @@
                                 <button id="add-agent-btn" class="login-button" style="max-width: 180px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Add Agent</button>
                             </div>
                             <div id="agent-message" class="message-label" style="display: none;"></div>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="content-card section-card" style="margin-top: 40px;">
+                <!-- Manager: Locations Section -->
+                <div id="mgr-locations-content" class="content-pane">
+                    <div class="content-card section-card">
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">📍 Location Management</h1>
+                        <p class="label" style="color: #64748b;">Manage delivery zones and restaurant locations. (Coming soon)</p>
+                    </div>
+                </div>
+
+                <!-- Manager: Feedbacks Section -->
+                <div id="mgr-feedback-content" class="content-pane">
+                    <div class="content-card section-card">
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">💬 All Feedbacks</h1>
+                        <p class="label" style="color: #64748b;">View and analyze feedbacks from all users. (Coming soon)</p>
+                    </div>
+                </div>
+
+                <!-- Manager: Account Section -->
+                <div id="mgr-account-content" class="content-pane">
+                    <div class="content-card section-card">
                         <h1 class="title-label" style="text-align: left; color: #1e1b4b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">⚙️ Manager Account Settings</h1>
                         <p class="label" style="margin-bottom: 20px; color: #64748b;">Update your administrative credentials (Name, Email, Password).</p>
                         
