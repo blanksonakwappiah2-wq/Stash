@@ -35,8 +35,21 @@ const availabilitiesNavBtn = document.getElementById('nav-availabilities-btn');
 const ownerTrackingNavBtn = document.getElementById('nav-owner-tracking-btn');
 const homeNavBtn = document.getElementById('nav-menu-btn');
 
-let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let currentUser = null;
 let authToken = localStorage.getItem('authToken') || null;
+
+try {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser && savedUser !== "undefined" && savedUser !== "null") {
+        currentUser = JSON.parse(savedUser);
+    }
+} catch (e) {
+    console.error("Session parse error:", e);
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    currentUser = null;
+    authToken = null;
+}
 let mgrMap = null;
 let simulationInterval = null;
 let agentMarkers = {}; // To track and move agent markers
@@ -207,16 +220,6 @@ function logout() {
 
 document.getElementById('sidebar-logout-btn').addEventListener('click', logout);
 
-// Show password toggles
-document.getElementById('login-show-password').addEventListener('change', (e) => {
-    document.getElementById('login-password').type = e.target.checked ? 'text' : 'password';
-});
-
-document.getElementById('reg-show-password').addEventListener('change', (e) => {
-    const type = e.target.checked ? 'text' : 'password';
-    document.getElementById('reg-password').type = type;
-    document.getElementById('reg-confirm-password').type = type;
-});
 
 function showAlert(message) {
     alert("QuickBite\n\n" + message);
@@ -348,15 +351,27 @@ document.getElementById('login-btn').addEventListener('click', async () => {
         return;
     }
 
+    const loginBtn = document.getElementById('login-btn');
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Logging in...";
+
+    console.log("Attempting login for:", email);
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
         const response = await fetch(BACKEND_URL + 'login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
         
+        console.log("Login response status:", response.status);
         if (response.ok) {
             const data = await response.json();
+            console.log("Login successful, user role:", data.role);
             currentUser = {
                 id: data.id,
                 name: data.name,
@@ -390,11 +405,19 @@ document.getElementById('login-btn').addEventListener('click', async () => {
                 if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
             }, 600);
         } else {
-            const error = await response.json();
-            showMessage('login-message', error.message || "Invalid credentials. Please try again.", false);
+            const errorData = await response.json();
+            showMessage('login-message', errorData.message || "Invalid credentials. Please try again.", false);
         }
     } catch (e) {
-        showMessage('login-message', "Network error. Make sure backend is running.", false);
+        console.error("Login Error:", e);
+        if (e.name === 'AbortError') {
+            showMessage('login-message', "Login timed out. The server might be waking up (Render Free Tier can take 1-2 minutes). Please try again in a moment.", false);
+        } else {
+            showMessage('login-message', "Connection error. Please check your internet or try again later.", false);
+        }
+    } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Login";
     }
 });
 
@@ -426,15 +449,27 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         return;
     }
 
+    const regBtn = document.getElementById('register-btn');
+    regBtn.disabled = true;
+    regBtn.textContent = "Registering...";
+
+    console.log("Attempting registration for:", email);
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+
         const response = await fetch(BACKEND_URL + 'register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, role })
+            body: JSON.stringify({ name, email, password, role }),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
+        console.log("Registration response status:", response.status);
         if (response.ok) {
             const data = await response.json();
+            console.log("Registration successful, user role:", data.role);
             currentUser = {
                 id: data.id,
                 name: data.name,
@@ -468,12 +503,17 @@ document.getElementById('register-btn').addEventListener('click', async () => {
                 if (welcomeTitle) welcomeTitle.textContent = `Welcome, ${currentUser.name}!`;
                 clearRegisterInputs();
             }, 1000);
-        } else {
-            const error = await response.json();
-            showMessage('reg-message', error.message || "Registration failed.", false);
         }
     } catch (e) {
-        showMessage('reg-message', "Network error. Make sure backend is running.", false);
+        console.error("Registration Error:", e);
+        if (e.name === 'AbortError') {
+            showMessage('reg-message', "Registration timed out. The server might be waking up (Render Free Tier can take 1-2 minutes). Please try again in a moment.", false);
+        } else {
+            showMessage('reg-message', "Connection error. Please check your internet or try again later.", false);
+        }
+    } finally {
+        regBtn.disabled = false;
+        regBtn.textContent = "Register";
     }
 });
 
