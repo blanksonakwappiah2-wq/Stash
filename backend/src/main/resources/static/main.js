@@ -1241,8 +1241,10 @@ window.loadProfileToUI = loadProfileToUI;
 
 // Update navigation click listeners to handle extra work
 document.getElementById('nav-account-btn').addEventListener('click', loadProfileToUI);
-document.getElementById('checkout-btn').removeEventListener('click', placeOrder);
-document.getElementById('checkout-btn').addEventListener('click', openOrderModal);
+const checkoutBtn = document.getElementById('checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', openOrderModal);
+}
 
 async function fetchAndShowOrders() {
     try {
