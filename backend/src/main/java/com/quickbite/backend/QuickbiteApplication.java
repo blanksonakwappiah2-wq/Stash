@@ -43,6 +43,7 @@ public class QuickbiteApplication {
                 manager.setPassword(passwordEncoder.encode("Manager123"));
                 manager.setRole(UserRole.MANAGER);
                 userRepository.save(manager);
+                System.out.println("Seeded Manager account.");
             }
 
             if (userRepository.findByEmail("customer@quickbite.com") == null) {
@@ -52,77 +53,32 @@ public class QuickbiteApplication {
                 customer.setPassword(passwordEncoder.encode("Customer123"));
                 customer.setRole(UserRole.CUSTOMER);
                 userRepository.save(customer);
+                System.out.println("Seeded Customer account.");
             }
 
-            if (userRepository.findByEmail("owner@quickbite.com") == null) {
+            if (restaurantRepository.count() == 0) {
                 User owner = new User();
                 owner.setName("Restaurant Owner");
                 owner.setEmail("owner@quickbite.com");
                 owner.setPassword(passwordEncoder.encode("Owner123"));
                 owner.setRole(UserRole.RESTAURANT_OWNER);
                 userRepository.save(owner);
-            }
-
-            if (userRepository.findByEmail("agent@quickbite.com") == null) {
-                User agent = new User();
-                agent.setName("Delivery Agent");
-                agent.setEmail("agent@quickbite.com");
-                agent.setPassword(passwordEncoder.encode("Agent123"));
-                agent.setRole(UserRole.DELIVERY_AGENT);
-                userRepository.save(agent);
-            }
-
-            if (restaurantRepository.count() == 0) {
-                User owner = userRepository.findByEmail("owner@quickbite.com");
+                System.out.println("Seeded Owner account.");
 
                 Restaurant pizza = new Restaurant();
                 pizza.setName("Pepperoni Palace");
                 pizza.setCategory("Pizza");
                 pizza.setAddress("123 Pizza St");
                 pizza.setContact("555-PIZZA");
-                pizza.setWebsite("https://pepperonipalace.com");
                 pizza.setOwner(owner);
                 restaurantRepository.save(pizza);
 
-                // Seed Menu Items for Pizza
                 MenuItem m1 = new MenuItem();
-                m1.setName("Margherita Pizza");
+                m1.setName("Classic Margherita");
                 m1.setPrice(12.99);
-                m1.setDescription("Fresh basil, mozzarella, and tomato sauce.");
                 m1.setRestaurant(pizza);
                 menuItemRepository.save(m1);
-
-                Restaurant burger = new Restaurant();
-                burger.setName("Burger Heaven");
-                burger.setCategory("Burgers");
-                burger.setAddress("456 Burger Ave");
-                burger.setContact("555-BURGER");
-                burger.setWebsite("https://burgerheaven.com");
-                restaurantRepository.save(burger);
-
-                Restaurant sushi = new Restaurant();
-                sushi.setName("Sakura Sushi");
-                sushi.setCategory("Sushi");
-                sushi.setAddress("789 Sushi Rd");
-                sushi.setContact("555-SUSHI");
-                sushi.setWebsite("https://sakurasushi.com");
-                restaurantRepository.save(sushi);
-
-                Restaurant chinese = new Restaurant();
-                chinese.setName("Dragon Wok");
-                chinese.setCategory("Chinese");
-                chinese.setAddress("321 Wok Way");
-                chinese.setContact("555-WOK");
-                chinese.setWebsite("https://dragonwok.com");
-                restaurantRepository.save(chinese);
-
-                Restaurant dessert = new Restaurant();
-                dessert.setName("Sweet Treats");
-                dessert.setCategory("Desserts");
-                dessert.setAddress("654 Sugar Ln");
-                dessert.setContact("555-SWEET");
-                dessert.setWebsite("https://sweettreats.com");
-                restaurantRepository.save(dessert);
+                System.out.println("Seeded Restaurant and Menu.");
             }
 
             if (deliveryOptionRepository.count() == 0) {
@@ -133,22 +89,7 @@ public class QuickbiteApplication {
                 standard.setPerKmFee(0.50);
                 standard.setEstimatedTime(45);
                 deliveryOptionRepository.save(standard);
-
-                DeliveryOption express = new DeliveryOption();
-                express.setMethod("express");
-                express.setCategory("Food/Express");
-                express.setBaseFee(4.99);
-                express.setPerKmFee(0.75);
-                express.setEstimatedTime(25);
-                deliveryOptionRepository.save(express);
-
-                DeliveryOption drone = new DeliveryOption();
-                drone.setMethod("drone");
-                drone.setCategory("Specialty");
-                drone.setBaseFee(6.99);
-                drone.setPerKmFee(1.00);
-                drone.setEstimatedTime(15);
-                deliveryOptionRepository.save(drone);
+                System.out.println("Seeded Delivery Options.");
             }
         };
     }

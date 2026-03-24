@@ -1,3 +1,11 @@
+// Global Error Handler for Diagnostics
+window.onerror = function(message, source, lineno, colno, error) {
+    const errorMsg = `CRITICAL JS ERROR: ${message}\nAt: ${source}:${lineno}:${colno}`;
+    console.error(errorMsg, error);
+    alert(errorMsg + "\n\nPlease try 'Clear Cache & Reset' on the login screen.");
+    return false;
+};
+
 const BACKEND_URL = "/api/users/";
 const RESTAURANT_URL = "/api/restaurants";
 const DELIVERY_URL = "/api/delivery/";
@@ -218,6 +226,14 @@ function logout() {
     switchOuterLayout(loginScene);
 }
 
+function logoutAndReset() {
+    console.log("Performing hard reset...");
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.reload();
+}
+
+window.logoutAndReset = logoutAndReset;
 document.getElementById('sidebar-logout-btn').addEventListener('click', logout);
 
 
