@@ -458,7 +458,7 @@ async function handleLogin() {
             updateNavigationForRole(currentUser.role);
             
             setTimeout(() => {
-                switchOuterLayout(mainLayout);
+                switchOuterLayout('main-layout');
                 // Redirect to role-specific default pane
                 if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
                     switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
@@ -553,7 +553,7 @@ async function handleRegister() {
             updateNavigationForRole(currentUser.role);
             
             setTimeout(() => {
-                switchOuterLayout(mainLayout);
+                switchOuterLayout('main-layout');
                 // Redirect to role-specific default pane
                 if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
                     switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
