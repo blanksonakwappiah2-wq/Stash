@@ -779,6 +779,79 @@ function updateNavigationForRole(role) {
     }
 }
 
+// Manager: Fetch & Display Customers
+async function fetchAndShowCustomers() {
+    try {
+        const response = await secureFetch(BACKEND_URL + 'users');
+        if (!response || !response.ok) return;
+        const users = await response.json();
+        const customers = users.filter(u => u.role === 'CUSTOMER');
+        const list = document.getElementById('customer-list');
+        if (!list) return;
+
+        if (customers.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No customers registered yet.</p>';
+            return;
+        }
+
+        list.innerHTML = customers.map(c => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3em; flex-shrink: 0;">👤</div>
+                    <div>
+                        <p style="font-weight: 700; color: #1e1b4b; margin: 0;">${c.name}</p>
+                        <p style="font-size: 0.85em; color: #64748b; margin: 2px 0;">${c.email}</p>
+                        ${c.phone ? `<p style="font-size: 0.8em; color: #94a3b8; margin: 0;">📞 ${c.phone}</p>` : ''}
+                    </div>
+                    <span class="category-badge" style="margin-left: auto; background: #e0e7ff; color: #4338ca;">Customer</span>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load customers', e);
+    }
+}
+
+// Manager: Fetch & Display Feedbacks
+async function fetchAndShowFeedbacks() {
+    const list = document.getElementById('feedback-list');
+    if (!list) return;
+    list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 30px; color: #94a3b8;">Loading feedback... 🔄</p>';
+
+    try {
+        const response = await secureFetch('/api/reviews');
+        if (!response || !response.ok) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No feedback submitted yet. 🌟</p>';
+            return;
+        }
+        const feedbacks = await response.json();
+
+        if (!feedbacks || feedbacks.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No feedback submitted yet. 🌟</p>';
+            return;
+        }
+
+        list.innerHTML = feedbacks.map(f => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">💬</div>
+                        <div>
+                            <p style="font-weight: 700; color: #1e1b4b; margin: 0;">${f.customer?.name || 'Anonymous'}</p>
+                            <p style="font-size: 0.8em; color: #94a3b8; margin: 0;">${f.createdAt ? new Date(f.createdAt).toLocaleDateString() : 'Recent'}</p>
+                        </div>
+                    </div>
+                    <div style="color: #f59e0b;">${'⭐'.repeat(Math.min(f.rating || 5, 5))}</div>
+                </div>
+                <p style="color: #475569; font-size: 0.95em; line-height: 1.6; background: #f8fafc; padding: 12px; border-radius: 10px; margin: 0;">"${f.comment}"</p>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load feedbacks', e);
+        list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">Error loading feedback. Please try again.</p>';
+    }
+}
+
 // Manager Map & Real-time Simulation
 function initManagerMap() {
     if (typeof L === 'undefined') {
