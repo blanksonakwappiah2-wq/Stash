@@ -9,6 +9,37 @@
     <!-- Leaflet Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- FAIL-SAFE DIAGNOSTICS: Ensure console works even if main.js fails -->
+    <script>
+        window.addEventListener('error', function(e) {
+            const errDiv = document.getElementById('debug-logs-content');
+            if (errDiv) {
+                errDiv.innerHTML += `<div style="color: #ef4444; margin-bottom:5px;">[ERROR] ${e.message} at ${e.filename}:${e.lineno}</div>`;
+            }
+            // If the heartbeat hasn't started in 5 seconds, alert
+            setTimeout(() => {
+                if (document.getElementById('status-text').textContent === "Logic: Init...") {
+                    console.warn("Script initialization appears stalled.");
+                }
+            }, 5000);
+        });
+
+        function toggleDebugConsole() {
+            const consoleEl = document.getElementById('debug-console');
+            if (consoleEl) {
+                consoleEl.style.display = (consoleEl.style.display === 'none') ? 'block' : 'none';
+            }
+        }
+        
+        function logoutAndReset() {
+            if (confirm("This will clear all local session data and reload. Proceed?")) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.reload();
+            }
+        }
+    </script>
 </head>
 <body>
     <div id="app">
@@ -38,8 +69,8 @@
                 <div id="login-message" class="message-label" style="display: none;"></div>
                 
                 <div style="text-align: center; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
-                    <a href="#" onclick="logoutAndReset(); return false;" style="font-size: 0.8em; color: #64748b; text-decoration: none; border-bottom: 1px dashed #cbd5e1;">⚠️ Stuck? Clear Cache & Reset</a>
-                    <a href="#" onclick="toggleDebugConsole(); return false;" style="font-size: 0.8em; color: #6366f1; text-decoration: none;">🔍 Show Debug Logs</a>
+                    <button onclick="logoutAndReset();" style="background: none; border: none; font-size: 0.8em; color: #64748b; text-decoration: none; border-bottom: 1px dashed #cbd5e1; cursor: pointer;">⚠️ Stuck? Clear Cache & Reset</button>
+                    <button onclick="toggleDebugConsole();" style="background: none; border: none; font-size: 0.8em; color: #6366f1; text-decoration: none; cursor: pointer;">🔍 Show Debug Logs</button>
                 </div>
 
                 <!-- Heartbeat & Status -->
@@ -511,6 +542,7 @@
         </div>
     </div>
     
-    <script type="module" src="main.js"></script>
+    <!-- Use a simple script tag instead of type="module" to maximize compatibility -->
+    <script src="main.js?v=999-ULTIMATE-ALPHA"></script>
 </body>
 </html>

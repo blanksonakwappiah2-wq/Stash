@@ -1,14 +1,17 @@
 // Global Error Handler for Diagnostics
+console.log("QuickBite: main.js is loading...");
+
 window.onerror = function(message, source, lineno, colno, error) {
     const errorMsg = `CRITICAL JS ERROR: ${message}\nAt: ${source}:${lineno}:${colno}`;
     console.error(errorMsg, error);
-    logToScreen(errorMsg, true);
+    if (typeof logToScreen === 'function') logToScreen(errorMsg, true);
     alert(errorMsg + "\n\nPlease try 'Clear Cache & Reset' on the login screen.");
     return false;
 };
 
 // Log to Screen for easier debugging on Render
 function logToScreen(msg, isError = false) {
+    console.log(`[LOG] ${msg}`);
     const content = document.getElementById('debug-logs-content');
     if (!content) return;
     const time = new Date().toLocaleTimeString();
@@ -1202,18 +1205,33 @@ function initSession() {
 
 // Global initialization call on window load
 window.addEventListener('load', () => {
-    logToScreen("Window loaded. Starting logic...");
+    console.log("QuickBite: Window load event fired.");
+    logToScreen("Initializing application...");
     try {
+        logToScreen("-> Initializing Sidebar...");
         setupSidebar();
+        
+        logToScreen("-> Initializing Navigation...");
         setupNavListeners();
         
-        // Setup Auth Listeners
+        logToScreen("-> Binding Authentication Buttons...");
         const loginBtn = document.getElementById('login-btn');
-        if (loginBtn) loginBtn.addEventListener('click', handleLogin);
-        const regBtn = document.getElementById('register-btn');
-        if (regBtn) regBtn.addEventListener('click', handleRegister);
+        if (loginBtn) {
+            loginBtn.addEventListener('click', handleLogin);
+            logToScreen("   [OK] Login button bound.");
+        } else {
+            logToScreen("   [WARN] Login button NOT FOUND in DOM.", true);
+        }
 
-        // Setup Manager Action Listeners
+        const regBtn = document.getElementById('register-btn');
+        if (regBtn) {
+            regBtn.addEventListener('click', handleRegister);
+            logToScreen("   [OK] Register button bound.");
+        } else {
+            logToScreen("   [WARN] Register button NOT FOUND in DOM.", true);
+        }
+
+        logToScreen("-> Binding Manager Action Buttons...");
         const addRestBtn = document.getElementById('add-rest-btn');
         if (addRestBtn) addRestBtn.addEventListener('click', handleAddRestaurant);
         const addAgentBtn = document.getElementById('add-agent-btn');
@@ -1221,9 +1239,9 @@ window.addEventListener('load', () => {
         const updateMgrBtn = document.getElementById('update-manager-btn');
         if (updateMgrBtn) updateMgrBtn.addEventListener('click', handleUpdateManager);
 
-        logToScreen("All listeners attached.");
+        logToScreen("Initialization complete.");
     } catch (e) {
-        logToScreen("Listener Setup Failed: " + e.message, true);
+        logToScreen("Initialization FAILED at: " + e.stack, true);
         console.error("Setup Error:", e);
     }
     startHeartbeat();
