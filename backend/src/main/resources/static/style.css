@@ -78,40 +78,50 @@ body {
 .auth-features {
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 28px;
 }
 
 .auth-feature-item {
     display: flex;
-    align-items: center;
-    gap: 18px;
-    background: rgba(255,255,255,0.07);
-    padding: 16px 20px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.12);
-    transition: background 0.3s ease;
+    align-items: flex-start;
+    gap: 20px;
+    padding-left: 0;
+    border-left: 3px solid rgba(129,140,248,0.5);
+    padding-left: 20px;
+    background: none;
+    border-radius: 0;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    transition: border-color 0.3s ease;
 }
 
 .auth-feature-item:hover {
-    background: rgba(255,255,255,0.12);
+    border-left-color: #818cf8;
+    background: none;
 }
 
 .auth-feature-icon {
-    font-size: 28px;
+    font-size: 24px;
     flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.9;
 }
 
 .auth-feature-item strong {
     display: block;
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: 700;
     color: white;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
 }
 
 .auth-feature-item p {
     font-size: 13px;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.55);
     margin: 0;
+    line-height: 1.5;
 }
 
 /* Right Form Panel */
