@@ -50,6 +50,7 @@ public class RestaurantController {
             restaurant.setContact(request.getContact());
             restaurant.setWebsite(request.getWebsite());
             restaurant.setCategory(request.getCategory() != null ? request.getCategory() : "General");
+            restaurant.setImageUrl(request.getImageUrl());
 
             // Handle Owner
             if (request.getOwnerId() != null) {
@@ -88,6 +89,9 @@ public class RestaurantController {
             if (request.getCategory() != null) {
                 existing.setCategory(request.getCategory());
             }
+            if (request.getImageUrl() != null) {
+                existing.setImageUrl(request.getImageUrl());
+            }
 
             Restaurant updated = restaurantService.updateRestaurant(existing);
             return ResponseEntity.ok(convertToDTO(updated));
@@ -118,6 +122,7 @@ public class RestaurantController {
         dto.setContact(restaurant.getContact());
         dto.setCategory(restaurant.getCategory());
         dto.setWebsite(restaurant.getWebsite());
+        dto.setImageUrl(restaurant.getImageUrl());
         if (restaurant.getOwner() != null) {
             dto.setOwnerId(restaurant.getOwner().getId());
             dto.setOwnerName(restaurant.getOwner().getName());

@@ -12,6 +12,8 @@ public class RestaurantDTO {
 
     public RestaurantDTO() {}
 
+    private String imageUrl;
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -29,4 +31,6 @@ public class RestaurantDTO {
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
     public String getOwnerName() { return ownerName; }
     public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

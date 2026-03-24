@@ -10,6 +10,8 @@ public class RestaurantRequest {
 
     public RestaurantRequest() {}
 
+    private String imageUrl;
+
     // Getters and Setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -23,4 +25,6 @@ public class RestaurantRequest {
     public void setWebsite(String website) { this.website = website; }
     public Long getOwnerId() { return ownerId; }
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

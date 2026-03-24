@@ -203,7 +203,7 @@ function switchPane(paneId, navBtnId) {
 
     // Special logic for tracking pane
     if (paneId === 'tracking-content') {
-        initMap();
+        initCustomerMap();
     }
 
     // Special logic for orders pane
@@ -843,6 +843,24 @@ function initOwnerMap() {
 
     fetchMapData(mgrMap, 'RESTAURANT_OWNER');
 }
+ 
+function initCustomerMap() {
+    if (typeof L === 'undefined') {
+        logToScreen("Leaflet (L) is MISSING. Customer Map cannot initialize.", true);
+        return;
+    }
+    const mapDiv = document.getElementById('map');
+    if (!mapDiv) return;
+
+    if (mgrMap) {
+        mgrMap.remove();
+    }
+
+    mgrMap = L.map('map').setView([51.505, -0.09], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mgrMap);
+
+    fetchMapData(mgrMap, 'CUSTOMER');
+}
 
 async function fetchMapData(targetMap, role) {
     try {
@@ -931,19 +949,27 @@ async function fetchAndShowRestaurants() {
         const restaurants = await response.json();
         
         const list = document.getElementById('restaurants-list');
-        list.innerHTML = restaurants.map(rest => `
-            <div class="restaurant-card" onclick="showRestaurantMenu(${rest.id}, '${rest.name}')">
-                <div class="restaurant-image" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80')"></div>
-                <div class="restaurant-info">
-                    <h3 class="restaurant-name">${rest.name}</h3>
-                    <p class="restaurant-category">${rest.category}</p>
-                    <div class="restaurant-meta">
-                        <span>⭐ 4.8</span>
-                        <span>$${rest.deliveryFee || '2.99'} Delivery</span>
+        list.innerHTML = restaurants.map(rest => {
+            const displayImage = rest.imageUrl || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80&sig=${rest.id}`;
+            const locationText = rest.address ? `📍 ${rest.address.split(',')[0]}` : '📍 Nearby - 1.2km';
+            
+            return `
+                <div class="restaurant-card" onclick="showRestaurantMenu(${rest.id}, '${rest.name.replace(/'/g, "\\'")}')">
+                    <div class="restaurant-image" style="background-image: url('${displayImage}')"></div>
+                    <div class="restaurant-info">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
+                            <h3 class="restaurant-name">${rest.name}</h3>
+                            <span class="category-badge" style="font-size: 0.6em; padding: 4px 8px;">${rest.category}</span>
+                        </div>
+                        <div class="location-tag">${locationText}</div>
+                        <div class="restaurant-meta">
+                            <span style="color: #f59e0b; font-weight: 700;">⭐ 4.8</span>
+                            <span style="color: #64748b; font-size: 0.85em;">Free Delivery over $20</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         // Show cart if logged as CUSTOMER
         const cartSidebar = document.getElementById('customer-cart-sidebar');
@@ -981,13 +1007,13 @@ async function showRestaurantMenu(restaurantId, restaurantName) {
 
         list.innerHTML = items.map(item => `
             <div class="restaurant-card" style="cursor: default;">
-                <div class="restaurant-image" style="background-image: url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80')"></div>
+                <div class="restaurant-image" style="background-image: url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80&sig=${item.id}')"></div>
                 <div class="restaurant-info">
                     <h3 class="restaurant-name">${item.name}</h3>
-                    <p class="restaurant-category" style="height: 40px; overflow: hidden;">${item.description || 'Delicious meal prepared with fresh ingredients.'}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <p class="restaurant-category" style="height: 40px; overflow: hidden; margin-bottom: 10px;">${item.description || 'Delicious meal prepared with fresh ingredients.'}</p>
+                    <div class="restaurant-meta">
                         <span style="font-weight: 700; color: #1e1b4b; font-size: 1.1em;">$${item.price.toFixed(2)}</span>
-                        <button class="login-button" style="padding: 8px 15px; font-size: 0.8em; margin: 0;" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
+                        <button class="login-button" style="padding: 8px 15px; font-size: 0.8em; margin: 0; width: auto;" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
                     </div>
                 </div>
             </div>
@@ -1042,24 +1068,46 @@ function updateCartUI() {
     checkoutBtn.disabled = false;
 }
 
-// Global exposure for onclick handlers
-window.addToCart = addToCart;
-window.removeFromCart = removeFromCart;
-window.showRestaurantMenu = showRestaurantMenu;
-
-document.getElementById('checkout-btn').addEventListener('click', placeOrder);
-
-async function placeOrder() {
+function openOrderModal() {
     if (!currentUser || cart.length === 0 || !selectedRestaurantId) return;
+    
+    const overlay = document.getElementById('order-confirm-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+        updateOrderModalValues();
+    }
+}
 
-    const checkoutBtn = document.getElementById('checkout-btn');
-    checkoutBtn.disabled = true;
-    checkoutBtn.innerText = 'Processing...';
+function closeOrderModal() {
+    const overlay = document.getElementById('order-confirm-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function updateOrderModalValues() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const select = document.getElementById('delivery-method-select');
+    const deliveryFee = parseFloat(select.options[select.selectedIndex].dataset.fee);
+    
+    document.getElementById('confirm-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+    document.getElementById('confirm-delivery-fee').innerText = `$${deliveryFee.toFixed(2)}`;
+    document.getElementById('confirm-total').innerText = `$${(subtotal + deliveryFee).toFixed(2)}`;
+}
+
+document.getElementById('delivery-method-select').addEventListener('change', updateOrderModalValues);
+document.getElementById('final-confirm-btn').addEventListener('click', confirmFinalOrder);
+
+async function confirmFinalOrder() {
+    const select = document.getElementById('delivery-method-select');
+    const deliveryOptionId = parseInt(select.value);
+    const confirmBtn = document.getElementById('final-confirm-btn');
+    
+    confirmBtn.disabled = true;
+    confirmBtn.innerText = 'Processing...';
 
     const orderRequest = {
         restaurantId: selectedRestaurantId,
         deliveryAddress: currentUser.address || 'Standard Delivery Address',
-        deliveryOptionId: 1, // Default option
+        deliveryOptionId: deliveryOptionId,
         items: cart.map(i => ({ menuItemId: i.menuItemId, quantity: i.quantity }))
     };
 
@@ -1073,6 +1121,7 @@ async function placeOrder() {
             alert('🎉 Order placed successfully!');
             cart = [];
             updateCartUI();
+            closeOrderModal();
             switchPane('orders-content', 'nav-orders-btn');
             fetchAndShowOrders();
         } else {
@@ -1083,10 +1132,117 @@ async function placeOrder() {
         console.error("Order placement failed", e);
         alert('An error occurred while placing your order.');
     } finally {
-        checkoutBtn.disabled = false;
-        checkoutBtn.innerText = 'Place Order';
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = 'Confirm & Pay';
     }
 }
+
+// Feedback Logic
+document.getElementById('submit-feedback-btn').addEventListener('click', submitFeedback);
+
+async function submitFeedback() {
+    const comment = document.getElementById('feedback-comment').value.trim();
+    if (!comment) return;
+
+    const btn = document.getElementById('submit-feedback-btn');
+    btn.disabled = true;
+    btn.innerText = 'Sending...';
+
+    try {
+        const response = await secureFetch('/api/reviews', {
+            method: 'POST',
+            body: JSON.stringify({
+                comment: comment,
+                customer: { id: currentUser.id },
+                rating: 5 // Default for general feedback
+            })
+        });
+
+        if (response.ok) {
+            showMessage('feedback-message', "Thank you! Your feedback has been sent to the manager.", true);
+            document.getElementById('feedback-comment').value = '';
+        } else {
+            showMessage('feedback-message', "Failed to send feedback. Please try again.", false);
+        }
+    } catch (e) {
+        console.error("Feedback error:", e);
+        showMessage('feedback-message', "Connection error. Please try again.", false);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Submit Feedback';
+    }
+}
+
+// Profile Logic
+document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+
+async function saveProfile() {
+    const name = document.getElementById('profile-name').value.trim();
+    const address = document.getElementById('profile-address').value.trim();
+    const phone = document.getElementById('profile-phone').value.trim();
+    const password = document.getElementById('profile-password').value;
+
+    if (!name) return;
+
+    const btn = document.getElementById('save-profile-btn');
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
+    const updateRequest = {
+        name: name,
+        email: currentUser.email,
+        address: address,
+        phone: phone
+    };
+    if (password) updateRequest.password = password;
+
+    try {
+        const response = await secureFetch(`/api/users/${currentUser.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(updateRequest)
+        });
+
+        if (response.ok) {
+            const updatedUser = await response.json();
+            currentUser.name = updatedUser.name;
+            currentUser.address = updatedUser.address;
+            currentUser.phone = updatedUser.phone;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            showMessage('profile-message', "Profile updated successfully!", true);
+            const welcomeTitle = document.querySelector('.welcome-title');
+            if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
+        } else {
+            showMessage('profile-message', "Update failed. Please try again.", false);
+        }
+    } catch (e) {
+        console.error("Profile update error:", e);
+        showMessage('profile-message', "Connection error. Please try again.", false);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Changes';
+    }
+}
+
+function loadProfileToUI() {
+    if (!currentUser) return;
+    document.getElementById('profile-name').value = currentUser.name || '';
+    document.getElementById('profile-email').value = currentUser.email || '';
+    document.getElementById('profile-address').value = currentUser.address || '';
+    document.getElementById('profile-phone').value = currentUser.phone || '';
+    document.getElementById('profile-password').value = '';
+}
+
+// Expose to window
+window.closeOrderModal = closeOrderModal;
+window.submitFeedback = submitFeedback;
+window.saveProfile = saveProfile;
+window.loadProfileToUI = loadProfileToUI;
+
+// Update navigation click listeners to handle extra work
+document.getElementById('nav-account-btn').addEventListener('click', loadProfileToUI);
+document.getElementById('checkout-btn').removeEventListener('click', placeOrder);
+document.getElementById('checkout-btn').addEventListener('click', openOrderModal);
 
 async function fetchAndShowOrders() {
     try {

@@ -16,6 +16,7 @@ public class Restaurant {
     private String website;
     private Double latitude;
     private Double longitude;
+    private String imageUrl;
     @OneToOne
     private User owner;
 
@@ -34,6 +35,8 @@ public class Restaurant {
     public void setOwner(User owner) { this.owner = owner; }
     public String getWebsite() { return website; }
     public void setWebsite(String website) { this.website = website; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public Double getLatitude() { return latitude; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }

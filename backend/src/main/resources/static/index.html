@@ -179,44 +179,81 @@
             <main id="content-area" class="content-area">
                 <!-- Welcome/Home Content -->
                 <div id="home-content" class="content-pane">
-                    <div class="content-card">
-                        <h1 class="welcome-title">Welcome back, QuickBite!</h1>
-                        <p class="welcome-subtitle">Hungry? Explore our top-rated restaurants or track your latest orders from the menu on the left.</p>
-                        <div class="quick-stats">
-                            <div class="stat-card">
-                                <span class="stat-value">50+</span>
-                                <span class="stat-label">Restaurants</span>
+                    <div class="dashboard-hero">
+                        <div class="hero-text">
+                            <h1 class="welcome-title">Welcome back, QuickBite!</h1>
+                            <p class="welcome-subtitle">Your favorite meals, delivered fresh and fast to your doorstep.</p>
+                            <div class="hero-actions">
+                                <button class="login-button" onclick="switchPane('restaurants-content', 'nav-browse-btn')">🚀 Order Now</button>
+                                <button class="register-button" style="background: white; color: #6366f1;" onclick="switchPane('tracking-content', 'nav-tracking-btn')">📍 Track Order</button>
                             </div>
-                            <div class="stat-card">
-                                <span class="stat-value">25min</span>
-                                <span class="stat-label">Avg. Delivery</span>
+                        </div>
+                    </div>
+
+                    <div class="services-overview">
+                        <h2 class="section-title">Our Services</h2>
+                        <div class="service-grid">
+                            <div class="service-card">
+                                <div class="service-icon">⚡</div>
+                                <h3>Fast Delivery</h3>
+                                <p>Average delivery time under 25 minutes for all local orders.</p>
                             </div>
+                            <div class="service-card">
+                                <div class="service-icon">🥘</div>
+                                <h3>Quality Food</h3>
+                                <p>We partner with top-rated restaurants to ensure the best taste.</p>
+                            </div>
+                            <div class="service-card">
+                                <div class="service-icon">🛡️</div>
+                                <h3>Safe & Secure</h3>
+                                <p>Contactless delivery and sanitized handling for your safety.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="safety-assurance">
+                        <div class="safety-content">
+                            <h3>🤝 Safe Delivery Assurance</h3>
+                            <p>We prioritize your health and safety. Every delivery agent follows strict hygiene protocols, including regular sanitization and temperature checks.</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-section">
+                        <h2 class="section-title">Support & Contact</h2>
+                        <div class="contact-grid">
+                            <a href="https://wa.me/1234567890" target="_blank" class="contact-btn whatsapp">
+                                <span>📱 WhatsApp Support</span>
+                            </a>
+                            <a href="tel:+1234567890" class="contact-btn phone">
+                                <span>📞 Call Us: +123 456 7890</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Restaurants List Section -->
                 <div id="restaurants-content" class="content-pane">
-                    <div style="display: flex; gap: 20px;">
-                        <div class="content-card" style="flex: 1;">
-                            <h1 class="title-label" style="text-align: left;">Available Restaurants</h1>
+                    <div style="display: flex; gap: 30px; align-items: flex-start;">
+                        <!-- Center Part: Restaurants Grid -->
+                        <div style="flex: 1;">
+                            <h1 class="section-title">Available Restaurants</h1>
                             <div id="restaurants-list" class="restaurant-grid">
                                 <!-- Restaurant cards will be injected here -->
                             </div>
                         </div>
                         
-                        <!-- Customer Cart Sidebar (Visible only for Customers) -->
-                        <div id="customer-cart-sidebar" class="content-card" style="width: 300px; display: none; flex-direction: column; background: #f8fafc; position: sticky; top: 20px; align-self: flex-start;">
-                            <h2 class="title-label" style="font-size: 1.2em; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">🛒 Your Cart</h2>
-                            <div id="cart-items" style="flex: 1; overflow-y: auto; max-height: 400px; margin-bottom: 20px;">
-                                <p class="label" style="text-align: center; color: #94a3b8; padding-top: 20px;">Your cart is empty.</p>
+                        <!-- Side Part: Your Order -->
+                        <div id="customer-cart-sidebar" class="content-card" style="width: 350px; display: none; flex-direction: column; background: white; position: sticky; top: 20px; border-radius: 24px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
+                            <h2 class="section-title" style="font-size: 1.4em; margin-bottom: 20px;">🛒 Your Order</h2>
+                            <div id="cart-items" style="flex: 1; overflow-y: auto; max-height: 50vh; margin-bottom: 25px;">
+                                <p class="label" style="text-align: center; color: #94a3b8; padding-top: 40px;">Your cart is empty. <br>Select a restaurant to start ordering!</p>
                             </div>
-                            <div style="border-top: 2px solid #e2e8f0; padding-top: 15px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: 700; color: #1e1b4b;">
-                                    <span>Total:</span>
+                            <div style="border-top: 2px solid #f1f5f9; padding-top: 20px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: 800; color: #1e1b4b; font-size: 1.2em;">
+                                    <span>Total Amount:</span>
                                     <span id="cart-total">$0.00</span>
                                 </div>
-                                <button id="checkout-btn" class="login-button" style="width: 100%;" disabled>Place Order</button>
+                                <button id="checkout-btn" class="login-button" style="width: 100%; padding: 18px;" disabled>Review & Place Order</button>
                             </div>
                         </div>
                     </div>
@@ -523,19 +560,90 @@
                     </div>
                 </div>
 
-                <!-- Feedback Section (Placeholder) -->
-                <div id="feedback-content" class="content-pane">
-                    <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">💬 Customer Feedback</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">We'd love to hear your thoughts! (Feedback form coming soon)</p>
+                <!-- Global Modal: Order Re-confirmation -->
+                <div id="order-confirm-overlay" class="sidebar-overlay" style="display: none; align-items: center; justify-content: center;">
+                    <div class="content-card" style="width: 90%; max-width: 500px; animation: slideUp 0.4s ease;">
+                        <h2 class="section-title">Finalize Your Order</h2>
+                        <p class="label" style="color: #64748b; margin-bottom: 20px;">Almost there! Please choose your delivery method to see the final cost.</p>
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="label" style="color: #1e1b4b;">Delivery Type</label>
+                            <select id="delivery-method-select" class="combo-box" style="width: 100%; background: #f8fafc; color: #1e1b4b; border-color: #e2e8f0;">
+                                <option value="1" data-fee="2.99">🚀 Standard Motorbike ($2.99)</option>
+                                <option value="2" data-fee="5.99">🚗 Premium Car ($5.99)</option>
+                                <option value="3" data-fee="1.99">🚲 Bicycle Eco ($1.99)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 15px; margin-bottom: 25px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #64748b;">
+                                <span>Items Subtotal:</span>
+                                <span id="confirm-subtotal">$0.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #64748b;">
+                                <span>Delivery Fee:</span>
+                                <span id="confirm-delivery-fee">$2.99</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-weight: 800; color: #1e1b4b; font-size: 1.2em; border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-top: 10px;">
+                                <span>Grand Total:</span>
+                                <span id="confirm-total">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="back-button" onclick="closeOrderModal()" style="color: #64748b;">Cancel</button>
+                            <button id="final-confirm-btn" class="login-button">Confirm & Pay</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- My Account Section (Placeholder) -->
+                <!-- Global Pane: Feedback -->
+                <div id="feedback-content" class="content-pane">
+                    <div class="content-card" style="max-width: 600px; margin: 0 auto; padding: 40px;">
+                        <h1 class="section-title">Share Your Experience</h1>
+                        <p class="label" style="color: #64748b; margin-bottom: 30px;">Your feedback goes directly to our management team to help us improve.</p>
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="label" style="color: #1e1b4b;">How was your experience today?</label>
+                            <textarea id="feedback-comment" class="text-field" placeholder="Tell us what you loved or how we can improve..." style="width: 100%; height: 150px; resize: none; background: #f8fafc; border-color: #e2e8f0; color: #1e1b4b;"></textarea>
+                        </div>
+                        
+                        <button id="submit-feedback-btn" class="login-button" style="width: 100%; padding: 18px;">Submit Feedback</button>
+                        <div id="feedback-message" class="message-label" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Global Pane: My Account -->
                 <div id="account-content" class="content-pane">
-                    <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">👤 My Account</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">Manage your personal details and payment methods. (Coming soon)</p>
+                    <div class="content-card" style="max-width: 700px; margin: 0 auto; padding: 40px;">
+                        <h1 class="section-title">My Profile</h1>
+                        <p class="label" style="color: #64748b; margin-bottom: 30px;">Update your personal information and contact details.</p>
+                        
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label class="label" style="color: #1e1b4b;">Full Name</label>
+                                <input type="text" id="profile-name" class="text-field" style="background: #f8fafc; border-color: #e2e8f0; color: #1e1b4b;">
+                            </div>
+                            <div class="form-group">
+                                <label class="label" style="color: #1e1b4b;">Email Address</label>
+                                <input type="text" id="profile-email" class="text-field" disabled style="background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label class="label" style="color: #1e1b4b;">Delivery Address</label>
+                                <input type="text" id="profile-address" class="text-field" style="background: #f8fafc; border-color: #e2e8f0; color: #1e1b4b;">
+                            </div>
+                            <div class="form-group">
+                                <label class="label" style="color: #1e1b4b;">Phone Number</label>
+                                <input type="text" id="profile-phone" class="text-field" style="background: #f8fafc; border-color: #e2e8f0; color: #1e1b4b;">
+                            </div>
+                            <div class="form-group">
+                                <label class="label" style="color: #1e1b4b;">New Password (Optional)</label>
+                                <input type="password" id="profile-password" class="text-field" placeholder="Leave blank to keep current" style="background: #f8fafc; border-color: #e2e8f0; color: #1e1b4b;">
+                            </div>
+                        </div>
+                        
+                        <button id="save-profile-btn" class="login-button" style="width: 100%; padding: 18px;">Save Changes</button>
+                        <div id="profile-message" class="message-label" style="display: none;"></div>
                     </div>
                 </div>
             </main>

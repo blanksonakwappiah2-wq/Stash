@@ -20,4 +20,10 @@ public class ReviewController {
     public List<Review> getAllReviews() {
         return reviewRepository.findAll();
     }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    public Review createReview(@RequestBody Review review) {
+        return reviewRepository.save(review);
+    }
 }

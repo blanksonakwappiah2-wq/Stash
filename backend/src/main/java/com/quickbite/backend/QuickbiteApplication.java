@@ -66,12 +66,31 @@ public class QuickbiteApplication {
                 System.out.println("Seeded Owner account.");
 
                 Restaurant pizza = new Restaurant();
-                pizza.setName("Pepperoni Palace");
-                pizza.setCategory("Pizza");
-                pizza.setAddress("123 Pizza St");
-                pizza.setContact("555-PIZZA");
+                pizza.setName("Grandma's Kitchen");
+                pizza.setCategory("Italian");
+                pizza.setAddress("123 Artisan Way, Roma");
+                pizza.setContact("555-KITCHEN");
+                pizza.setImageUrl("https://i.pinimg.com/736x/1e/95/a3/1e95a3d36f534d755e4b0a82934c9b11.jpg");
                 pizza.setOwner(owner);
                 restaurantRepository.save(pizza);
+
+                Restaurant burgers = new Restaurant();
+                burgers.setName("Burger House");
+                burgers.setCategory("Fast Food");
+                burgers.setAddress("456 Grill St, Metro");
+                burgers.setContact("555-BURGER");
+                burgers.setImageUrl("https://i.pinimg.com/736x/21/df/76/21df767439167df3c4c9b1f618a56249.jpg");
+                burgers.setOwner(owner);
+                restaurantRepository.save(burgers);
+
+                Restaurant sushi = new Restaurant();
+                sushi.setName("Sushi Master");
+                sushi.setCategory("Japanese");
+                sushi.setAddress("789 Sakura Blvd, Neo");
+                sushi.setContact("555-SUSHI");
+                sushi.setImageUrl("https://i.pinimg.com/736x/09/a4/09/09a4097e034e64a13d7e6f6f1a8e1e81.jpg");
+                sushi.setOwner(owner);
+                restaurantRepository.save(sushi);
 
                 MenuItem m1 = new MenuItem();
                 m1.setName("Classic Margherita");
