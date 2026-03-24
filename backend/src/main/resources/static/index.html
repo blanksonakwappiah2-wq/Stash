@@ -439,9 +439,15 @@
 
                         <!-- Right: Map -->
                         <div style="flex: 1; position: relative; display: flex; flex-direction: column;">
-                            <div style="padding: 15px 25px; background: rgba(255,255,255,0.9); border-bottom: 2px solid #e2e8f0; z-index: 1000; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="padding: 12px 20px; background: rgba(255,255,255,0.97); border-bottom: 2px solid #e2e8f0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                                 <div>
                                     <h2 style="color: #1e1b4b; margin: 0; font-size: 1.1em; font-weight: 700;">📍 Operations Command Center</h2>
+                                </div>
+                                <!-- Search Bar -->
+                                <div style="display: flex; align-items: center; gap: 8px; flex: 1; max-width: 380px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px 14px;">
+                                    <span style="font-size: 1em;">🔍</span>
+                                    <input id="mgr-map-search" type="text" placeholder="Search location, address, city..." style="border: none; background: transparent; outline: none; font-size: 0.9em; color: #1e1b4b; flex: 1;" onkeydown="if(event.key==='Enter')searchOnMap('mgr')">
+                                    <button onclick="searchOnMap('mgr')" style="background: #6366f1; color: white; border: none; padding: 5px 14px; border-radius: 8px; font-size: 0.8em; font-weight: 600; cursor: pointer;">Find</button>
                                 </div>
                                 <div style="display: flex; gap: 10px;">
                                     <div class="category-badge" style="background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; font-size: 0.7em;">🏪 Restaurants</div>
@@ -584,12 +590,18 @@
                     <div class="content-card full-width">
                         <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🚴 Real-Time Delivery Tracking</h1>
                         <p class="label" style="margin-bottom: 20px; color: #64748b;">Follow your delivery agent's journey live on the map below.</p>
-                        
+
+                        <!-- Location Search Bar -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 18px; align-items: center;">
+                            <span style="font-size: 1.2em;">📍</span>
+                            <input id="customer-map-search" type="text" placeholder="Search for a location, city, or address to navigate the map..." style="flex: 1; border: none; background: transparent; outline: none; font-size: 0.95em; color: #1e1b4b;" onkeydown="if(event.key==='Enter')searchOnMap('customer')">
+                            <button onclick="searchOnMap('customer')" class="login-button" style="margin: 0; padding: 10px 22px; font-size: 0.85em; width: auto; border-radius: 10px;">Search</button>
+                        </div>
+                        <div id="map-search-result" style="display: none; padding: 8px 14px; background: #e0e7ff; border-radius: 10px; font-size: 0.85em; color: #4338ca; margin-bottom: 14px;"></div>
+
                         <!-- Map Container -->
                         <div id="map-container" class="map-wrapper">
-                            <div id="map" style="height: 400px; background: #eee; border-radius: 15px; display: flex; align-items: center; justify-content: center;">
-                                <p class="label" style="color: #666;">Google Maps placeholder... (Real Maps requires API key)</p>
-                            </div>
+                            <div id="map" style="height: 450px; border-radius: 15px;"></div>
                         </div>
                     </div>
                 </div>

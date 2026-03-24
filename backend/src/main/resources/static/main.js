@@ -916,6 +916,66 @@ function initOwnerMap() {
 
     fetchMapData(mgrMap, 'RESTAURANT_OWNER');
 }
+// ── Map Location Search (Nominatim / OpenStreetMap) ──────────────────────────
+let searchMarker = null;
+
+async function searchOnMap(target) {
+    const inputId = target === 'mgr' ? 'mgr-map-search' : 'customer-map-search';
+    const query = (document.getElementById(inputId)?.value || '').trim();
+    if (!query) return;
+
+    const resultEl = document.getElementById('map-search-result');
+    if (resultEl) {
+        resultEl.style.display = 'block';
+        resultEl.textContent = 'Searching...';
+    }
+
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+        const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+        const data = await res.json();
+
+        if (!data.length) {
+            if (resultEl) resultEl.textContent = `❌ No results found for "${query}". Try a different search.`;
+            return;
+        }
+
+        const place = data[0];
+        const lat = parseFloat(place.lat);
+        const lng = parseFloat(place.lon);
+        const name = place.display_name;
+
+        // Pan the correct map
+        const targetMap = mgrMap;
+        if (!targetMap) {
+            if (resultEl) resultEl.textContent = '⚠️ Map not loaded yet. Open the map first.';
+            return;
+        }
+
+        targetMap.setView([lat, lng], 14);
+
+        // Remove old search marker if present
+        if (searchMarker) {
+            searchMarker.remove();
+        }
+
+        searchMarker = L.marker([lat, lng])
+            .addTo(targetMap)
+            .bindPopup(`<strong>📍 ${name.split(',').slice(0, 3).join(', ')}</strong>`)
+            .openPopup();
+
+        if (resultEl) {
+            resultEl.style.display = 'block';
+            resultEl.textContent = `✅ Found: ${name.split(',').slice(0, 3).join(', ')}`;
+        }
+    } catch (e) {
+        console.error('Geocoding error:', e);
+        if (resultEl) resultEl.textContent = '❌ Search failed. Check your connection and try again.';
+    }
+}
+
+window.searchOnMap = searchOnMap;
+
  
 function initCustomerMap() {
     if (typeof L === 'undefined') {
