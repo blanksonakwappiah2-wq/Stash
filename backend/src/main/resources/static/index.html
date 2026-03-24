@@ -39,8 +39,24 @@
                 
                 <div id="login-message" class="message-label" style="display: none;"></div>
                 
-                <div style="text-align: center; margin-top: 20px;">
+                <div style="text-align: center; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
                     <a href="#" onclick="logoutAndReset(); return false;" style="font-size: 0.8em; color: #64748b; text-decoration: none; border-bottom: 1px dashed #cbd5e1;">⚠️ Stuck? Clear Cache & Reset</a>
+                    <a href="#" onclick="toggleDebugConsole(); return false;" style="font-size: 0.8em; color: #6366f1; text-decoration: none;">🔍 Show Debug Logs</a>
+                </div>
+
+                <!-- Heartbeat & Status -->
+                <div id="app-status" style="position: fixed; bottom: 10px; left: 10px; font-size: 0.7em; color: #94a3b8; display: flex; align-items: center; gap: 5px; z-index: 9999;">
+                    <span id="heartbeat" style="width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; display: inline-block;"></span>
+                    <span id="status-text">Logic: Init...</span>
+                </div>
+
+                <!-- Debug Console (Hidden by default) -->
+                <div id="debug-console" style="display: none; position: fixed; bottom: 40px; left: 10px; right: 10px; height: 180px; background: rgba(0,0,0,0.85); color: #22c55e; font-family: 'Courier New', Courier, monospace; font-size: 0.75em; padding: 15px; border-radius: 12px; overflow-y: auto; z-index: 9998; border: 1px solid #444; box-shadow: 0 -5px 20px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #444; margin-bottom: 10px; padding-bottom: 5px;">
+                        <strong>SYSTEM LOGS</strong>
+                        <a href="#" onclick="toggleDebugConsole(); return false;" style="color: #ef4444; text-decoration: none;">[CLOSE]</a>
+                    </div>
+                    <div id="debug-logs-content"></div>
                 </div>
             </div>
         </div>

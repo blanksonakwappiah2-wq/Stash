@@ -2,9 +2,44 @@
 window.onerror = function(message, source, lineno, colno, error) {
     const errorMsg = `CRITICAL JS ERROR: ${message}\nAt: ${source}:${lineno}:${colno}`;
     console.error(errorMsg, error);
+    logToScreen(errorMsg, true);
     alert(errorMsg + "\n\nPlease try 'Clear Cache & Reset' on the login screen.");
     return false;
 };
+
+// Log to Screen for easier debugging on Render
+function logToScreen(msg, isError = false) {
+    const content = document.getElementById('debug-logs-content');
+    if (!content) return;
+    const time = new Date().toLocaleTimeString();
+    content.innerHTML += `<div style="margin-bottom: 5px; color: ${isError ? '#ef4444' : '#22c55e'}">[${time}] ${msg}</div>`;
+    content.scrollTop = content.scrollHeight;
+}
+
+window.logToScreen = logToScreen;
+
+function toggleDebugConsole() {
+    const consoleEl = document.getElementById('debug-console');
+    if (consoleEl) {
+        consoleEl.style.display = (consoleEl.style.display === 'none') ? 'block' : 'none';
+        if (consoleEl.style.display === 'block') {
+            logToScreen("--- Debug Console Opened ---");
+        }
+    }
+}
+window.toggleDebugConsole = toggleDebugConsole;
+
+// Logic Heartbeat
+function startHeartbeat() {
+    const hb = document.getElementById('heartbeat');
+    const statusText = document.getElementById('status-text');
+    let state = false;
+    setInterval(() => {
+        state = !state;
+        if (hb) hb.style.background = state ? '#22c55e' : '#94a3b8';
+        if (statusText) statusText.textContent = "Logic: OK";
+    }, 1000);
+}
 
 const BACKEND_URL = "/api/users/";
 const RESTAURANT_URL = "/api/restaurants";
@@ -740,6 +775,10 @@ function updateNavigationForRole(role) {
 
 // Manager Map & Real-time Simulation
 function initManagerMap() {
+    if (typeof L === 'undefined') {
+        logToScreen("Leaflet (L) is MISSING. Manager Map cannot initialize.", true);
+        return;
+    }
     if (mgrMap) {
         mgrMap.remove();
     }
@@ -782,6 +821,10 @@ function initManagerMap() {
 }
 
 function initOwnerMap() {
+    if (typeof L === 'undefined') {
+        logToScreen("Leaflet (L) is MISSING. Owner Map cannot initialize.", true);
+        return;
+    }
     const mapDiv = document.getElementById('owner-map');
     if (!mapDiv) return;
 
@@ -1122,28 +1165,41 @@ function startSimulation() {
 
 // Session Initialization
 function initSession() {
-    console.log("Checking session...", { authToken: !!authToken, currentUser: !!currentUser });
-    if (authToken && currentUser) {
-        updateNavigationForRole(currentUser.role);
-        switchOuterLayout(mainLayout);
-        
-        // Land on default pane based on role
-        if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
-            switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
-        } else if (currentUser.role === 'RESTAURANT_OWNER') {
-            switchPane('owner-content', 'nav-owner-btn');
-        } else if (currentUser.role === 'DELIVERY_AGENT') {
-            switchPane('agent-content', 'nav-agent-btn');
-        } else {
-            switchPane('home-content', 'nav-menu-btn');
-        }
+    logToScreen("Initializing session check...");
+    try {
+        console.log("Checking session...", { authToken: !!authToken, currentUser: !!currentUser });
+        if (authToken && currentUser) {
+            logToScreen(`Session found for: ${currentUser.email} (${currentUser.role})`);
+            updateNavigationForRole(currentUser.role);
+            switchOuterLayout(mainLayout);
+            
+            // Land on default pane based on role
+            if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
+                switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
+            } else if (currentUser.role === 'RESTAURANT_OWNER') {
+                switchPane('owner-content', 'nav-owner-btn');
+            } else if (currentUser.role === 'DELIVERY_AGENT') {
+                switchPane('agent-content', 'nav-agent-btn');
+            } else {
+                switchPane('home-content', 'nav-menu-btn');
+            }
 
-        const welcomeTitle = document.querySelector('.welcome-title');
-        if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
-    } else {
+            const welcomeTitle = document.querySelector('.welcome-title');
+            if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
+        } else {
+            logToScreen("No active session. Showing login.");
+            switchOuterLayout(loginScene);
+        }
+    } catch (e) {
+        console.error("Initialization Failed:", e);
+        logToScreen("Initialization CRASHED: " + e.message, true);
         switchOuterLayout(loginScene);
     }
 }
 
-// Initial Call
-initSession();
+// Global initialization call on window load
+window.addEventListener('load', () => {
+    logToScreen("Window loaded. Starting logic...");
+    startHeartbeat();
+    initSession();
+});
