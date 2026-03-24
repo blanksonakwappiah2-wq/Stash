@@ -131,27 +131,22 @@ function switchOuterLayout(layout) {
     layout.classList.add('active');
 }
 
-// Sidebar Mobile Toggle Logic
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebar-overlay');
-const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+function setupSidebar() {
+    logToScreen("Setting up sidebar listeners...");
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 
-function toggleMobileSidebar(show) {
-    if (show) {
-        sidebar.classList.add('mobile-active');
-        sidebarOverlay.classList.add('active');
-    } else {
-        sidebar.classList.remove('mobile-active');
-        sidebarOverlay.classList.remove('active');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => toggleMobileSidebar(true));
     }
-}
-
-if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', () => toggleMobileSidebar(true));
-}
-
-if (sidebarOverlay) {
-    sidebarOverlay.addEventListener('click', () => toggleMobileSidebar(false));
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', () => toggleMobileSidebar(false));
+    }
+    const logoutBtn = document.getElementById('sidebar-logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
 }
 
 // Switch between Inner Dashboard Panes
@@ -209,33 +204,48 @@ function switchPane(paneId, navBtnId) {
     }
 }
 
-// Sidebar Navigation Listeners
-document.getElementById('nav-menu-btn').addEventListener('click', () => switchPane('home-content', 'nav-menu-btn'));
-document.getElementById('nav-browse-btn').addEventListener('click', () => switchPane('restaurants-content', 'nav-browse-btn'));
-document.getElementById('nav-owner-btn').addEventListener('click', () => switchPane('owner-content', 'nav-owner-btn'));
-document.getElementById('nav-owner-tracking-btn').addEventListener('click', () => switchPane('owner-tracking-content', 'nav-owner-tracking-btn'));
-document.getElementById('nav-agent-btn').addEventListener('click', () => switchPane('agent-content', 'nav-agent-btn'));
-document.getElementById('nav-mgr-customers-btn').addEventListener('click', () => switchPane('mgr-customers-content', 'nav-mgr-customers-btn'));
-document.getElementById('nav-mgr-owners-btn').addEventListener('click', () => switchPane('mgr-owners-content', 'nav-mgr-owners-btn'));
-document.getElementById('nav-mgr-agents-btn').addEventListener('click', () => switchPane('mgr-agents-content', 'nav-mgr-agents-btn'));
-document.getElementById('nav-mgr-locations-btn').addEventListener('click', () => switchPane('mgr-locations-content', 'nav-mgr-locations-btn'));
-document.getElementById('nav-mgr-feedback-btn').addEventListener('click', () => switchPane('mgr-feedback-content', 'nav-mgr-feedback-btn'));
-document.getElementById('nav-mgr-account-btn').addEventListener('click', () => switchPane('mgr-account-content', 'nav-mgr-account-btn'));
-document.getElementById('nav-orders-btn').addEventListener('click', () => switchPane('orders-content', 'nav-orders-btn'));
-document.getElementById('nav-tracking-btn').addEventListener('click', () => switchPane('tracking-content', 'nav-tracking-btn'));
-document.getElementById('nav-feedback-btn').addEventListener('click', () => switchPane('feedback-content', 'nav-feedback-btn'));
-document.getElementById('nav-account-btn').addEventListener('click', () => switchPane('account-content', 'nav-account-btn'));
-document.getElementById('nav-availabilities-btn').addEventListener('click', () => switchPane('availabilities-content', 'nav-availabilities-btn'));
+function setupNavListeners() {
+    logToScreen("Setting up navigation listeners...");
+    const navConfigs = [
+        { id: 'nav-menu-btn', pane: 'home-content' },
+        { id: 'nav-browse-btn', pane: 'restaurants-content' },
+        { id: 'nav-owner-btn', pane: 'owner-content' },
+        { id: 'nav-owner-tracking-btn', pane: 'owner-tracking-content' },
+        { id: 'nav-agent-btn', pane: 'agent-content' },
+        { id: 'nav-mgr-customers-btn', pane: 'mgr-customers-content' },
+        { id: 'nav-mgr-owners-btn', pane: 'mgr-owners-content' },
+        { id: 'nav-mgr-agents-btn', pane: 'mgr-agents-content' },
+        { id: 'nav-mgr-locations-btn', pane: 'mgr-locations-content' },
+        { id: 'nav-mgr-feedback-btn', pane: 'mgr-feedback-content' },
+        { id: 'nav-mgr-account-btn', pane: 'mgr-account-content' },
+        { id: 'nav-orders-btn', pane: 'orders-content' },
+        { id: 'nav-tracking-btn', pane: 'tracking-content' },
+        { id: 'nav-feedback-btn', pane: 'feedback-content' },
+        { id: 'nav-account-btn', pane: 'account-content' },
+        { id: 'nav-availabilities-btn', pane: 'availabilities-content' }
+    ];
 
-// Login/Register Links
-document.getElementById('go-to-register-btn').addEventListener('click', () => {
-    switchOuterLayout(registerScene);
-    document.getElementById('reg-message').style.display = 'none';
-});
-document.getElementById('back-to-login-btn').addEventListener('click', () => {
-    switchOuterLayout(loginScene);
-    document.getElementById('login-message').style.display = 'none';
-});
+    navConfigs.forEach(config => {
+        const btn = document.getElementById(config.id);
+        if (btn) {
+            btn.addEventListener('click', () => switchPane(config.pane, config.id));
+        }
+    });
+
+    const toReg = document.getElementById('go-to-register-btn');
+    if (toReg) toReg.addEventListener('click', () => {
+        switchOuterLayout(registerScene);
+        const msg = document.getElementById('reg-message');
+        if (msg) msg.style.display = 'none';
+    });
+
+    const backToLog = document.getElementById('back-to-login-btn');
+    if (backToLog) backToLog.addEventListener('click', () => {
+        switchOuterLayout(loginScene);
+        const msg = document.getElementById('login-message');
+        if (msg) msg.style.display = 'none';
+    });
+}
 
 const clearLoginInputs = () => {
     document.getElementById('login-email').value = '';
@@ -393,7 +403,7 @@ function showMessage(elementId, text, isSuccess) {
 }
 
 // Logic for Login
-document.getElementById('login-btn').addEventListener('click', async () => {
+async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
 
@@ -466,14 +476,11 @@ document.getElementById('login-btn').addEventListener('click', async () => {
         } else {
             showMessage('login-message', "Connection error. Please check your internet or try again later.", false);
         }
-    } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Login";
     }
-});
+}
 
 // Logic for Register
-document.getElementById('register-btn').addEventListener('click', async () => {
+async function handleRegister() {
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
@@ -562,14 +569,11 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         } else {
             showMessage('reg-message', "Connection error. Please check your internet or try again later.", false);
         }
-    } finally {
-        regBtn.disabled = false;
-        regBtn.textContent = "Register";
     }
-});
+}
 
 // Manager Action: Add Restaurant
-document.getElementById('add-rest-btn').addEventListener('click', async () => {
+async function handleAddRestaurant() {
     const name = document.getElementById('rest-name').value.trim();
     const category = document.getElementById('rest-category').value.trim();
     const address = document.getElementById('rest-address').value.trim();
@@ -610,10 +614,10 @@ document.getElementById('add-rest-btn').addEventListener('click', async () => {
     } catch (e) {
         showMessage('manager-message', "Error connecting to server.", false);
     }
-});
+}
 
 // Manager Action: Add Delivery Agent
-document.getElementById('add-agent-btn').addEventListener('click', async () => {
+async function handleAddAgent() {
     const name = document.getElementById('agent-name').value.trim();
     const email = document.getElementById('agent-email').value.trim();
     const password = document.getElementById('agent-password').value;
@@ -642,10 +646,10 @@ document.getElementById('add-agent-btn').addEventListener('click', async () => {
     } catch (e) {
         showMessage('agent-message', "Error connecting to server.", false);
     }
-});
+}
 
 // Manager Action: Update Own Account
-document.getElementById('update-manager-btn').addEventListener('click', async () => {
+async function handleUpdateManager() {
     if (!currentUser) return;
     
     const name = document.getElementById('mgr-update-name').value.trim();
@@ -699,7 +703,7 @@ document.getElementById('update-manager-btn').addEventListener('click', async ()
     } catch (e) {
         showMessage('mgr-update-message', "Error connecting to server.", false);
     }
-});
+}
 
 async function fetchAndShowAgents() {
     try {
@@ -1200,6 +1204,29 @@ function initSession() {
 // Global initialization call on window load
 window.addEventListener('load', () => {
     logToScreen("Window loaded. Starting logic...");
+    try {
+        setupSidebar();
+        setupNavListeners();
+        
+        // Setup Auth Listeners
+        const loginBtn = document.getElementById('login-btn');
+        if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+        const regBtn = document.getElementById('register-btn');
+        if (regBtn) regBtn.addEventListener('click', handleRegister);
+
+        // Setup Manager Action Listeners
+        const addRestBtn = document.getElementById('add-rest-btn');
+        if (addRestBtn) addRestBtn.addEventListener('click', handleAddRestaurant);
+        const addAgentBtn = document.getElementById('add-agent-btn');
+        if (addAgentBtn) addAgentBtn.addEventListener('click', handleAddAgent);
+        const updateMgrBtn = document.getElementById('update-manager-btn');
+        if (updateMgrBtn) updateMgrBtn.addEventListener('click', handleUpdateManager);
+
+        logToScreen("All listeners attached.");
+    } catch (e) {
+        logToScreen("Listener Setup Failed: " + e.message, true);
+        console.error("Setup Error:", e);
+    }
     startHeartbeat();
     initSession();
 });
