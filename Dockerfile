@@ -23,17 +23,21 @@ USER spring:spring
 # Copy the jar from the build stage
 COPY --from=build /app/backend/target/*.jar app.jar
 
+# Explicitly expose the default Render port
+EXPOSE 10000
+
 # Run with the production profile by default
+# Use shell-form to ensure ${PORT} is expanded correctly.
 # Use aggressive memory and startup optimizations for Render Free Tier (512MB)
-ENTRYPOINT ["java", \
-    "-Xmx256m", "-Xms256m", \
-    "-XX:MaxRAMPercentage=50.0", \
-    "-XX:InitialRAMPercentage=50.0", \
-    "-XX:+ExitOnOutOfMemoryError", \
-    "-XX:ReservedCodeCacheSize=40m", \
-    "-Xss256k", \
-    "-XX:TieredStopAtLevel=1", \
-    "-Dspring.main.lazy-initialization=true", \
-    "-Dspring.profiles.active=prod", \
-    "-Dserver.port=${PORT}", \
-    "-jar", "app.jar"]
+ENTRYPOINT java \
+    -Xmx256m -Xms256m \
+    -XX:MaxRAMPercentage=50.0 \
+    -XX:InitialRAMPercentage=50.0 \
+    -XX:+ExitOnOutOfMemoryError \
+    -XX:ReservedCodeCacheSize=40m \
+    -Xss256k \
+    -XX:TieredStopAtLevel=1 \
+    -Dspring.main.lazy-initialization=true \
+    -Dspring.profiles.active=prod \
+    -Dserver.port=${PORT:-10000} \
+    -jar app.jar
