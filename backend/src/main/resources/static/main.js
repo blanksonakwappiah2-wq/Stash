@@ -47,36 +47,21 @@ const DELIVERY_URL = "/api/delivery/";
 const EMAIL_PATTERN = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-// Outer Layout Containers
-const loginScene = document.getElementById('login-scene');
-const registerScene = document.getElementById('register-scene');
-const mainLayout = document.getElementById('main-layout');
+// Proactive Logging for Diagnostics
+console.log("QuickBite: main.js loaded and executing...");
+logToScreen("main.js module reached.");
 
-// Inner Content Panes
-const homeContent = document.getElementById('home-content');
-const restaurantsContent = document.getElementById('restaurants-content');
-const managerContent = document.getElementById('manager-content');
-const ordersContent = document.getElementById('orders-content');
-const trackingContent = document.getElementById('tracking-content');
-
-// Nav Buttons
-const navItems = document.querySelectorAll('.nav-item');
-const mgrCustomersBtn = document.getElementById('nav-mgr-customers-btn');
-const mgrOwnersBtn = document.getElementById('nav-mgr-owners-btn');
-const mgrAgentsBtn = document.getElementById('nav-mgr-agents-btn');
-const mgrLocationsBtn = document.getElementById('nav-mgr-locations-btn');
-const mgrFeedbackBtn = document.getElementById('nav-mgr-feedback-btn');
-const mgrAccountBtn = document.getElementById('nav-mgr-account-btn');
-const ownerNavBtn = document.getElementById('nav-owner-btn');
-const agentNavBtn = document.getElementById('nav-agent-btn');
-const browseNavBtn = document.getElementById('nav-browse-btn');
-const ordersNavBtn = document.getElementById('nav-orders-btn');
-const trackingNavBtn = document.getElementById('nav-tracking-btn');
-const feedbackNavBtn = document.getElementById('nav-feedback-btn');
-const accountNavBtn = document.getElementById('nav-account-btn');
-const availabilitiesNavBtn = document.getElementById('nav-availabilities-btn');
-const ownerTrackingNavBtn = document.getElementById('nav-owner-tracking-btn');
-const homeNavBtn = document.getElementById('nav-menu-btn');
+// Outer Layout Containers (Harden these better in getters)
+function getElement(id) {
+    const el = document.getElementById(id);
+    if (!el) {
+        // Only log if it's a critical scene
+        if (id.includes('scene') || id.includes('layout')) {
+            console.warn(`CRITICAL ELEMENT MISSING: ${id}`);
+        }
+    }
+    return el;
+}
 
 let currentUser = null;
 let authToken = localStorage.getItem('authToken') || null;
@@ -124,11 +109,30 @@ async function secureFetch(url, options = {}) {
 }
 
 // Switch between Top-Level Outer Containers
-function switchOuterLayout(layout) {
-    loginScene.classList.remove('active');
-    registerScene.classList.remove('active');
-    mainLayout.classList.remove('active');
-    layout.classList.add('active');
+function switchOuterLayout(targetLayout) {
+    const scenes = ['login-scene', 'register-scene', 'main-layout'];
+    scenes.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+    });
+    if (targetLayout) {
+        // targetLayout can be an element or an ID
+        const el = (typeof targetLayout === 'string') ? document.getElementById(targetLayout) : targetLayout;
+        if (el) el.classList.add('active');
+    }
+}
+
+function toggleMobileSidebar(show) {
+    const sb = document.getElementById('sidebar');
+    const sbo = document.getElementById('sidebar-overlay');
+    if (!sb || !sbo) return;
+    if (show) {
+        sb.classList.add('mobile-active');
+        sbo.classList.add('active');
+    } else {
+        sb.classList.remove('mobile-active');
+        sbo.classList.remove('active');
+    }
 }
 
 function setupSidebar() {
@@ -158,9 +162,10 @@ function switchPane(paneId, navBtnId) {
     if (targetPane) targetPane.classList.add('active');
     
     // Update nav item active state
-    navItems.forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     if (navBtnId) {
-        document.getElementById(navBtnId).classList.add('active');
+        const btn = document.getElementById(navBtnId);
+        if (btn) btn.classList.add('active');
     }
 
     // Mobile: Close sidebar after selection
@@ -234,14 +239,14 @@ function setupNavListeners() {
 
     const toReg = document.getElementById('go-to-register-btn');
     if (toReg) toReg.addEventListener('click', () => {
-        switchOuterLayout(registerScene);
+        switchOuterLayout('register-scene');
         const msg = document.getElementById('reg-message');
         if (msg) msg.style.display = 'none';
     });
 
     const backToLog = document.getElementById('back-to-login-btn');
     if (backToLog) backToLog.addEventListener('click', () => {
-        switchOuterLayout(loginScene);
+        switchOuterLayout('login-scene');
         const msg = document.getElementById('login-message');
         if (msg) msg.style.display = 'none';
     });
@@ -268,7 +273,7 @@ function logout() {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('authToken');
     clearLoginInputs();
-    switchOuterLayout(loginScene);
+    switchOuterLayout('login-scene');
 }
 
 function logoutAndReset() {
@@ -735,45 +740,39 @@ async function fetchAndShowAgents() {
     }
 }
 
+function setDisplay(id, display) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = display;
+}
+
 function updateNavigationForRole(role) {
     // Hide everything first
-    navItems.forEach(btn => btn.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(btn => btn.style.display = 'none');
     
-    // Home is hidden for managers, agents and owners
+    // Role-specific visibility
     if (role === 'CUSTOMER') {
-        homeNavBtn.style.display = 'flex';
-    }
-    
-    if (role === 'CUSTOMER') {
-        browseNavBtn.style.display = 'flex';
-        ordersNavBtn.style.display = 'flex';
-        trackingNavBtn.style.display = 'flex';
-        feedbackNavBtn.style.display = 'flex';
-        accountNavBtn.style.display = 'flex';
+        setDisplay('nav-menu-btn', 'flex');
+        setDisplay('nav-browse-btn', 'flex');
+        setDisplay('nav-orders-btn', 'flex');
+        setDisplay('nav-tracking-btn', 'flex');
+        setDisplay('nav-feedback-btn', 'flex');
+        setDisplay('nav-account-btn', 'flex');
     } else if (role === 'MANAGER' || role === 'ADMIN') {
-        mgrCustomersBtn.style.display = 'flex';
-        mgrOwnersBtn.style.display = 'flex';
-        mgrAgentsBtn.style.display = 'flex';
-        mgrLocationsBtn.style.display = 'flex';
-        mgrFeedbackBtn.style.display = 'flex';
-        mgrAccountBtn.style.display = 'flex';
-        
-        // Explicitly hide customer-specific redundant items for manager
-        homeNavBtn.style.display = 'none';
-        trackingNavBtn.style.display = 'none';
-        ordersNavBtn.style.display = 'none';
-        browseNavBtn.style.display = 'none';
+        setDisplay('nav-mgr-customers-btn', 'flex');
+        setDisplay('nav-mgr-owners-btn', 'flex');
+        setDisplay('nav-mgr-agents-btn', 'flex');
+        setDisplay('nav-mgr-locations-btn', 'flex');
+        setDisplay('nav-mgr-feedback-btn', 'flex');
+        setDisplay('nav-mgr-account-btn', 'flex');
     } else if (role === 'RESTAURANT_OWNER') {
-        ownerNavBtn.style.display = 'flex';
-        ownerTrackingNavBtn.style.display = 'flex';
-        ordersNavBtn.style.display = 'flex';
-        feedbackNavBtn.style.display = 'flex';
-        homeNavBtn.style.display = 'none';
+        setDisplay('nav-owner-btn', 'flex');
+        setDisplay('nav-owner-tracking-btn', 'flex');
+        setDisplay('nav-orders-btn', 'flex');
+        setDisplay('nav-feedback-btn', 'flex');
     } else if (role === 'DELIVERY_AGENT') {
-        agentNavBtn.style.display = 'flex';
-        availabilitiesNavBtn.style.display = 'flex';
-        feedbackNavBtn.style.display = 'flex';
-        homeNavBtn.style.display = 'none'; // Ensure Dashboard is explicitly hidden
+        setDisplay('nav-agent-btn', 'flex');
+        setDisplay('nav-availabilities-btn', 'flex');
+        setDisplay('nav-feedback-btn', 'flex');
     }
 }
 
@@ -1175,7 +1174,7 @@ function initSession() {
         if (authToken && currentUser) {
             logToScreen(`Session found for: ${currentUser.email} (${currentUser.role})`);
             updateNavigationForRole(currentUser.role);
-            switchOuterLayout(mainLayout);
+            switchOuterLayout('main-layout');
             
             // Land on default pane based on role
             if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
@@ -1192,12 +1191,12 @@ function initSession() {
             if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
         } else {
             logToScreen("No active session. Showing login.");
-            switchOuterLayout(loginScene);
+            switchOuterLayout('login-scene');
         }
     } catch (e) {
         console.error("Initialization Failed:", e);
         logToScreen("Initialization CRASHED: " + e.message, true);
-        switchOuterLayout(loginScene);
+        switchOuterLayout('login-scene');
     }
 }
 
