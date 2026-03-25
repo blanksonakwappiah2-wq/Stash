@@ -44,7 +44,8 @@ function startHeartbeat() {
     }, 1000);
 }
 
-const BACKEND_URL = "/api/users/";
+const AUTH_URL = "/api/users/";
+const ORDER_URL = "/api/orders";
 const RESTAURANT_URL = "/api/restaurants";
 const DELIVERY_URL = "/api/delivery/";
 const EMAIL_PATTERN = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -296,7 +297,7 @@ function showAlert(message) {
 
 async function fetchAndShowCustomers() {
     try {
-        const response = await secureFetch(BACKEND_URL + 'users');
+        const response = await secureFetch(AUTH_URL);
         if (!response || !response.ok) return;
         const allUsers = await response.json();
         const customers = allUsers.filter(u => u.role === 'CUSTOMER');
@@ -429,7 +430,7 @@ async function handleLogin() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
-        const response = await fetch(BACKEND_URL + 'login', {
+        const response = await fetch(AUTH_URL + 'login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -527,7 +528,7 @@ async function handleRegister() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
 
-        const response = await fetch(BACKEND_URL + 'register', {
+        const response = await fetch(AUTH_URL + 'register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, role }),
@@ -1007,7 +1008,7 @@ function initCustomerMap() {
 async function fetchMapData(targetMap, role) {
     try {
         const [usersRes, restsRes] = await Promise.all([
-            secureFetch(BACKEND_URL + 'users'),
+            secureFetch(AUTH_URL),
             fetch(RESTAURANT_URL)
         ]);
 
@@ -1128,7 +1129,7 @@ async function fetchAndShowRestaurants() {
 
 async function fetchAndShowOwnerRestaurant() {
     try {
-        const response = await secureFetch(BACKEND_URL + 'restaurants');
+        const response = await secureFetch(RESTAURANT_URL);
         if (!response || !response.ok) return;
         const allRestaurants = await response.json();
         const myRestaurant = allRestaurants.find(r => r.ownerId === currentUser.id);
@@ -1424,11 +1425,11 @@ if (checkoutBtn) {
 
 async function fetchAndShowOrders() {
     try {
-        let url = BACKEND_URL + 'orders';
+        let url = ORDER_URL;
         if (currentUser.role === 'CUSTOMER') {
-            url = BACKEND_URL + `orders/customer/${currentUser.id}`;
+            url = ORDER_URL + `/customer/${currentUser.id}`;
         } else if (currentUser.role === 'RESTAURANT_OWNER') {
-            const restResp = await secureFetch(BACKEND_URL + 'restaurants');
+            const restResp = await secureFetch(RESTAURANT_URL);
             if (!restResp || !restResp.ok) return;
             const allRests = await restResp.json();
             const myRest = allRests.find(r => r.ownerId === currentUser.id);
@@ -1440,7 +1441,7 @@ async function fetchAndShowOrders() {
                 list.innerHTML = '';
                 return;
             }
-            url = BACKEND_URL + `orders/restaurant/${myRest.id}`;
+            url = ORDER_URL + `/restaurant/${myRest.id}`;
         }
 
         const response = await secureFetch(url);

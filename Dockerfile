@@ -9,8 +9,8 @@ COPY android/pom.xml android/
 COPY desktop/pom.xml desktop/
 # We need the source for backend
 COPY backend/src backend/src
-# Build only the backend module
-RUN mvn -f backend/pom.xml clean package -Dmaven.test.skip=true
+# Build only the backend module using reactor flags
+RUN mvn clean package -pl backend -am -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-jammy
