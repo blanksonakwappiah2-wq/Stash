@@ -514,24 +514,22 @@
                 <!-- Restaurant Owner Portal -->
                 <div id="owner-content" class="content-pane">
                     <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🏪 My Restaurant Dashboard</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">Manage your menu, view incoming orders, and track your performance.</p>
-                        
-                        <div class="quick-stats" style="margin-bottom: 30px;">
-                            <div class="stat-card">
-                                <span class="stat-value">0</span>
-                                <span class="stat-label">Today's Orders</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-value">$0.00</span>
-                                <span class="stat-label">Daily Revenue</span>
-                            </div>
-                        </div>
+                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px;">
+                             <h1 class="title-label" style="text-align: left; color: #1e1b4b; margin: 0;">🏪 My Restaurant Overview</h1>
+                             <button id="owner-view-public-btn" class="login-button" style="margin: 0; padding: 10px 20px; font-size: 0.9em; max-width: 200px;">👁️ View Public Page</button>
+                         </div>
+                         
+                         <div id="owner-restaurant-details" style="display: none;">
+                             <img id="owner-rest-img" src="" style="width: 100%; height: 250px; object-fit: cover; border-radius: 15px; margin-bottom: 20px;">
+                             <h2 id="owner-rest-name" style="font-size: 2em; margin-bottom: 10px; color: #1e1b4b;"></h2>
+                             <p class="label" style="font-size: 1.1em; color: #64748b; margin-bottom: 5px;">📍 <span id="owner-rest-address"></span></p>
+                             <p class="label" style="font-size: 1.1em; color: #64748b; margin-bottom: 5px;">📞 <span id="owner-rest-contact"></span></p>
+                             <p class="label" style="font-size: 1.1em; color: #64748b; margin-bottom: 20px;">🏷️ <span id="owner-rest-category"></span></p>
+                         </div>
 
-                        <div class="content-card" style="background: #f8fafc; border: 1px dashed #cbd5e1; box-shadow: none;">
-                            <h3 class="label" style="font-weight: 700; color: #1e1b4b;">Manage Menu</h3>
-                            <p class="label" style="font-size: 0.9em; color: #64748b;">(Coming Soon: Add/Edit products for your restaurant)</p>
-                        </div>
+                         <div id="owner-no-restaurant-msg" style="display: none; text-align: center; padding: 40px;">
+                             <p class="label" style="color: #94a3b8; font-size: 1.2em;">You have not been assigned to a restaurant yet.</p>
+                         </div>
                     </div>
                 </div>
                 <!-- Restaurant Owner: Tracking Section -->

@@ -196,9 +196,9 @@ function switchPane(paneId, navBtnId) {
         simulationInterval = null;
     }
 
-    // Special logic for owner tracking
-    if (paneId === 'owner-tracking-content') {
-        initOwnerMap();
+    // Special logic for owner pane
+    if (paneId === 'owner-content') {
+        fetchAndShowOwnerRestaurant();
     }
 
     // Special logic for tracking pane
@@ -1126,6 +1126,40 @@ async function fetchAndShowRestaurants() {
     }
 }
 
+async function fetchAndShowOwnerRestaurant() {
+    try {
+        const response = await secureFetch(BACKEND_URL + 'restaurants');
+        if (!response || !response.ok) return;
+        const allRestaurants = await response.json();
+        const myRestaurant = allRestaurants.find(r => r.ownerId === currentUser.id);
+        
+        const detailsDiv = document.getElementById('owner-restaurant-details');
+        const noRestMsg = document.getElementById('owner-no-restaurant-msg');
+        const viewPublicBtn = document.getElementById('owner-view-public-btn');
+        
+        if (myRestaurant) {
+            detailsDiv.style.display = 'block';
+            noRestMsg.style.display = 'none';
+            viewPublicBtn.style.display = 'block';
+            document.getElementById('owner-rest-img').src = myRestaurant.imageUrl || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80';
+            document.getElementById('owner-rest-name').textContent = myRestaurant.name;
+            document.getElementById('owner-rest-address').textContent = myRestaurant.address;
+            document.getElementById('owner-rest-contact').textContent = myRestaurant.contact;
+            document.getElementById('owner-rest-category').textContent = myRestaurant.category;
+            
+            viewPublicBtn.onclick = () => {
+                showRestaurantMenu(myRestaurant.id, myRestaurant.name.replace(/'/g, "\\'"));
+            };
+        } else {
+            detailsDiv.style.display = 'none';
+            noRestMsg.style.display = 'block';
+            viewPublicBtn.style.display = 'none';
+        }
+    } catch (e) {
+        console.error("Failed to load owner's restaurant", e);
+    }
+}
+
 async function showRestaurantMenu(restaurantId, restaurantName) {
     selectedRestaurantId = restaurantId;
     switchPane('restaurant-menu-content', 'nav-browse-btn');
@@ -1390,13 +1424,23 @@ if (checkoutBtn) {
 
 async function fetchAndShowOrders() {
     try {
-        let url = '/api/orders';
+        let url = BACKEND_URL + 'orders';
         if (currentUser.role === 'CUSTOMER') {
-            url = `/api/orders/customer/${currentUser.id}`;
+            url = BACKEND_URL + `orders/customer/${currentUser.id}`;
         } else if (currentUser.role === 'RESTAURANT_OWNER') {
-             // We'd need to find the restaurant belonging to this owner
-             // For now, this placeholder remains as simple as before
-             return; 
+            const restResp = await secureFetch(BACKEND_URL + 'restaurants');
+            if (!restResp || !restResp.ok) return;
+            const allRests = await restResp.json();
+            const myRest = allRests.find(r => r.ownerId === currentUser.id);
+            if (!myRest) {
+                const list = document.getElementById('orders-list');
+                const message = document.getElementById('orders-message');
+                message.textContent = "You don't have a restaurant assigned to you.";
+                message.style.display = 'block';
+                list.innerHTML = '';
+                return;
+            }
+            url = BACKEND_URL + `orders/restaurant/${myRest.id}`;
         }
 
         const response = await secureFetch(url);
