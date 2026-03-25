@@ -71,14 +71,6 @@ public class UserService {
             targetRole = UserRole.CUSTOMER;
         }
 
-        // Restrict Manager Role to a single account
-        if (targetRole == UserRole.MANAGER) {
-            List<User> existingManagers = userRepository.findByRole(UserRole.MANAGER);
-            if (!existingManagers.isEmpty()) {
-                throw new RuntimeException(
-                        "A Manager already exists. To update credentials, please use the Manager Portal.");
-            }
-        }
 
         User user = new User();
         user.setName(name);
