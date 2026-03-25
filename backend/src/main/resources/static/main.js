@@ -792,7 +792,7 @@ function updateNavigationForRole(role) {
 // Manager: Fetch & Display Customers
 async function fetchAndShowCustomers() {
     try {
-        const response = await secureFetch(BACKEND_URL + 'users');
+        const response = await secureFetch(AUTH_URL);
         if (!response || !response.ok) return;
         const users = await response.json();
         const customers = users.filter(u => u.role === 'CUSTOMER');
@@ -1592,3 +1592,34 @@ window.addEventListener('load', () => {
     startHeartbeat();
     initSession();
 });
+
+// Manager: Fetch & Display Agents
+async function fetchAndShowAgents() {
+    try {
+        const response = await secureFetch(AUTH_URL);
+        if (!response || !response.ok) return;
+        const users = await response.json();
+        const agents = users.filter(u => u.role === 'DELIVERY_AGENT');
+        const list = document.getElementById('agent-list');
+        if (!list) return;
+
+        if (agents.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No delivery agents registered yet.</p>';
+            return;
+        }
+
+        list.innerHTML = agents.map(a => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3em; flex-shrink: 0;">🚴</div>
+                    <div>
+                        <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${a.name}</p>
+                        <p class="label" style="font-size: 0.8em; color: #64748b; margin: 0;">${a.email}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load agents', e);
+    }
+}
