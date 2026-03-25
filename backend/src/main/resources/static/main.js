@@ -496,7 +496,7 @@ async function handleRegister() {
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
     const confirm = document.getElementById('reg-confirm-password').value;
-    const role = document.getElementById('reg-role').value;
+    const role = 'CUSTOMER'; // Public registration is strictly Customer only
 
     if (!name || !email || !password || !confirm) {
         showMessage('reg-message', "Please fill in all fields.", false);
