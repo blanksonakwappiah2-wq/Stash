@@ -484,6 +484,9 @@ async function handleLogin() {
         } else {
             showMessage('login-message', "Connection error. Please check your internet or try again later.", false);
         }
+    } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Login";
     }
 }
 
@@ -569,6 +572,9 @@ async function handleRegister() {
                 if (welcomeTitle) welcomeTitle.textContent = `Welcome, ${currentUser.name}!`;
                 clearRegisterInputs();
             }, 1000);
+        } else {
+            const errorData = await response.json();
+            showMessage('reg-message', errorData.message || "Registration failed. Please try again.", false);
         }
     } catch (e) {
         console.error("Registration Error:", e);
@@ -577,6 +583,9 @@ async function handleRegister() {
         } else {
             showMessage('reg-message', "Connection error. Please check your internet or try again later.", false);
         }
+    } finally {
+        regBtn.disabled = false;
+        regBtn.textContent = "Register";
     }
 }
 
