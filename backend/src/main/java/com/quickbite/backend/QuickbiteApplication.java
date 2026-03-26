@@ -57,13 +57,16 @@ public class QuickbiteApplication {
             }
 
             if (restaurantRepository.count() == 0) {
-                User owner = new User();
-                owner.setName("Restaurant Owner");
-                owner.setEmail("owner@quickbite.com");
-                owner.setPassword(passwordEncoder.encode("Owner123"));
-                owner.setRole(UserRole.RESTAURANT_OWNER);
-                userRepository.save(owner);
-                System.out.println("Seeded Owner account.");
+                User owner = userRepository.findByEmail("owner@quickbite.com");
+                if (owner == null) {
+                    owner = new User();
+                    owner.setName("Restaurant Owner");
+                    owner.setEmail("owner@quickbite.com");
+                    owner.setPassword(passwordEncoder.encode("Owner123"));
+                    owner.setRole(UserRole.RESTAURANT_OWNER);
+                    userRepository.save(owner);
+                    System.out.println("Seeded Owner account.");
+                }
 
                 Restaurant pizza = new Restaurant();
                 pizza.setName("Grandma's Kitchen");
