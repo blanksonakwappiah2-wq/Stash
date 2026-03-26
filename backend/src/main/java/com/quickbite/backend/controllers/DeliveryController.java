@@ -75,4 +75,36 @@ public class DeliveryController {
                 "longitude", agent.getLongitude() != null ? agent.getLongitude() : 0.0,
                 "destination", order.getDeliveryAddress()));
     }
+
+    @GetMapping("/orders/{agentId}")
+    public List<Order> getAgentOrders(@PathVariable Long agentId) {
+        User agent = userRepository.findById(agentId).orElse(null);
+        if (agent == null) return List.of();
+        return orderRepository.findByDeliveryAgent(agent);
+    }
+
+    @PostMapping("/orders/{orderId}/transfer")
+    public ResponseEntity<?> transferOrder(@PathVariable Long orderId) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) return ResponseEntity.notFound().build();
+        
+        order.setDeliveryAgent(null);
+        orderRepository.save(order);
+        return ResponseEntity.ok(Map.of("message", "Order released to fleet."));
+    }
+
+    @PutMapping("/status")
+    public ResponseEntity<?> updateStatus(@RequestBody Map<String, Object> statusData) {
+        Long agentId = ((Number) statusData.get("agentId")).longValue();
+        Boolean isOnline = (Boolean) statusData.get("isOnline");
+
+        User agent = userRepository.findById(agentId).orElse(null);
+        if (agent == null || agent.getRole() != UserRole.DELIVERY_AGENT) {
+            return ResponseEntity.badRequest().body("Invalid agent.");
+        }
+
+        agent.setIsOnline(isOnline);
+        userRepository.save(agent);
+        return ResponseEntity.ok(Map.of("isOnline", agent.getIsOnline()));
+    }
 }

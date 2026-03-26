@@ -99,4 +99,14 @@ public class User {
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
+
+    private boolean isOnline = false;
+
+    public boolean getIsOnline() {
+        return isOnline;
+    }
+
+    public void setIsOnline(boolean isOnline) {
+        this.isOnline = isOnline;
+    }
 }

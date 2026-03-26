@@ -213,6 +213,16 @@ function switchPane(paneId, navBtnId) {
     if (paneId === 'orders-content') {
         fetchAndShowOrders();
     }
+
+    // Special logic for agent portal
+    if (paneId === 'agent-content') {
+        fetchAndShowAgentOrders();
+        setTimeout(initAgentMap, 100);
+    }
+
+    if (paneId === 'availabilities-content') {
+        updateAgentStatusUI();
+    }
 }
 
 function setupNavListeners() {
@@ -1626,6 +1636,13 @@ window.addEventListener('load', () => {
         const updateMgrBtn = document.getElementById('update-manager-btn');
         if (updateMgrBtn) updateMgrBtn.addEventListener('click', handleUpdateManager);
 
+        logToScreen("-> Binding Delivery Agent Action Buttons...");
+        const toggleStatusBtn = document.getElementById('toggle-status-btn');
+        if (toggleStatusBtn) toggleStatusBtn.addEventListener('click', toggleAgentOnlineStatus);
+        
+        const submitPermBtn = document.getElementById('submit-perm-btn');
+        if (submitPermBtn) submitPermBtn.addEventListener('click', submitPermissionRequest);
+
         logToScreen("Initialization complete.");
     } catch (e) {
         logToScreen("Initialization FAILED at: " + e.stack, true);
@@ -1664,4 +1681,132 @@ async function fetchAndShowAgents() {
     } catch (e) {
         console.error('Failed to load agents', e);
     }
+}
+
+// ── Delivery Agent Portal Logic ──────────────────────────────────────────────
+
+let agentMap = null;
+
+async function fetchAndShowAgentOrders() {
+    const list = document.getElementById('assigned-orders-list');
+    if (!list) return;
+
+    try {
+        const response = await secureFetch(`/api/delivery/orders/${currentUser.id}`);
+        if (!response || !response.ok) return;
+        const orders = await response.json();
+
+        if (orders.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>';
+            return;
+        }
+
+        list.innerHTML = orders.map(order => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0; background: #fff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="category-badge" style="background: #6366f1; color: white;">Order #${order.id}</span>
+                    <span class="category-badge" style="background: #f1f5f9; color: #64748b;">${order.status}</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <p class="label" style="font-weight: 700; color: #1e1b4b; margin-bottom: 5px;">Pickup: ${order.restaurant.name}</p>
+                    <p class="label" style="font-size: 0.85em; color: #64748b; margin: 0;">Drop-off: ${order.deliveryAddress}</p>
+                </div>
+                <div class="button-group" style="margin-top: 15px;">
+                    <button class="register-button" style="padding: 8px 15px; font-size: 0.85em; border-color: #ef4444; color: #ef4444;" onclick="transferOrderToFleet(${order.id})">🔄 Assign Another Agent</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load agent orders', e);
+    }
+}
+
+async function transferOrderToFleet(orderId) {
+    if (!confirm("Are you sure you want to release this order back to the fleet? Another agent will need to claim it.")) return;
+    
+    try {
+        const response = await secureFetch(`/api/delivery/orders/${orderId}/transfer`, { method: 'POST' });
+        if (response && response.ok) {
+            logToScreen(`Order #${orderId} released to fleet.`);
+            fetchAndShowAgentOrders();
+        }
+    } catch (e) {
+        console.error('Failed to transfer order', e);
+    }
+}
+
+async function toggleAgentOnlineStatus() {
+    const isCurrentlyOnline = currentUser.isOnline || false;
+    const newStatus = !isCurrentlyOnline;
+    
+    try {
+        const response = await secureFetch('/api/delivery/status', {
+            method: 'PUT',
+            body: JSON.stringify({ agentId: currentUser.id, isOnline: newStatus })
+        });
+        
+        if (response && response.ok) {
+            currentUser.isOnline = newStatus;
+            updateAgentStatusUI();
+            logToScreen(`You are now ${newStatus ? 'ONLINE' : 'OFFLINE'}.`);
+        }
+    } catch (e) {
+        console.error('Failed to update status', e);
+    }
+}
+
+function updateAgentStatusUI() {
+    const textEl = document.getElementById('agent-status-text');
+    const btnEl = document.getElementById('toggle-status-btn');
+    if (!textEl || !btnEl) return;
+    
+    const isOnline = currentUser.isOnline || false;
+    if (isOnline) {
+        textEl.innerHTML = 'You are currently <strong style="color: #10b981;">Online</strong> and ready for orders.';
+        btnEl.textContent = 'Go Offline';
+        btnEl.style.background = '#ef4444';
+    } else {
+        textEl.innerHTML = 'You are currently <strong>Offline</strong>.';
+        btnEl.textContent = 'Go Online';
+        btnEl.style.background = '#6366f1';
+    }
+}
+
+function initAgentMap() {
+    const mapDiv = document.getElementById('agent-delivery-map');
+    if (!mapDiv) return;
+
+    if (agentMap) {
+        agentMap.remove();
+    }
+
+    agentMap = L.map('agent-delivery-map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(agentMap);
+    
+    logToScreen("Agent portal map initialized.");
+}
+
+function submitPermissionRequest() {
+    const start = document.getElementById('perm-start-date').value;
+    const end = document.getElementById('perm-end-date').value;
+    const reason = document.getElementById('perm-reason').value;
+    const msgEl = document.getElementById('perm-message');
+    
+    if (!start || !end || !reason) {
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#ef4444';
+        msgEl.textContent = "Please fill in all fields.";
+        return;
+    }
+    
+    msgEl.style.display = 'block';
+    msgEl.style.color = '#10b981';
+    msgEl.textContent = "Permission request submitted to manager! ✅";
+    
+    logToScreen(`[PERMISSION] Request from ${currentUser.name}: ${start} to ${end} (${reason})`);
+    
+    // Clear form
+    document.getElementById('perm-start-date').value = '';
+    document.getElementById('perm-end-date').value = '';
+    document.getElementById('perm-reason').value = '';
 }

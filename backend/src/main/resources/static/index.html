@@ -568,24 +568,50 @@
                 <div id="agent-content" class="content-pane">
                     <div class="content-card section-card">
                         <h1 class="title-label" style="text-align: left; color: #1e1b4b;">📦 My Deliveries</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">View and manage your current deliveries.</p>
+                        <p class="label" style="margin-bottom: 20px; color: #64748b;">View and manage your current deliveries. Use the map for navigation.</p>
                         
+                        <div id="agent-map-container" style="height: 350px; width: 100%; border-radius: 15px; margin-bottom: 25px; border: 1px solid #e2e8f0; z-index: 1;">
+                            <div id="agent-delivery-map" style="height: 100%; width: 100%; border-radius: 15px;"></div>
+                        </div>
+
                         <div id="assigned-orders-list" class="restaurant-grid">
                             <p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>
                         </div>
-
                     </div>
                 </div>
 
-                <!-- Availabilities Section (Placeholder) -->
+                <!-- Availabilities Section -->
                 <div id="availabilities-content" class="content-pane">
                     <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">⏳ My Availabilities</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">Set your active status and working hours.</p>
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🕙 My Availabilities & Status</h1>
+                        <p class="label" style="margin-bottom: 25px; color: #64748b;">Manage your active status and request time-off permissions.</p>
                         
-                        <div class="button-group" style="margin-top: 30px; justify-content: flex-start;">
-                            <button class="login-button" style="background: #10b981; max-width: 200px;">I'm Online & Ready</button>
-                            <button class="register-button" style="max-width: 200px;">Go Offline</button>
+                        <div style="background: #f8fafc; padding: 25px; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h3 style="color: #1e1b4b; margin: 0; font-size: 1.1em;">Work Status</h3>
+                                <p id="agent-status-text" style="color: #64748b; font-size: 0.9em; margin: 5px 0 0 0;">You are currently <strong>Offline</strong>.</p>
+                            </div>
+                            <button id="toggle-status-btn" class="login-button" style="width: auto; margin: 0; padding: 12px 30px; background: #6366f1;">Go Online</button>
+                        </div>
+
+                        <div style="border-top: 1px solid #f1f5f9; padding-top: 30px;">
+                            <h3 style="color: #1e1b4b; margin-bottom: 15px; font-size: 1.1em;">📅 Request Permission (Time-off)</h3>
+                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label class="label">Start Date</label>
+                                    <input type="date" id="perm-start-date" class="text-field">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label">End Date</label>
+                                    <input type="date" id="perm-end-date" class="text-field">
+                                </div>
+                                <div class="form-group" style="grid-column: 1/-1;">
+                                    <label class="label">Reason for request</label>
+                                    <textarea id="perm-reason" class="text-field" placeholder="Briefly explain your request..." style="height: 100px; resize: none;"></textarea>
+                                </div>
+                            </div>
+                            <button id="submit-perm-btn" class="login-button" style="margin-top: 20px; background: #64748b;">Submit Permission Request</button>
+                            <div id="perm-message" class="message-label" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
