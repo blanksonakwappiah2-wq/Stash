@@ -28,6 +28,9 @@ public class User {
     private Double latitude;
     private Double longitude;
 
+    @jakarta.persistence.Column(name = "is_online")
+    private boolean online = false;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -102,13 +105,11 @@ public class User {
         this.longitude = longitude;
     }
 
-    private boolean isOnline = false;
-
-    public boolean getIsOnline() {
-        return isOnline;
+    public boolean isOnline() {
+        return online;
     }
 
-    public void setIsOnline(boolean isOnline) {
-        this.isOnline = isOnline;
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

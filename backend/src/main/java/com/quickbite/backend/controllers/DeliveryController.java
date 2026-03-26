@@ -103,8 +103,8 @@ public class DeliveryController {
             return ResponseEntity.badRequest().body("Invalid agent.");
         }
 
-        agent.setIsOnline(isOnline);
+        agent.setOnline(isOnline);
         userRepository.save(agent);
-        return ResponseEntity.ok(Map.of("isOnline", agent.getIsOnline()));
+        return ResponseEntity.ok(Map.of("isOnline", agent.isOnline()));
     }
 }
