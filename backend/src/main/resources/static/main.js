@@ -205,6 +205,8 @@ function switchPane(paneId, navBtnId) {
     // Special logic for tracking pane
     if (paneId === 'tracking-content') {
         initCustomerMap();
+    } else if (paneId === 'owner-tracking-content') {
+        initOwnerMap();
     }
 
     // Special logic for orders pane
@@ -795,7 +797,11 @@ function updateNavigationForRole(role) {
     } else if (role === 'RESTAURANT_OWNER') {
         setDisplay('nav-owner-btn', 'flex');
         setDisplay('nav-owner-tracking-btn', 'flex');
-        setDisplay('nav-orders-btn', 'flex');
+        const ordersBtn = document.getElementById('nav-orders-btn');
+        if (ordersBtn) {
+            ordersBtn.style.display = 'flex';
+            ordersBtn.textContent = '📋 Orders';
+        }
         setDisplay('nav-feedback-btn', 'flex');
     } else if (role === 'DELIVERY_AGENT') {
         setDisplay('nav-agent-btn', 'flex');
@@ -1104,7 +1110,12 @@ async function fetchMapData(targetMap, role) {
 async function fetchAndShowRestaurants() {
     try {
         const response = await fetch(RESTAURANT_URL);
-        const restaurants = await response.json();
+        let restaurants = await response.json();
+        
+        // Filter: If user is an OWNER, only show THEIR restaurant
+        if (currentUser && currentUser.role === 'RESTAURANT_OWNER') {
+            restaurants = restaurants.filter(r => r.ownerId === currentUser.id);
+        }
         
         const list = document.getElementById('restaurants-list');
         list.innerHTML = restaurants.map(rest => {
@@ -1440,6 +1451,17 @@ if (checkoutBtn) {
 
 async function fetchAndShowOrders() {
     try {
+        const titleEl = document.getElementById('orders-title');
+        const descEl = document.getElementById('orders-message');
+        
+        if (currentUser.role === 'CUSTOMER') {
+            if (titleEl) titleEl.textContent = "My Orders";
+            if (descEl) descEl.textContent = "You haven't placed any orders yet. Start exploring now!";
+        } else if (currentUser.role === 'RESTAURANT_OWNER') {
+            if (titleEl) titleEl.textContent = "Orders Received";
+            if (descEl) descEl.textContent = "History of orders ordered by customers from your restaurant.";
+        }
+        
         let url = ORDER_URL;
         if (currentUser.role === 'CUSTOMER') {
             url = ORDER_URL + `/customer/${currentUser.id}`;
@@ -1468,6 +1490,11 @@ async function fetchAndShowOrders() {
         
         if (orders.length === 0) {
             message.style.display = 'block';
+            if (currentUser.role === 'RESTAURANT_OWNER') {
+                message.textContent = "No orders received from customers yet. 📥";
+            } else {
+                message.textContent = "You haven't placed any orders yet. Start exploring now!";
+            }
             list.innerHTML = '';
             return;
         }
