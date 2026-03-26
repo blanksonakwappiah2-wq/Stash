@@ -1,3 +1,13 @@
+---
+title: QuickBite App
+emoji: 🍴
+colorFrom: orange
+colorTo: red
+sdk: docker
+app_port: 10000
+pinned: false
+---
+
 # QuickBite Food Ordering & Delivery System
 
 This project is a full-stack Java application for food ordering and delivery.
