@@ -22,16 +22,24 @@ public class DeliveryController {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     @GetMapping("/agents")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('MANAGER')")
     public List<User> getAgents() {
         return userRepository.findByRole(UserRole.DELIVERY_AGENT);
     }
 
     @PostMapping("/agents")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('MANAGER')")
     public ResponseEntity<?> addAgent(@RequestBody User agent) {
         agent.setRole(UserRole.DELIVERY_AGENT);
         if (userRepository.findByEmail(agent.getEmail()) != null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Agent with this email already exists."));
+        }
+        if (agent.getPassword() != null && !agent.getPassword().isEmpty()) {
+            agent.setPassword(passwordEncoder.encode(agent.getPassword()));
         }
         return ResponseEntity.ok(userRepository.save(agent));
     }

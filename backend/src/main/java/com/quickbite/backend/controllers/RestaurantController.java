@@ -57,6 +57,19 @@ public class RestaurantController {
                 User existingOwner = userService.getUserById(request.getOwnerId())
                         .orElseThrow(() -> new ResourceNotFoundException("User", request.getOwnerId()));
                 restaurant.setOwner(existingOwner);
+            } else if (request.getOwnerEmail() != null && !request.getOwnerEmail().isEmpty()) {
+                User existingOwner = userService.findByEmail(request.getOwnerEmail());
+                if (existingOwner != null) {
+                    restaurant.setOwner(existingOwner);
+                } else {
+                    User newOwner = userService.register(
+                            request.getOwnerName(),
+                            request.getOwnerEmail(),
+                            request.getOwnerPassword(),
+                            "RESTAURANT_OWNER"
+                    );
+                    restaurant.setOwner(newOwner);
+                }
             }
 
             Restaurant created = restaurantService.createRestaurant(restaurant);

@@ -11,6 +11,11 @@ public class RestaurantRequest {
     public RestaurantRequest() {}
 
     private String imageUrl;
+    
+    // New fields for Inline Owner Creation
+    private String ownerName;
+    private String ownerEmail;
+    private String ownerPassword;
 
     // Getters and Setters
     public String getName() { return name; }
@@ -27,4 +32,13 @@ public class RestaurantRequest {
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getOwnerName() { return ownerName; }
+    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+    
+    public String getOwnerEmail() { return ownerEmail; }
+    public void setOwnerEmail(String ownerEmail) { this.ownerEmail = ownerEmail; }
+    
+    public String getOwnerPassword() { return ownerPassword; }
+    public void setOwnerPassword(String ownerPassword) { this.ownerPassword = ownerPassword; }
 }
