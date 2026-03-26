@@ -29,7 +29,7 @@ public class User {
     private Double longitude;
 
     @jakarta.persistence.Column(name = "is_online")
-    private boolean online = false;
+    private Boolean online = false;
 
     // Getters and Setters
     public Long getId() {
@@ -106,10 +106,10 @@ public class User {
     }
 
     public boolean isOnline() {
-        return online;
+        return online != null ? online : false;
     }
 
-    public void setOnline(boolean online) {
+    public void setOnline(Boolean online) {
         this.online = online;
     }
 }
