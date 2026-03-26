@@ -3,6 +3,7 @@ package com.quickbite.backend.entities;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,6 +36,7 @@ public class Order {
     private DeliveryOption deliveryOption;
     private LocalDateTime orderTime;
     private LocalDateTime deliveryTime;
+    @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
     @ManyToOne
