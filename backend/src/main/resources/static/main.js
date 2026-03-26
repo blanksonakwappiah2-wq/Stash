@@ -295,6 +295,21 @@ function showAlert(message) {
     alert("QuickBite\n\n" + message);
 }
 
+// Global Password Visibility Toggle
+function togglePasswordVisibility(inputId, toggleEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        toggleEl.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        toggleEl.textContent = '👁️';
+    }
+}
+window.togglePasswordVisibility = togglePasswordVisibility;
+
 async function fetchAndShowCustomers() {
     try {
         const response = await secureFetch(AUTH_URL);
