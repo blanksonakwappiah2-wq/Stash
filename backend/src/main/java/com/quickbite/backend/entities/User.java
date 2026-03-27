@@ -103,7 +103,7 @@ public class User {
         this.longitude = longitude;
     }
 
-    public boolean isOnline() {
+    public Boolean getOnline() {
         return online != null ? online : false;
     }
 

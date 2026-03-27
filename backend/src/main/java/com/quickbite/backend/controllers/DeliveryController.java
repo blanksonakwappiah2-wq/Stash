@@ -113,6 +113,6 @@ public class DeliveryController {
 
         agent.setOnline(isOnline);
         userRepository.save(agent);
-        return ResponseEntity.ok(Map.of("isOnline", agent.isOnline()));
+        return ResponseEntity.ok(Map.of("isOnline", agent.getOnline()));
     }
 }
