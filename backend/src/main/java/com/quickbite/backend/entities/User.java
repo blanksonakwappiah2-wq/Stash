@@ -18,6 +18,7 @@ public class User {
     private String name;
     @jakarta.persistence.Column(unique = true)
     private String email;
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String address;
     private String phone;
@@ -54,7 +55,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return password;
     }
