@@ -72,11 +72,7 @@ public class UserController {
         try {
             User user = userService.findByEmail(loginRequest.getEmail());
             if (user != null) {
-                if (!user.isEmailVerified()) {
-                    return ResponseEntity.status(403)
-                            .body(Map.of("message", "Email not verified. Please verify your email first."));
-                }
-
+                // Verification check removed
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
@@ -158,16 +154,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/verify")
-    public ResponseEntity<?> verify(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String code = request.get("code");
-        if (userService.verifyEmail(email, code)) {
-            return ResponseEntity.ok(Map.of("message", "Email verified successfully!"));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid verification code."));
-        }
-    }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER', 'RESTAURANT_OWNER', 'DELIVERY_AGENT')")

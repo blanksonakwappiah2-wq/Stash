@@ -78,13 +78,7 @@ public class UserService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole(targetRole);
-
-        // Generate 6-digit verification code
-        String code = String.format("%06d", new Random().nextInt(999999));
-        user.setVerificationCode(code);
-        user.setEmailVerified(false);
-
-        System.out.println("[SIMULATED EMAIL] To: " + email + " | Verification Code: " + code);
+        user.setEmailVerified(true); // Verification disabled
 
         return userRepository.save(user);
     }

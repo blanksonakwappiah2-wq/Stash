@@ -559,9 +559,16 @@ async function handleRegister() {
         clearTimeout(timeoutId);
 
         if (response.ok) {
-            localStorage.setItem('temp_verify_email', email);
-            localStorage.setItem('temp_pass', password); // Store temp pass for auto-login
-            switchOuterLayout('verify-scene');
+            showMessage('reg-message', "Registration successful! You can now login.", true);
+            setTimeout(() => {
+                switchOuterLayout('login-scene');
+                // Clean up registration fields
+                document.getElementById('reg-name').value = '';
+                document.getElementById('reg-email').value = '';
+                document.getElementById('reg-password').value = '';
+                document.getElementById('reg-confirm-password').value = '';
+                document.getElementById('reg-message').style.display = 'none';
+            }, 2000);
         } else {
             const err = await response.json();
             showMessage('reg-message', err.message || "Registration failed.", false);
@@ -1644,8 +1651,6 @@ window.addEventListener('load', () => {
         const submitPermBtn = document.getElementById('submit-perm-btn');
         if (submitPermBtn) submitPermBtn.addEventListener('click', submitPermissionRequest);
 
-        const verifyBtn = document.getElementById('verify-btn');
-        if (verifyBtn) verifyBtn.addEventListener('click', handleVerifyCode);
 
         logToScreen("Initialization complete.");
     } catch (e) {
@@ -1976,57 +1981,6 @@ async function handlePermissionAction(id, action) {
     }
 }
 
-async function handleVerifyCode() {
-    const code = document.getElementById('verify-code').value.trim();
-    const email = localStorage.getItem('temp_verify_email');
-    const msgEl = document.getElementById('verify-message');
-
-    if (code.length !== 6) {
-        showMessage('verify-message', "Please enter a valid 6-digit code.", false);
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/users/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, code })
-        });
-
-        if (response.ok) {
-            const password = localStorage.getItem('temp_pass');
-            localStorage.removeItem('temp_verify_email');
-            
-            // Visual Success Flow
-            document.getElementById('verify-input-container').style.display = 'none';
-            document.getElementById('verify-success-container').style.display = 'block';
-            
-            setTimeout(() => {
-                if (password) {
-                    handleLogin(email, password);
-                } else {
-                    switchOuterLayout('login-scene');
-                    showMessage('login-message', "Account verified! You can now login.", true);
-                }
-                // Reset Verify Scene for next time
-                document.getElementById('verify-input-container').style.display = 'block';
-                document.getElementById('verify-success-container').style.display = 'none';
-                document.getElementById('verify-code').value = '';
-            }, 3500);
-        } else {
-            const err = await response.json();
-            showMessage('verify-message', err.message || "Invalid code.", false);
-        }
-    } catch (e) {
-        console.error("Verification error", e);
-        showMessage('verify-message', "Connection error.", false);
-    }
-}
-
-function resendVerificationCode() {
-    logToScreen("Resend code requested (Simulated). Check logs.");
-    // In a real app, this would hit an endpoint to generate/send a new code
-}
 
 function startLocationTracking() {
     if (!navigator.geolocation) {
@@ -2082,40 +2036,4 @@ function updateAgentPosition(lat, lng) {
     }
 
     console.log(`[SYNC] Agent location: ${lat}, ${lng}`);
-}
-
-async function handleSkipVerification() {
-    const email = localStorage.getItem('temp_verify_email');
-    if (!email) {
-        showMessage('verify-message', "No active verification found.", false);
-        return;
-    }
-    
-    logToScreen("-> Skipping verification for: " + email);
-    
-    try {
-        const response = await fetch('/api/users/verify/skip?email=' + encodeURIComponent(email), {
-            method: 'POST'
-        });
-        
-        if (response.ok) {
-            const password = localStorage.getItem('temp_pass');
-            localStorage.removeItem('temp_verify_email');
-            
-            showMessage('verify-message', "Developer Skip Successful!", true);
-            setTimeout(() => {
-                if (password) {
-                    handleLogin(email, password);
-                } else {
-                    switchOuterLayout('login-scene');
-                    showMessage('login-message', "Verified! You can now login.", true);
-                }
-            }, 1000);
-        } else {
-            showMessage('verify-message', "Skip failed on server.", false);
-        }
-    } catch (e) {
-        console.error("Skip Error:", e);
-        showMessage('verify-message', "Connection error.", false);
-    }
 }
