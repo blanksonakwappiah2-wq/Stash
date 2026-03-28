@@ -83,7 +83,6 @@ public class QuickbiteApplication {
                 burgers.setAddress("456 Grill St, Metro");
                 burgers.setContact("555-BURGER");
                 burgers.setImageUrl("https://i.pinimg.com/736x/21/df/76/21df767439167df3c4c9b1f618a56249.jpg");
-                burgers.setOwner(owner);
                 restaurantRepository.save(burgers);
 
                 Restaurant sushi = new Restaurant();
@@ -92,7 +91,6 @@ public class QuickbiteApplication {
                 sushi.setAddress("789 Sakura Blvd, Neo");
                 sushi.setContact("555-SUSHI");
                 sushi.setImageUrl("https://i.pinimg.com/736x/09/a4/09/09a4097e034e64a13d7e6f6f1a8e1e81.jpg");
-                sushi.setOwner(owner);
                 restaurantRepository.save(sushi);
 
                 MenuItem m1 = new MenuItem();
