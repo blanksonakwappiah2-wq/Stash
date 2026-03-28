@@ -659,19 +659,29 @@ async function handleAddAgent() {
 async function handleUpdateManager() {
     if (!currentUser) return;
     
+    const email = document.getElementById('mgr-update-email').value.trim();
     const password = document.getElementById('mgr-update-password').value;
 
-    if (!password) {
-        showMessage('mgr-update-message', "Please provide a new password.", false);
+    if (!email && !password) {
+        showMessage('mgr-update-message', "Please provide at least one field to update.", false);
         return;
     }
 
-    if (password.length < 8) {
-        showMessage('mgr-update-message', "Password must be at least 8 characters.", false);
-        return;
+    const payload = {};
+    if (email) {
+        if (!EMAIL_PATTERN.test(email)) {
+            showMessage('mgr-update-message', "Invalid email format.", false);
+            return;
+        }
+        payload.email = email;
     }
-
-    const payload = { password: password };
+    if (password) {
+        if (password.length < 8) {
+            showMessage('mgr-update-message', "Password must be at least 8 characters.", false);
+            return;
+        }
+        payload.password = password;
+    }
 
     try {
         const response = await secureFetch(`/api/users/${currentUser.id}`, {
@@ -680,7 +690,12 @@ async function handleUpdateManager() {
         });
 
         if (response && response.ok) {
-            showMessage('mgr-update-message', "Password updated successfully!", true);
+            const updatedUser = await response.json();
+            currentUser = { ...currentUser, ...updatedUser };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            showMessage('mgr-update-message', "Account updated successfully!", true);
+            document.getElementById('mgr-update-email').value = '';
             document.getElementById('mgr-update-password').value = '';
         } else {
             const error = await response.json();
