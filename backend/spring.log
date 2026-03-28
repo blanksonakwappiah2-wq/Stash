@@ -1,0 +1,126 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.quickbite:backend >------------------------
+[INFO] Building QuickBite Backend 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.1.0:run (default-cli) > test-compile @ backend >>>
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ backend ---
+[INFO] Copying 5 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ backend ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] <<< spring-boot:3.1.0:run (default-cli) < test-compile @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.1.0:run (default-cli) @ backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.1.0)
+
+2026-03-28T14:56:53.476Z  INFO 11616 --- [           main] c.q.backend.QuickbiteApplication         : Starting QuickbiteApplication using Java 25.0.1 with PID 11616 (C:\Users\user\Desktop\New folder\backend\target\classes started by user in C:\Users\user\Desktop\New folder\backend)
+2026-03-28T14:56:53.478Z  INFO 11616 --- [           main] c.q.backend.QuickbiteApplication         : No active profile set, falling back to 1 default profile: "default"
+2026-03-28T14:56:54.311Z  INFO 11616 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-28T14:56:54.395Z  INFO 11616 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 77 ms. Found 7 JPA repository interfaces.
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (file:/C:/Users/user/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.8/tomcat-embed-core-10.1.8.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-03-28T14:56:55.088Z  INFO 11616 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2026-03-28T14:56:55.097Z  INFO 11616 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-28T14:56:55.098Z  INFO 11616 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
+2026-03-28T14:56:55.196Z  INFO 11616 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-03-28T14:56:55.197Z  INFO 11616 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1669 ms
+2026-03-28T14:56:55.317Z  INFO 11616 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-28T14:56:55.501Z  INFO 11616 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:quickbite user=SA
+2026-03-28T14:56:55.502Z  INFO 11616 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-28T14:56:55.515Z  INFO 11616 --- [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:quickbite'
+2026-03-28T14:56:55.653Z  INFO 11616 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-03-28T14:56:55.698Z  INFO 11616 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.2.Final
+2026-03-28T14:56:55.701Z  INFO 11616 --- [           main] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2026-03-28T14:56:55.817Z  INFO 11616 --- [           main] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2026-03-28T14:56:55.945Z  INFO 11616 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-28T14:56:55.987Z  INFO 11616 --- [           main] org.hibernate.orm.dialect                : HHH035001: Using dialect: org.hibernate.dialect.H2Dialect, version: 2.1.214
+2026-03-28T14:56:56.234Z  INFO 11616 --- [           main] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2026-03-28T14:56:56.946Z  INFO 11616 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+Hibernate: drop table if exists delivery_options cascade 
+Hibernate: drop table if exists menu_items cascade 
+Hibernate: drop table if exists order_items cascade 
+Hibernate: drop table if exists orders cascade 
+Hibernate: drop table if exists restaurants cascade 
+Hibernate: drop table if exists reviews cascade 
+Hibernate: drop table if exists users cascade 
+Hibernate: create table delivery_options (base_fee float(53), estimated_time integer, per_km_fee float(53), id bigint generated by default as identity, category varchar(255), method varchar(255), primary key (id))
+Hibernate: create table menu_items (price float(53) not null, id bigint generated by default as identity, restaurant_id bigint, description varchar(255), image_url varchar(255), name varchar(255), primary key (id))
+Hibernate: create table order_items (price float(53) not null, quantity integer not null, id bigint generated by default as identity, menu_item_id bigint, order_id bigint, primary key (id))
+Hibernate: create table orders (delivery_fee float(53) not null, distance float(53) not null, total_amount float(53) not null, customer_id bigint, delivery_agent_id bigint, delivery_option_id bigint, delivery_time timestamp(6), id bigint generated by default as identity, order_time timestamp(6), restaurant_id bigint, delivery_address varchar(255), status varchar(255) check (status in ('PENDING','CONFIRMED','PREPARING','READY','DELIVERING','DELIVERED')), primary key (id))
+Hibernate: create table restaurants (latitude float(53), longitude float(53), id bigint generated by default as identity, owner_id bigint unique, address varchar(255), category varchar(255), contact varchar(255), image_url varchar(255), name varchar(255), website varchar(255), primary key (id))
+Hibernate: create table reviews (rating integer not null, customer_id bigint, id bigint generated by default as identity, restaurant_id bigint, comment varchar(255), primary key (id))
+Hibernate: create table users (is_online boolean, latitude float(53), longitude float(53), id bigint generated by default as identity, address varchar(255), email varchar(255) unique, name varchar(255), password varchar(255), phone varchar(255), role varchar(255) check (role in ('CUSTOMER','RESTAURANT_OWNER','DELIVERY_AGENT','MANAGER')), primary key (id))
+Hibernate: create index idx_order_status on orders (status)
+Hibernate: create index idx_restaurant_category on restaurants (category)
+Hibernate: create index idx_user_email on users (email)
+Hibernate: alter table if exists menu_items add constraint FKhaqtoboitpl0n541y0sc753my foreign key (restaurant_id) references restaurants
+Hibernate: alter table if exists order_items add constraint FKdtfg1f49yr5yye2fpl2xid2xo foreign key (menu_item_id) references menu_items
+Hibernate: alter table if exists order_items add constraint FKbioxgbv59vetrxe0ejfubep1w foreign key (order_id) references orders
+Hibernate: alter table if exists orders add constraint FKsjfs85qf6vmcurlx43cnc16gy foreign key (customer_id) references users
+Hibernate: alter table if exists orders add constraint FKgdr6mf6gyc66i584kcs08nman foreign key (delivery_agent_id) references users
+Hibernate: alter table if exists orders add constraint FK9torxrjjagxir0arfn1dbd5e1 foreign key (delivery_option_id) references delivery_options
+Hibernate: alter table if exists orders add constraint FK2m9qulf12xm537bku3jnrrbup foreign key (restaurant_id) references restaurants
+Hibernate: alter table if exists restaurants add constraint FKp5mmmypepihvmkdb83qwugr4d foreign key (owner_id) references users
+Hibernate: alter table if exists reviews add constraint FKkquncb1glvrldaui8v52xfd5q foreign key (customer_id) references users
+Hibernate: alter table if exists reviews add constraint FKsu8ow2q842enesfbqphjrfi5g foreign key (restaurant_id) references restaurants
+2026-03-28T14:56:57.018Z  INFO 11616 --- [           main] o.h.t.s.i.e.GenerationTargetToDatabase   : HHH000476: Executing script '[injected ScriptSourceInputNonExistentImpl script]'
+2026-03-28T14:56:57.020Z  INFO 11616 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-28T14:56:57.244Z  WARN 11616 --- [           main] ocalVariableTableParameterNameDiscoverer : Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: com.quickbite.backend.repositories.UserRepository
+2026-03-28T14:56:57.428Z  WARN 11616 --- [           main] ocalVariableTableParameterNameDiscoverer : Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: com.quickbite.backend.repositories.OrderRepository
+2026-03-28T14:56:57.489Z  WARN 11616 --- [           main] ocalVariableTableParameterNameDiscoverer : Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: com.quickbite.backend.repositories.MenuItemRepository
+2026-03-28T14:56:57.735Z  WARN 11616 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-28T14:56:57.830Z  INFO 11616 --- [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-03-28T14:56:58.103Z  INFO 11616 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-03-28T14:56:58.190Z  INFO 11616 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@5fc42998, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@16422f27, org.springframework.security.web.context.SecurityContextHolderFilter@27f8f1cc, org.springframework.security.web.header.HeaderWriterFilter@66e44f9f, org.springframework.web.filter.CorsFilter@5dfb65d5, org.springframework.security.web.authentication.logout.LogoutFilter@14927cd4, com.quickbite.backend.security.JwtAuthenticationFilter@260f05ee, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@3ede428e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@70a8654, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@f4aec23, org.springframework.security.web.session.SessionManagementFilter@2d21d12b, org.springframework.security.web.access.ExceptionTranslationFilter@5bdef8ee, org.springframework.security.web.access.intercept.AuthorizationFilter@121b7a95]
+2026-03-28T14:56:58.498Z  INFO 11616 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2026-03-28T14:56:58.509Z  INFO 11616 --- [           main] c.q.backend.QuickbiteApplication         : Started QuickbiteApplication in 5.375 seconds (process running for 5.73)
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: insert into users (address,email,latitude,longitude,name,is_online,password,phone,role,id) values (?,?,?,?,?,?,?,?,?,default)
+Seeded Manager account.
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: insert into users (address,email,latitude,longitude,name,is_online,password,phone,role,id) values (?,?,?,?,?,?,?,?,?,default)
+Seeded Customer account.
+Hibernate: select count(*) from restaurants r1_0
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: insert into users (address,email,latitude,longitude,name,is_online,password,phone,role,id) values (?,?,?,?,?,?,?,?,?,default)
+Seeded Owner account.
+Hibernate: insert into restaurants (address,category,contact,image_url,latitude,longitude,name,owner_id,website,id) values (?,?,?,?,?,?,?,?,?,default)
+Hibernate: insert into restaurants (address,category,contact,image_url,latitude,longitude,name,owner_id,website,id) values (?,?,?,?,?,?,?,?,?,default)
+Hibernate: insert into restaurants (address,category,contact,image_url,latitude,longitude,name,owner_id,website,id) values (?,?,?,?,?,?,?,?,?,default)
+Hibernate: insert into menu_items (description,image_url,name,price,restaurant_id,id) values (?,?,?,?,?,default)
+Seeded Restaurant and Menu.
+Hibernate: select count(*) from delivery_options d1_0
+Hibernate: insert into delivery_options (base_fee,category,estimated_time,method,per_km_fee,id) values (?,?,?,?,?,default)
+Seeded Delivery Options.
+2026-03-28T14:57:03.168Z  INFO 11616 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-28T14:57:03.169Z  INFO 11616 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-03-28T14:57:03.170Z  INFO 11616 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: insert into users (address,email,latitude,longitude,name,is_online,password,phone,role,id) values (?,?,?,?,?,?,?,?,?,default)
+2026-03-28T15:01:42.956Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m47s346ms579µs900ns).
