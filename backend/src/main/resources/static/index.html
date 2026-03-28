@@ -166,6 +166,44 @@
             </div>
         </div>
 
+        <!-- Verify Scene -->
+        <div id="verify-scene" class="scene" style="display: none;">
+            <div class="grid-pane">
+                <div id="verify-input-container">
+                    <h1 class="title-label">Verify Your Email</h1>
+                    <p class="label" style="text-align: center; margin-bottom: 20px; color: rgba(255,255,255,0.7);">We've sent a 6-digit verification code to your email. Please enter it below to activate your account.</p>
+                    
+                    <div class="form-group">
+                        <label class="label">6-Digit Code:</label>
+                        <input type="text" id="verify-code" class="text-field" placeholder="000000" maxlength="6" style="text-align: center; font-size: 1.5em; letter-spacing: 5px; font-weight: 700;">
+                    </div>
+                    
+                    <div id="verify-message" class="message-label" style="display: none;"></div>
+                    
+                    <div class="button-group">
+                        <button id="verify-btn" class="login-button">Verify & Login</button>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 20px; font-size: 0.9em; color: rgba(255,255,255,0.5);">
+                        Didn't receive code? <a href="#" style="color: #818cf8; text-decoration: none;" onclick="resendVerificationCode();">Resend Code</a>
+                    </p>
+                </div>
+
+                <div id="verify-success-container" style="display: none; text-align: center; padding: 40px 0;">
+                    <div class="success-checkmark">
+                        <div class="check-icon">
+                            <span class="icon-line line-tip"></span>
+                            <span class="icon-line line-long"></span>
+                            <div class="icon-circle"></div>
+                            <div class="icon-fix"></div>
+                        </div>
+                    </div>
+                    <h2 class="title-label" style="margin-top: 20px;">Email Verified!</h2>
+                    <p class="label" style="color: rgba(255,255,255,0.7);">Your account is now active. Redirecting you to login...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Main App Layout (Hidden by default, shown after login) -->
         <div id="main-layout" class="layout-container">
             <!-- Mobile Navigation Bar (Only for small screens) -->

@@ -1931,11 +1931,19 @@ async function handleVerifyCode() {
         });
 
         if (response.ok) {
-            showMessage('verify-message', "Email verified! You can now login.", true);
+            // Visual Success Flow
+            document.getElementById('verify-input-container').style.display = 'none';
+            document.getElementById('verify-success-container').style.display = 'block';
+            
             setTimeout(() => {
                 switchOuterLayout('login-scene');
                 localStorage.removeItem('temp_verify_email');
-            }, 2000);
+                // Reset for next time
+                document.getElementById('verify-input-container').style.display = 'block';
+                document.getElementById('verify-success-container').style.display = 'none';
+                document.getElementById('verify-code').value = '';
+                showMessage('login-message', "Account verified! You can now login.", true);
+            }, 3500);
         } else {
             const err = await response.json();
             showMessage('verify-message', err.message || "Invalid code.", false);
