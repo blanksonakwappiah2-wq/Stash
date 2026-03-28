@@ -63,6 +63,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        System.out.println("[DEBUG] Login attempt - Email: " + loginRequest.getEmail() + ", Password present: " + (loginRequest.getPassword() != null));
         if (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty() ||
                 loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
             return ResponseEntity.badRequest()
