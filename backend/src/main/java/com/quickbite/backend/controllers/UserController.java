@@ -67,11 +67,16 @@ public class UserController {
         }
 
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-
             User user = userService.findByEmail(loginRequest.getEmail());
             if (user != null) {
+                if (!user.isEmailVerified()) {
+                    return ResponseEntity.status(403)
+                            .body(Map.of("message", "Email not verified. Please verify your email first."));
+                }
+
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
                 UserDetails userDetails = org.springframework.security.core.userdetails.User
                         .builder()
                         .username(user.getEmail())
@@ -144,6 +149,17 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verify(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        if (userService.verifyEmail(email, code)) {
+            return ResponseEntity.ok(Map.of("message", "Email verified successfully!"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid verification code."));
         }
     }
 

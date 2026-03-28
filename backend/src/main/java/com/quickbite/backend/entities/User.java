@@ -31,6 +31,12 @@ public class User {
     @jakarta.persistence.Column(name = "is_online")
     private Boolean online = false;
 
+    @jakarta.persistence.Column(name = "is_email_verified")
+    private boolean isEmailVerified = false;
+
+    @jakarta.persistence.Column(name = "verification_code")
+    private String verificationCode;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -110,5 +116,21 @@ public class User {
 
     public void setOnline(Boolean online) {
         this.online = online;
+    }
+
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        isEmailVerified = emailVerified;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
     }
 }

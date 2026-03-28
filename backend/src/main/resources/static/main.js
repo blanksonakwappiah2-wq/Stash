@@ -48,6 +48,7 @@ const AUTH_URL = "/api/users/";
 const ORDER_URL = "/api/orders";
 const RESTAURANT_URL = "/api/restaurants";
 const DELIVERY_URL = "/api/delivery/";
+const PERMISSION_URL = "/api/delivery/permissions";
 const EMAIL_PATTERN = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
@@ -223,6 +224,10 @@ function switchPane(paneId, navBtnId) {
     if (paneId === 'availabilities-content') {
         updateAgentStatusUI();
     }
+
+    if (paneId === 'mgr-permissions-content') {
+        fetchAndShowPermissions();
+    }
 }
 
 function setupNavListeners() {
@@ -243,7 +248,8 @@ function setupNavListeners() {
         { id: 'nav-tracking-btn', pane: 'tracking-content' },
         { id: 'nav-feedback-btn', pane: 'feedback-content' },
         { id: 'nav-account-btn', pane: 'account-content' },
-        { id: 'nav-availabilities-btn', pane: 'availabilities-content' }
+        { id: 'nav-availabilities-btn', pane: 'availabilities-content' },
+        { id: 'nav-mgr-permissions-btn', pane: 'mgr-permissions-content' }
     ];
 
     navConfigs.forEach(config => {
@@ -803,6 +809,7 @@ function updateNavigationForRole(role) {
         setDisplay('nav-mgr-agents-btn', 'flex');
         setDisplay('nav-mgr-locations-btn', 'flex');
         setDisplay('nav-mgr-feedback-btn', 'flex');
+        setDisplay('nav-mgr-permissions-btn', 'flex');
         setDisplay('nav-mgr-account-btn', 'flex');
     } else if (role === 'RESTAURANT_OWNER') {
         setDisplay('nav-owner-btn', 'flex');
@@ -1643,6 +1650,9 @@ window.addEventListener('load', () => {
         const submitPermBtn = document.getElementById('submit-perm-btn');
         if (submitPermBtn) submitPermBtn.addEventListener('click', submitPermissionRequest);
 
+        const verifyBtn = document.getElementById('verify-btn');
+        if (verifyBtn) verifyBtn.addEventListener('click', handleVerifyCode);
+
         logToScreen("Initialization complete.");
     } catch (e) {
         logToScreen("Initialization FAILED at: " + e.stack, true);
@@ -1790,7 +1800,7 @@ function initAgentMap() {
     logToScreen("Agent portal map initialized.");
 }
 
-function submitPermissionRequest() {
+async function submitPermissionRequest() {
     const start = document.getElementById('perm-start-date').value;
     const end = document.getElementById('perm-end-date').value;
     const reason = document.getElementById('perm-reason').value;
@@ -1803,16 +1813,142 @@ function submitPermissionRequest() {
         return;
     }
     
-    msgEl.style.display = 'block';
-    msgEl.style.color = '#10b981';
-    msgEl.textContent = "Permission request submitted to manager! ✅";
-    
-    logToScreen(`[PERMISSION] Request from ${currentUser.name}: ${start} to ${end} (${reason})`);
-    
-    // Clear form
-    document.getElementById('perm-start-date').value = '';
-    document.getElementById('perm-end-date').value = '';
-    document.getElementById('perm-reason').value = '';
+    const payload = {
+        agent: { id: currentUser.id },
+        startDate: start,
+        endDate: end,
+        reason: reason
+    };
+
+    try {
+        const response = await secureFetch(PERMISSION_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        if (response && response.ok) {
+            msgEl.style.display = 'block';
+            msgEl.style.color = '#10b981';
+            msgEl.textContent = "Permission request submitted to manager! ✅";
+            logToScreen(`[PERMISSION] Request from ${currentUser.name} submitted.`);
+            
+            // Clear form
+            document.getElementById('perm-start-date').value = '';
+            document.getElementById('perm-end-date').value = '';
+            document.getElementById('perm-reason').value = '';
+        } else {
+            const err = await response.json();
+            msgEl.style.display = 'block';
+            msgEl.style.color = '#ef4444';
+            msgEl.textContent = err.message || "Failed to submit request.";
+        }
+    } catch (e) {
+        console.error("Error submitting permission", e);
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#ef4444';
+        msgEl.textContent = "Connection error.";
+    }
+}
+
+async function fetchAndShowPermissions() {
+    try {
+        const response = await secureFetch(PERMISSION_URL);
+        if (!response || !response.ok) return;
+        const requests = await response.json();
+        const list = document.getElementById('mgr-permissions-list');
+        if (!list) return;
+
+        if (requests.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No permission requests found.</p>';
+            return;
+        }
+
+        list.innerHTML = requests.map(req => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="category-badge" style="background: ${getPermissionStatusColor(req.status).bg}; color: ${getPermissionStatusColor(req.status).text};">${req.status}</span>
+                    <span style="font-size: 0.8em; color: #64748b;">Requested on: ${new Date().toLocaleDateString()}</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${req.agent.name}</p>
+                    <p class="label" style="font-size: 0.85em; color: #64748b; margin: 2px 0;">${req.startDate} to ${req.endDate}</p>
+                    <p class="label" style="font-size: 0.9em; color: #1e1b4b; margin-top: 10px; font-style: italic;">"${req.reason}"</p>
+                </div>
+                ${req.status === 'PENDING' ? `
+                <div class="button-group" style="margin-top: 15px;">
+                    <button class="login-button" style="padding: 8px 15px; font-size: 0.85em; background: #10b981;" onclick="handlePermissionAction(${req.id}, 'approve')">Approve</button>
+                    <button class="register-button" style="padding: 8px 15px; font-size: 0.85em; background: #ef4444; border: none; color: white;" onclick="handlePermissionAction(${req.id}, 'reject')">Reject</button>
+                </div>
+                ` : ''}
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load permissions', e);
+    }
+}
+
+function getPermissionStatusColor(status) {
+    switch (status) {
+        case 'PENDING': return { bg: '#fffbeb', text: '#d97706' };
+        case 'APPROVED': return { bg: '#dcfce7', text: '#166534' };
+        case 'REJECTED': return { bg: '#fdf2f2', text: '#dc2626' };
+        default: return { bg: '#f1f5f9', text: '#475569' };
+    }
+}
+
+async function handlePermissionAction(id, action) {
+    const confirmMsg = action === 'approve' ? 'Are you sure you want to APPROVE this request?' : 'Are you sure you want to REJECT this request?';
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const response = await secureFetch(`${PERMISSION_URL}/${id}/${action}`, { method: 'PUT' });
+        if (response && response.ok) {
+            logToScreen(`Permission ${id} ${action}d.`);
+            fetchAndShowPermissions();
+        } else {
+            alert(`Failed to ${action} request.`);
+        }
+    } catch (e) {
+        console.error(`Failed to ${action} permission`, e);
+    }
+}
+
+async function handleVerifyCode() {
+    const code = document.getElementById('verify-code').value.trim();
+    const email = localStorage.getItem('temp_verify_email');
+    const msgEl = document.getElementById('verify-message');
+
+    if (code.length !== 6) {
+        showMessage('verify-message', "Please enter a valid 6-digit code.", false);
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/users/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code })
+        });
+
+        if (response.ok) {
+            showMessage('verify-message', "Email verified! You can now login.", true);
+            setTimeout(() => {
+                switchOuterLayout('login-scene');
+                localStorage.removeItem('temp_verify_email');
+            }, 2000);
+        } else {
+            const err = await response.json();
+            showMessage('verify-message', err.message || "Invalid code.", false);
+        }
+    } catch (e) {
+        console.error("Verification error", e);
+        showMessage('verify-message', "Connection error.", false);
+    }
+}
+
+function resendVerificationCode() {
+    logToScreen("Resend code requested (Simulated). Check logs.");
+    // In a real app, this would hit an endpoint to generate/send a new code
 }
 
 function startLocationTracking() {
@@ -1821,7 +1957,7 @@ function startLocationTracking() {
         return;
     }
 
-    logToScreen("Starting live location tracking...");
+    logToScreen("Starting high-accuracy live location tracking...");
     agentLocationWatcher = navigator.geolocation.watchPosition(
         (position) => {
             const { latitude, longitude } = position.coords;
@@ -1831,7 +1967,11 @@ function startLocationTracking() {
             console.error("Geolocation error:", error);
             logToScreen(`Location error: ${error.message}`, true);
         },
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+        { 
+            enableHighAccuracy: true, 
+            maximumAge: 0, 
+            timeout: 10000 
+        }
     );
 }
 

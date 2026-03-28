@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserService {
@@ -78,7 +79,25 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         user.setRole(targetRole);
 
+        // Generate 6-digit verification code
+        String code = String.format("%06d", new Random().nextInt(999999));
+        user.setVerificationCode(code);
+        user.setEmailVerified(false);
+
+        System.out.println("[SIMULATED EMAIL] To: " + email + " | Verification Code: " + code);
+
         return userRepository.save(user);
+    }
+
+    public boolean verifyEmail(String email, String code) {
+        User user = userRepository.findByEmail(email);
+        if (user != null && code.equals(user.getVerificationCode())) {
+            user.setEmailVerified(true);
+            user.setVerificationCode(null);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
     public User updateUser(Long id, String name, String email, String password) {
