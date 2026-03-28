@@ -471,10 +471,15 @@ async function handleLogin(emailOverride = null, passwordOverride = null) {
     }
 
     try {
+        const payload = { email, password };
+        const bodyStr = JSON.stringify(payload);
+        console.log("LOGIN PAYLOAD:", bodyStr);
+        logToScreen("-> Sending Login JSON: " + bodyStr);
+
         const response = await fetch(AUTH_URL + 'login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: bodyStr
         });
         
         if (response.ok) {
