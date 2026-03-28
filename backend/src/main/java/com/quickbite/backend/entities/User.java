@@ -60,7 +60,7 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return password;
     }
