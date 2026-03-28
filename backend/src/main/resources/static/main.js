@@ -452,10 +452,6 @@ function showMessage(elementId, text, isSuccess) {
 
 // Logic for Login
 async function handleLogin(emailOverride = null, passwordOverride = null) {
-    // Prevent event object from being treated as emailOverride
-    if (emailOverride && typeof emailOverride !== 'string') emailOverride = null;
-    if (passwordOverride && typeof passwordOverride !== 'string') passwordOverride = null;
-
     const email = emailOverride || document.getElementById('login-email').value.trim();
     const password = passwordOverride || document.getElementById('login-password').value;
 
@@ -471,15 +467,10 @@ async function handleLogin(emailOverride = null, passwordOverride = null) {
     }
 
     try {
-        const payload = { email, password };
-        const bodyStr = JSON.stringify(payload);
-        console.log("LOGIN PAYLOAD:", bodyStr);
-        logToScreen("-> Sending Login JSON: " + bodyStr);
-
         const response = await fetch(AUTH_URL + 'login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: bodyStr
+            body: JSON.stringify({ email, password })
         });
         
         if (response.ok) {
