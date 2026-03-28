@@ -1684,8 +1684,9 @@ async function fetchAndShowAgents() {
 }
 
 // ── Delivery Agent Portal Logic ──────────────────────────────────────────────
-
 let agentMap = null;
+let agentLocationWatcher = null;
+let agentMarker = null;
 
 async function fetchAndShowAgentOrders() {
     const list = document.getElementById('assigned-orders-list');
@@ -1765,10 +1766,12 @@ function updateAgentStatusUI() {
         textEl.innerHTML = 'You are currently <strong style="color: #10b981;">Online</strong> and ready for orders.';
         btnEl.textContent = 'Go Offline';
         btnEl.style.background = '#ef4444';
+        if (!agentLocationWatcher) startLocationTracking();
     } else {
         textEl.innerHTML = 'You are currently <strong>Offline</strong>.';
         btnEl.textContent = 'Go Online';
         btnEl.style.background = '#6366f1';
+        stopLocationTracking();
     }
 }
 
@@ -1778,9 +1781,10 @@ function initAgentMap() {
 
     if (agentMap) {
         agentMap.remove();
+        agentMap = null;
     }
 
-    agentMap = L.map('agent-delivery-map').setView([51.505, -0.09], 13);
+    agentMap = L.map('agent-delivery-map').setView([5.6, -0.2], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(agentMap);
     
     logToScreen("Agent portal map initialized.");
@@ -1809,4 +1813,56 @@ function submitPermissionRequest() {
     document.getElementById('perm-start-date').value = '';
     document.getElementById('perm-end-date').value = '';
     document.getElementById('perm-reason').value = '';
+}
+
+function startLocationTracking() {
+    if (!navigator.geolocation) {
+        logToScreen("Geolocation is not supported by this browser.", true);
+        return;
+    }
+
+    logToScreen("Starting live location tracking...");
+    agentLocationWatcher = navigator.geolocation.watchPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            updateAgentPosition(latitude, longitude);
+        },
+        (error) => {
+            console.error("Geolocation error:", error);
+            logToScreen(`Location error: ${error.message}`, true);
+        },
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+    );
+}
+
+function stopLocationTracking() {
+    if (agentLocationWatcher !== null) {
+        navigator.geolocation.clearWatch(agentLocationWatcher);
+        agentLocationWatcher = null;
+        logToScreen("Location tracking stopped.");
+    }
+    if (agentMarker && agentMap) {
+        agentMap.removeLayer(agentMarker);
+        agentMarker = null;
+    }
+}
+
+function updateAgentPosition(lat, lng) {
+    if (!agentMap) return;
+
+    if (!agentMarker) {
+        agentMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'agent-location-marker',
+                html: '<div style="background: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border: 2px solid #6366f1;">🚴</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+        }).addTo(agentMap);
+        agentMap.setView([lat, lng], 15);
+    } else {
+        agentMarker.setLatLng([lat, lng]);
+    }
+
+    console.log(`[SYNC] Agent location: ${lat}, ${lng}`);
 }

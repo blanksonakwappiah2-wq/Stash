@@ -586,12 +586,12 @@
                         <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🕙 My Availabilities & Status</h1>
                         <p class="label" style="margin-bottom: 25px; color: #64748b;">Manage your active status and request time-off permissions.</p>
                         
-                        <div style="background: #f8fafc; padding: 25px; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between;">
-                            <div>
+                        <div class="agent-status-card">
+                            <div class="status-info">
                                 <h3 style="color: #1e1b4b; margin: 0; font-size: 1.1em;">Work Status</h3>
                                 <p id="agent-status-text" style="color: #64748b; font-size: 0.9em; margin: 5px 0 0 0;">You are currently <strong>Offline</strong>.</p>
                             </div>
-                            <button id="toggle-status-btn" class="login-button" style="width: auto; margin: 0; padding: 12px 30px; background: #6366f1;">Go Online</button>
+                            <button id="toggle-status-btn" class="login-button status-toggle-btn">Go Online</button>
                         </div>
 
                         <div style="border-top: 1px solid #f1f5f9; padding-top: 30px;">
@@ -606,8 +606,8 @@
                                     <input type="date" id="perm-end-date" class="text-field">
                                 </div>
                                 <div class="form-group" style="grid-column: 1/-1;">
-                                    <label class="label">Reason for request</label>
-                                    <textarea id="perm-reason" class="text-field" placeholder="Briefly explain your request..." style="height: 100px; resize: none;"></textarea>
+                                    <label class="label" style="color: #1e1b4b; margin-bottom: 5px;">Reason for request</label>
+                                    <textarea id="perm-reason" class="text-field reason-textarea" placeholder="Briefly explain your request (e.g. medical, vacation, personal)..." style="height: 100px; resize: none;"></textarea>
                                 </div>
                             </div>
                             <button id="submit-perm-btn" class="login-button" style="margin-top: 20px; background: #64748b;">Submit Permission Request</button>

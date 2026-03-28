@@ -840,3 +840,38 @@ button:hover {
         padding: 40px 25px;
     }
 }
+
+/* Agent Availability Improvements */
+.agent-status-card {
+    background: #f8fafc;
+    padding: 25px;
+    border-radius: 18px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap; /* Good for mobile */
+}
+
+.status-toggle-btn {
+    width: auto !important;
+    min-width: 160px;
+    margin: 0 !important;
+    padding: 12px 25px !important;
+    font-size: 14px !important;
+}
+
+.reason-textarea {
+    color: #1e1b4b !important;
+    background: rgba(255,255,255,0.9) !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 15px !important;
+}
+
+/* Ensure labels in content area are visible */
+.content-area .label {
+    color: #1e1b4b;
+    margin-bottom: 4px;
+}
