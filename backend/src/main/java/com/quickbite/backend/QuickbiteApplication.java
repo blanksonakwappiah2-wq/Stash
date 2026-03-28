@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 @EnableCaching
+@org.springframework.scheduling.annotation.EnableAsync
 public class QuickbiteApplication {
     public static void main(String[] args) {
         SpringApplication.run(QuickbiteApplication.class, args);

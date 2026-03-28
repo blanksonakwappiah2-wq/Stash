@@ -116,6 +116,12 @@
             <artifactId>spring-security-crypto</artifactId>
             <version>6.1.0</version>
         </dependency>
+        <!-- Email Support -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

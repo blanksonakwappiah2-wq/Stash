@@ -34,6 +34,9 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private EmailService emailService;
+
     @GetMapping
     @PreAuthorize("hasAnyRole('MANAGER')")
     public List<User> getAllUsers() {
@@ -92,6 +95,9 @@ public class UserController {
                         user.getRole().name(),
                         user.getName(),
                         user.getId());
+
+                // Send login notification asynchronously
+                emailService.sendLoginNotification(user);
 
                 return ResponseEntity.ok(response);
             } else {
