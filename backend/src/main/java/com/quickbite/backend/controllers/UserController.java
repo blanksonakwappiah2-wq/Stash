@@ -7,6 +7,7 @@ import com.quickbite.backend.entities.User;
 import com.quickbite.backend.repositories.UserRepository;
 import com.quickbite.backend.security.JwtUtil;
 import com.quickbite.backend.services.UserService;
+import com.quickbite.backend.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
