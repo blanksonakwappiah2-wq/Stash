@@ -452,6 +452,10 @@ function showMessage(elementId, text, isSuccess) {
 
 // Logic for Login
 async function handleLogin(emailOverride = null, passwordOverride = null) {
+    // Prevent event object from being treated as emailOverride
+    if (emailOverride && typeof emailOverride !== 'string') emailOverride = null;
+    if (passwordOverride && typeof passwordOverride !== 'string') passwordOverride = null;
+
     const email = emailOverride || document.getElementById('login-email').value.trim();
     const password = passwordOverride || document.getElementById('login-password').value;
 
@@ -1615,7 +1619,7 @@ window.addEventListener('load', () => {
         logToScreen("-> Binding Authentication Buttons...");
         const loginBtn = document.getElementById('login-btn');
         if (loginBtn) {
-            loginBtn.addEventListener('click', handleLogin);
+            loginBtn.addEventListener('click', () => handleLogin());
             logToScreen("   [OK] Login button bound.");
         } else {
             logToScreen("   [WARN] Login button NOT FOUND in DOM.", true);
@@ -1623,7 +1627,7 @@ window.addEventListener('load', () => {
 
         const regBtn = document.getElementById('register-btn');
         if (regBtn) {
-            regBtn.addEventListener('click', handleRegister);
+            regBtn.addEventListener('click', () => handleRegister());
             logToScreen("   [OK] Register button bound.");
         } else {
             logToScreen("   [WARN] Register button NOT FOUND in DOM.", true);
