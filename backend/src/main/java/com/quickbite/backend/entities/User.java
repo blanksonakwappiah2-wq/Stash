@@ -32,7 +32,7 @@ public class User {
     private Boolean online = false;
 
     @jakarta.persistence.Column(name = "is_email_verified")
-    private boolean isEmailVerified = false;
+    private Boolean isEmailVerified = false;
 
     @jakarta.persistence.Column(name = "verification_code")
     private String verificationCode;
@@ -118,11 +118,11 @@ public class User {
         this.online = online;
     }
 
-    public boolean isEmailVerified() {
-        return isEmailVerified;
+    public Boolean isEmailVerified() {
+        return isEmailVerified != null ? isEmailVerified : false;
     }
 
-    public void setEmailVerified(boolean emailVerified) {
+    public void setEmailVerified(Boolean emailVerified) {
         isEmailVerified = emailVerified;
     }
 
