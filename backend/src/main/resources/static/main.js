@@ -231,6 +231,9 @@ function switchPane(paneId, navBtnId) {
     if (paneId === 'mgr-permissions-content') {
         fetchAndShowPermissions();
     }
+    if (paneId === 'mgr-customers-content') {
+        fetchAndShowCustomers();
+    }
 }
 
 function setupNavListeners() {
@@ -656,31 +659,19 @@ async function handleAddAgent() {
 async function handleUpdateManager() {
     if (!currentUser) return;
     
-    const name = document.getElementById('mgr-update-name').value.trim();
-    const email = document.getElementById('mgr-update-email').value.trim();
     const password = document.getElementById('mgr-update-password').value;
 
-    if (!name && !email && !password) {
-        showMessage('mgr-update-message', "Please provide at least one field to update.", false);
+    if (!password) {
+        showMessage('mgr-update-message', "Please provide a new password.", false);
         return;
     }
 
-    const payload = {};
-    if (name) payload.name = name;
-    if (email) {
-        if (!EMAIL_PATTERN.test(email)) {
-            showMessage('mgr-update-message', "Invalid email format.", false);
-            return;
-        }
-        payload.email = email;
+    if (password.length < 8) {
+        showMessage('mgr-update-message', "Password must be at least 8 characters.", false);
+        return;
     }
-    if (password) {
-        if (password.length < 8) {
-            showMessage('mgr-update-message', "Password must be at least 8 characters.", false);
-            return;
-        }
-        payload.password = password;
-    }
+
+    const payload = { password: password };
 
     try {
         const response = await secureFetch(`/api/users/${currentUser.id}`, {
@@ -689,17 +680,8 @@ async function handleUpdateManager() {
         });
 
         if (response && response.ok) {
-            const updatedUser = await response.json();
-            currentUser = { ...currentUser, ...updatedUser };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            showMessage('mgr-update-message', "Account updated successfully!", true);
-            document.getElementById('mgr-update-name').value = '';
-            document.getElementById('mgr-update-email').value = '';
+            showMessage('mgr-update-message', "Password updated successfully!", true);
             document.getElementById('mgr-update-password').value = '';
-            
-            const welcomeTitle = document.querySelector('.welcome-title');
-            if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${updatedUser.name}!`;
         } else {
             const error = await response.json();
             showMessage('mgr-update-message', error.message || "Update failed.", false);
@@ -1379,7 +1361,7 @@ async function saveProfile() {
 function updateNavigationForRole(role) {
     const navItems = {
         'CUSTOMER': ['nav-menu-btn', 'nav-browse-btn', 'nav-orders-btn', 'nav-tracking-btn', 'nav-account-btn'],
-        'MANAGER': ['nav-menu-btn', 'nav-mgr-customers-btn', 'nav-mgr-owners-btn', 'nav-mgr-agents-btn', 'nav-mgr-feedback-btn', 'nav-mgr-locations-btn', 'nav-mgr-permissions-btn', 'nav-account-btn'],
+        'MANAGER': ['nav-mgr-customers-btn', 'nav-mgr-owners-btn', 'nav-mgr-agents-btn', 'nav-mgr-feedback-btn', 'nav-mgr-locations-btn', 'nav-mgr-permissions-btn', 'nav-account-btn'],
         'RESTAURANT_OWNER': ['nav-menu-btn', 'nav-owner-btn', 'nav-owner-tracking-btn', 'nav-orders-btn', 'nav-account-btn'],
         'DELIVERY_AGENT': ['nav-menu-btn', 'nav-agent-orders-btn', 'nav-agent-history-btn', 'nav-agent-avail-btn', 'nav-account-btn']
     };
@@ -1658,6 +1640,37 @@ window.addEventListener('load', () => {
     startHeartbeat();
     initSession();
 });
+
+// Manager: Fetch & Display Customers
+async function fetchAndShowCustomers() {
+    try {
+        const response = await secureFetch(AUTH_URL);
+        if (!response || !response.ok) return;
+        const users = await response.json();
+        const customers = users.filter(u => u.role === 'CUSTOMER');
+        const list = document.getElementById('customer-list');
+        if (!list) return;
+
+        if (customers.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No customers registered yet.</p>';
+            return;
+        }
+
+        list.innerHTML = customers.map(c => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3em; flex-shrink: 0;">👤</div>
+                    <div>
+                        <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${c.name}</p>
+                        <p class="label" style="font-size: 0.8em; color: #64748b; margin: 0;">${c.email}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load customers', e);
+    }
+}
 
 // Manager: Fetch & Display Agents
 async function fetchAndShowAgents() {
