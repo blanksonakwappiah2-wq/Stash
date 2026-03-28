@@ -2083,3 +2083,39 @@ function updateAgentPosition(lat, lng) {
 
     console.log(`[SYNC] Agent location: ${lat}, ${lng}`);
 }
+
+async function handleSkipVerification() {
+    const email = localStorage.getItem('temp_verify_email');
+    if (!email) {
+        showMessage('verify-message', "No active verification found.", false);
+        return;
+    }
+    
+    logToScreen("-> Skipping verification for: " + email);
+    
+    try {
+        const response = await fetch('/api/users/verify/skip?email=' + encodeURIComponent(email), {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            const password = localStorage.getItem('temp_pass');
+            localStorage.removeItem('temp_verify_email');
+            
+            showMessage('verify-message', "Developer Skip Successful!", true);
+            setTimeout(() => {
+                if (password) {
+                    handleLogin(email, password);
+                } else {
+                    switchOuterLayout('login-scene');
+                    showMessage('login-message', "Verified! You can now login.", true);
+                }
+            }, 1000);
+        } else {
+            showMessage('verify-message', "Skip failed on server.", false);
+        }
+    } catch (e) {
+        console.error("Skip Error:", e);
+        showMessage('verify-message', "Connection error.", false);
+    }
+}
