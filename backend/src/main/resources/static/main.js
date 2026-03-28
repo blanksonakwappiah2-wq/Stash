@@ -115,13 +115,12 @@ async function secureFetch(url, options = {}) {
 
 // Switch between Top-Level Outer Containers
 function switchOuterLayout(targetLayout) {
-    const scenes = ['login-scene', 'register-scene', 'main-layout'];
+    const scenes = ['login-scene', 'register-scene', 'main-layout', 'verify-scene'];
     scenes.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('active');
     });
     if (targetLayout) {
-        // targetLayout can be an element or an ID
         const el = (typeof targetLayout === 'string') ? document.getElementById(targetLayout) : targetLayout;
         if (el) el.classList.add('active');
     }
@@ -190,6 +189,10 @@ function switchPane(paneId, navBtnId) {
         fetchAndShowFeedbacks();
     } else if (paneId === 'mgr-locations-content') {
         initManagerMap();
+    } else if (paneId === 'agent-orders-content') {
+        fetchAgentOrders();
+    } else if (paneId === 'agent-history-content') {
+        fetchAgentHistory();
     }
 
     // Clear simulation if not on map
@@ -445,9 +448,9 @@ function showMessage(elementId, text, isSuccess) {
 }
 
 // Logic for Login
-async function handleLogin() {
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
+async function handleLogin(emailOverride = null, passwordOverride = null) {
+    const email = emailOverride || document.getElementById('login-email').value.trim();
+    const password = passwordOverride || document.getElementById('login-password').value;
 
     if (!email || !password) {
         showMessage('login-message', "Both email and password are required.", false);
@@ -455,72 +458,55 @@ async function handleLogin() {
     }
 
     const loginBtn = document.getElementById('login-btn');
-    loginBtn.disabled = true;
-    loginBtn.textContent = "Logging in...";
+    if (loginBtn) {
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Logging in...";
+    }
 
-    console.log("Attempting login for:", email);
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
         const response = await fetch(AUTH_URL + 'login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-            signal: controller.signal
+            body: JSON.stringify({ email, password })
         });
-        clearTimeout(timeoutId);
         
-        console.log("Login response status:", response.status);
         if (response.ok) {
             const data = await response.json();
-            console.log("Login successful, user role:", data.role);
-            currentUser = {
-                id: data.id,
-                name: data.name,
-                email: data.email,
-                role: data.role
-            };
+            currentUser = { id: data.id, name: data.name, email: data.email, role: data.role };
             authToken = data.token;
             
-            // Save to localStorage
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             localStorage.setItem('authToken', authToken);
+            localStorage.removeItem('temp_pass'); // Clean up temp pass
 
-            showMessage('login-message', "Login successful! Welcome back.", true);
-            
             updateNavigationForRole(currentUser.role);
             
             setTimeout(() => {
                 switchOuterLayout('main-layout');
-                // Redirect to role-specific default pane
                 if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
                     switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
                 } else if (currentUser.role === 'RESTAURANT_OWNER') {
                     switchPane('owner-content', 'nav-owner-btn');
                 } else if (currentUser.role === 'DELIVERY_AGENT') {
-                    switchPane('agent-content', 'nav-agent-btn');
+                    switchPane('agent-orders-content', 'nav-agent-orders-btn');
                 } else {
                     switchPane('home-content', 'nav-menu-btn');
                 }
-                
                 const welcomeTitle = document.querySelector('.welcome-title');
                 if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
             }, 600);
         } else {
             const errorData = await response.json();
-            showMessage('login-message', errorData.message || "Invalid credentials. Please try again.", false);
+            showMessage('login-message', errorData.message || "Invalid credentials.", false);
         }
     } catch (e) {
         console.error("Login Error:", e);
-        if (e.name === 'AbortError') {
-            showMessage('login-message', "Login timed out. The server might be waking up (Render Free Tier can take 1-2 minutes). Please try again in a moment.", false);
-        } else {
-            showMessage('login-message', "Connection error. Please check your internet or try again later.", false);
-        }
+        showMessage('login-message', "Connection error.", false);
     } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Login";
+        if (loginBtn) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = "Login";
+        }
     }
 }
 
@@ -569,46 +555,13 @@ async function handleRegister() {
         });
         clearTimeout(timeoutId);
 
-        console.log("Registration response status:", response.status);
         if (response.ok) {
-            const data = await response.json();
-            console.log("Registration successful, user role:", data.role);
-            currentUser = {
-                id: data.id,
-                name: data.name,
-                email: data.email,
-                role: data.role
-            };
-            authToken = data.token;
-            
-            // Save to localStorage
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            localStorage.setItem('authToken', authToken);
-
-            showMessage('reg-message', "Registration successful! Welcome to QuickBite.", true);
-            
-            updateNavigationForRole(currentUser.role);
-            
-            setTimeout(() => {
-                switchOuterLayout('main-layout');
-                // Redirect to role-specific default pane
-                if (currentUser.role === 'MANAGER' || currentUser.role === 'ADMIN') {
-                    switchPane('mgr-customers-content', 'nav-mgr-customers-btn');
-                } else if (currentUser.role === 'RESTAURANT_OWNER') {
-                    switchPane('owner-content', 'nav-owner-btn');
-                } else if (currentUser.role === 'DELIVERY_AGENT') {
-                    switchPane('agent-content', 'nav-agent-btn');
-                } else {
-                    switchPane('home-content', 'nav-menu-btn');
-                }
-                
-                const welcomeTitle = document.querySelector('.welcome-title');
-                if (welcomeTitle) welcomeTitle.textContent = `Welcome, ${currentUser.name}!`;
-                clearRegisterInputs();
-            }, 1000);
+            localStorage.setItem('temp_verify_email', email);
+            localStorage.setItem('temp_pass', password); // Store temp pass for auto-login
+            switchOuterLayout('verify-scene');
         } else {
-            const errorData = await response.json();
-            showMessage('reg-message', errorData.message || "Registration failed. Please try again.", false);
+            const err = await response.json();
+            showMessage('reg-message', err.message || "Registration failed.", false);
         }
     } catch (e) {
         console.error("Registration Error:", e);
@@ -900,51 +853,30 @@ async function fetchAndShowFeedbacks() {
     }
 }
 
-// Manager Map & Real-time Simulation
-function initManagerMap() {
-    if (typeof L === 'undefined') {
-        logToScreen("Leaflet (L) is MISSING. Manager Map cannot initialize.", true);
-        return;
-    }
-    if (mgrMap) {
-        mgrMap.remove();
-    }
-
-    mgrMap = L.map('mgr-map').setView([51.505, -0.09], 13);
+async function initManagerMap() {
+    if (mgrMap) return;
+    mgrMap = L.map('mgr-map').setView([5.6037, -0.1870], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mgrMap);
+    
+    // Periodically fetch active agents and update markers
+    setInterval(async () => {
+        try {
+            const resp = await secureFetch(DELIVERY_URL + "active-agents");
+            if (!resp.ok) return;
+            const agents = await resp.json();
+            
+            // Clear old markers
+            Object.values(agentMarkers).forEach(m => mgrMap.removeLayer(m.marker));
+            agentMarkers = {};
 
-    // Sidebar: Delivery Progress List
-    const deliveryList = document.getElementById('mgr-live-delivery-list');
-    if (deliveryList) {
-        deliveryList.innerHTML = `
-            <div style="background: #fdf2f2; border: 1px solid #fee2e2; padding: 12px; border-radius: 10px; margin-bottom: 12px;">
-                <p class="label" style="font-weight:700; color:#991b1b; margin-bottom:5px;">📦 Order #7821</p>
-                <p class="label" style="font-size:0.75em; color:#64748b; margin-bottom:8px;">Grandma's Kitchen → Sarah J.</p>
-                <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
-                    <div style="width:65%; height:100%; background:#ef4444;"></div>
-                </div>
-                <p class="label" style="font-size:0.7em; margin-top:5px; color:#ef4444; font-weight:600;">🚴 On Route (Estimated 4m)</p>
-            </div>
-            <div style="background: #f0fdf4; border: 1px solid #dcfce7; padding: 12px; border-radius: 10px; margin-bottom: 12px;">
-                <p class="label" style="font-weight:700; color:#166534; margin-bottom:5px;">📦 Order #7823</p>
-                <p class="label" style="font-size:0.75em; color:#64748b; margin-bottom:8px;">Burger King → Mark R.</p>
-                <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
-                    <div style="width:30%; height:100%; background:#22c55e;"></div>
-                </div>
-                <p class="label" style="font-size:0.7em; margin-top:5px; color:#22c55e; font-weight:600;">👨‍🍳 Preparing</p>
-            </div>
-            <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 12px; border-radius: 10px;">
-                <p class="label" style="font-weight:700; color:#92400e; margin-bottom:5px;">📦 Order #7822</p>
-                <p class="label" style="font-size:0.75em; color:#64748b; margin-bottom:8px;">Sushi Master → Linda W.</p>
-                <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
-                    <div style="width:90%; height:100%; background:#f59e0b;"></div>
-                </div>
-                <p class="label" style="font-size:0.7em; margin-top:5px; color:#f59e0b; font-weight:600;">📍 Arriving (Estimated 1m)</p>
-            </div>
-        `;
-    }
-
-    fetchMapData(mgrMap, 'MANAGER');
+            agents.forEach(agent => {
+                const marker = L.marker([agent.latitude, agent.longitude], {
+                    icon: L.divIcon({ html: '🚴', className: 'agent-icon', iconSize: [30, 30] })
+                }).addTo(mgrMap).bindPopup(`<b>Agent: ${agent.name}</b><br>Status: Active`);
+                agentMarkers[agent.id] = { marker, lat: agent.latitude, lng: agent.longitude };
+            });
+        } catch (e) { console.error("Map update error", e); }
+    }, 3000);
 }
 
 function initOwnerMap() {
@@ -1437,11 +1369,76 @@ async function saveProfile() {
         }
     } catch (e) {
         console.error("Profile update error:", e);
-        showMessage('profile-message', "Connection error. Please try again.", false);
+        showMessage('profile-message', "Connection error.", false);
     } finally {
         btn.disabled = false;
         btn.innerText = 'Save Changes';
     }
+}
+
+function updateNavigationForRole(role) {
+    const navItems = {
+        'CUSTOMER': ['nav-menu-btn', 'nav-browse-btn', 'nav-orders-btn', 'nav-tracking-btn', 'nav-account-btn'],
+        'MANAGER': ['nav-menu-btn', 'nav-mgr-customers-btn', 'nav-mgr-owners-btn', 'nav-mgr-agents-btn', 'nav-mgr-feedback-btn', 'nav-mgr-locations-btn', 'nav-mgr-permissions-btn', 'nav-account-btn'],
+        'RESTAURANT_OWNER': ['nav-menu-btn', 'nav-owner-btn', 'nav-owner-tracking-btn', 'nav-orders-btn', 'nav-account-btn'],
+        'DELIVERY_AGENT': ['nav-menu-btn', 'nav-agent-orders-btn', 'nav-agent-history-btn', 'nav-agent-avail-btn', 'nav-account-btn']
+    };
+
+    document.querySelectorAll('.nav-item').forEach(item => item.style.display = 'none');
+    const activeNavs = navItems[role] || navItems['CUSTOMER'];
+    activeNavs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'flex';
+    });
+}
+
+async function fetchAgentOrders() {
+    try {
+        const response = await secureFetch(ORDER_URL + `/agent/${currentUser.id}`);
+        if (!response.ok) return;
+        const orders = await response.json();
+        const list = document.getElementById('agent-orders-list');
+        if (orders.length === 0) {
+            list.innerHTML = '<p class="label" style="text-align: center; margin-top: 20px; color: #94a3b8;">No active deliveries. 😴</p>';
+            return;
+        }
+        list.innerHTML = orders.filter(o => o.status !== 'DELIVERED').map(order => `
+            <div class="content-card" style="border-left: 5px solid #6366f1;">
+                <h3 style="color: #1e1b4b;">Order #${order.id} - ${order.status}</h3>
+                <p class="label" style="color: #64748b;">🏪 ${order.restaurantName} ➔ 📍 ${order.customerName}</p>
+                <p class="label" style="color: #64748b; font-size: 0.9em;">🏠 Address: ${order.deliveryAddress}</p>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    ${order.status === 'DELIVERING' ? 
+                        `<button class="login-button" style="margin:0; background:#10b981;" onclick="updateOrderStatus(${order.id}, 'DELIVERED')">Complete</button>` :
+                        `<button class="login-button" style="margin:0;" onclick="updateOrderStatus(${order.id}, 'DELIVERING')">Start</button>`
+                    }
+                    <button class="register-button" style="margin:0;" onclick="initAgentMapForOrder(${order.id})">Map</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) { console.error(e); }
+}
+
+async function fetchAgentHistory() {
+    try {
+        const response = await secureFetch(ORDER_URL + `/agent-history`);
+        if (!response.ok) return;
+        const orders = await response.json();
+        const list = document.getElementById('agent-history-list');
+        if (orders.length === 0) {
+            list.innerHTML = '<p class="label" style="text-align: center; margin-top: 20px; color: #94a3b8;">No history found. 🧺</p>';
+            return;
+        }
+        list.innerHTML = orders.map(order => `
+            <div class="content-card" style="opacity: 0.8;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight:700;">Order #${order.id}</span>
+                    <span class="category-badge">DELIVERED</span>
+                </div>
+                <p style="font-size: 0.9em; color: #64748b; margin-top: 10px;">${order.restaurantName} to ${order.customerName}</p>
+            </div>
+        `).join('');
+    } catch (e) { console.error(e); }
 }
 
 function loadProfileToUI() {
@@ -1589,7 +1586,7 @@ function initSession() {
             } else if (currentUser.role === 'RESTAURANT_OWNER') {
                 switchPane('owner-content', 'nav-owner-btn');
             } else if (currentUser.role === 'DELIVERY_AGENT') {
-                switchPane('agent-content', 'nav-agent-btn');
+                switchPane('agent-orders-content', 'nav-agent-orders-btn');
             } else {
                 switchPane('home-content', 'nav-menu-btn');
             }
@@ -1699,37 +1696,75 @@ let agentLocationWatcher = null;
 let agentMarker = null;
 
 async function fetchAndShowAgentOrders() {
-    const list = document.getElementById('assigned-orders-list');
-    if (!list) return;
+    fetchAgentOrders();
+}
+
+let agentOrderMap = null;
+let agentMarkersGroup = null;
+
+async function initAgentMapForOrder(orderId) {
+    document.getElementById('agent-tracking-map-container').style.display = 'block';
+    
+    if (!agentOrderMap) {
+        agentOrderMap = L.map('agent-map').setView([5.6037, -0.1870], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(agentOrderMap);
+        agentMarkersGroup = L.featureGroup().addTo(agentOrderMap);
+    }
 
     try {
-        const response = await secureFetch(`/api/delivery/orders/${currentUser.id}`);
-        if (!response || !response.ok) return;
-        const orders = await response.json();
+        const resp = await secureFetch(ORDER_URL + "/" + orderId);
+        if (!resp.ok) return;
+        const order = await resp.json();
 
-        if (orders.length === 0) {
-            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>';
-            return;
+        agentMarkersGroup.clearLayers();
+
+        const agentIcon = L.divIcon({ html: '<div class="map-marker-icon">🚴</div>', className: '', iconSize: [35, 35] });
+        const restIcon = L.divIcon({ html: '<div class="map-marker-icon">🏠</div>', className: '', iconSize: [35, 35] });
+        const custIcon = L.divIcon({ html: '<div class="map-marker-icon">📍</div>', className: '', iconSize: [35, 35] });
+
+        let agentLat = 5.6037, agentLng = -0.1870;
+        const agentMarker = L.marker([agentLat, agentLng], { icon: agentIcon }).addTo(agentMarkersGroup).bindPopup("<b>Me (Agent)</b>");
+
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(pos => {
+                agentLat = pos.coords.latitude;
+                agentLng = pos.coords.longitude;
+                agentMarker.setLatLng([agentLat, agentLng]);
+                updateAgentLiveLocation(agentLat, agentLng);
+            });
         }
 
-        list.innerHTML = orders.map(order => `
-            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0; background: #fff;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <span class="category-badge" style="background: #6366f1; color: white;">Order #${order.id}</span>
-                    <span class="category-badge" style="background: #f1f5f9; color: #64748b;">${order.status}</span>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <p class="label" style="font-weight: 700; color: #1e1b4b; margin-bottom: 5px;">Pickup: ${order.restaurant.name}</p>
-                    <p class="label" style="font-size: 0.85em; color: #64748b; margin: 0;">Drop-off: ${order.deliveryAddress}</p>
-                </div>
-                <div class="button-group" style="margin-top: 15px;">
-                    <button class="register-button" style="padding: 8px 15px; font-size: 0.85em; border-color: #ef4444; color: #ef4444;" onclick="transferOrderToFleet(${order.id})">🔄 Assign Another Agent</button>
-                </div>
-            </div>
-        `).join('');
-    } catch (e) {
-        console.error('Failed to load agent orders', e);
-    }
+        const restLat = agentLat + 0.005;
+        const restLng = agentLng + 0.008;
+        L.marker([restLat, restLng], { icon: restIcon }).addTo(agentMarkersGroup).bindPopup(`<b>Restaurant: ${order.restaurantName}</b>`);
+
+        const custLat = agentLat + 0.012;
+        const custLng = agentLng - 0.005;
+        L.marker([custLat, custLng], { icon: custIcon }).addTo(agentMarkersGroup).bindPopup(`<b>Deliver to: ${order.customerName}</b><br>${order.deliveryAddress}`);
+
+        agentOrderMap.fitBounds(agentMarkersGroup.getBounds(), { padding: [50, 50] });
+
+    } catch (e) { console.error("Agent map error", e); }
+}
+
+async function updateAgentLiveLocation(lat, lng) {
+    await secureFetch(DELIVERY_URL + "update-location", {
+        method: 'POST',
+        body: JSON.stringify({ latitude: lat, longitude: lng })
+    });
+}
+
+function updateOrderStatus(orderId, status) {
+    secureFetch(ORDER_URL + "/" + orderId + "/status?status=" + status, { method: 'PUT' })
+        .then(res => {
+            if (res.ok) {
+                fetchAgentOrders();
+                if (status === 'DELIVERED') {
+                    document.getElementById('agent-tracking-map-container').style.display = 'none';
+                    fetchAgentHistory();
+                }
+            }
+        });
 }
 
 async function transferOrderToFleet(orderId) {
@@ -1931,18 +1966,24 @@ async function handleVerifyCode() {
         });
 
         if (response.ok) {
+            const password = localStorage.getItem('temp_pass');
+            localStorage.removeItem('temp_verify_email');
+            
             // Visual Success Flow
             document.getElementById('verify-input-container').style.display = 'none';
             document.getElementById('verify-success-container').style.display = 'block';
             
             setTimeout(() => {
-                switchOuterLayout('login-scene');
-                localStorage.removeItem('temp_verify_email');
-                // Reset for next time
+                if (password) {
+                    handleLogin(email, password);
+                } else {
+                    switchOuterLayout('login-scene');
+                    showMessage('login-message', "Account verified! You can now login.", true);
+                }
+                // Reset Verify Scene for next time
                 document.getElementById('verify-input-container').style.display = 'block';
                 document.getElementById('verify-success-container').style.display = 'none';
                 document.getElementById('verify-code').value = '';
-                showMessage('login-message', "Account verified! You can now login.", true);
             }, 3500);
         } else {
             const err = await response.json();

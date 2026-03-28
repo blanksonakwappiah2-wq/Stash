@@ -171,6 +171,15 @@ public class OrderController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/agent-history")
+    @PreAuthorize("hasAnyRole('DELIVERY_AGENT')")
+    public List<OrderDTO> getAgentHistory(Authentication auth) {
+        User agent = userService.findByEmail(auth.getName());
+        return orderService.getOrdersByDeliveryAgentIdAndStatus(agent.getId(), OrderStatus.DELIVERED).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private OrderDTO convertToDTO(Order order) {
         OrderDTO dto = new OrderDTO();
         dto.setId(order.getId());

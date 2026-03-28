@@ -226,8 +226,9 @@
                     <button id="nav-browse-btn" class="nav-item">🍴 Browse Restaurants</button>
                     <button id="nav-owner-btn" class="nav-item" style="display: none;">🏪 My Restaurant</button>
                     <button id="nav-owner-tracking-btn" class="nav-item" style="display: none;">📍 Live Tracking</button>
-                    <button id="nav-agent-btn" class="nav-item" style="display: none;">📦 Deliveries</button>
-                    <button id="nav-availabilities-btn" class="nav-item" style="display: none;">⏳ Availabilities</button>
+                    <button id="nav-agent-orders-btn" class="nav-item" style="display: none;">📦 My Deliveries</button>
+                    <button id="nav-agent-history-btn" class="nav-item" style="display: none;">📜 Delivery History</button>
+                    <button id="nav-agent-avail-btn" class="nav-item" style="display: none;">📅 Availabilities</button>
                     <button id="nav-mgr-customers-btn" class="nav-item" style="display: none;">👥 Customers</button>
                     <button id="nav-mgr-owners-btn" class="nav-item" style="display: none;">🏪 Owners</button>
                     <button id="nav-mgr-agents-btn" class="nav-item" style="display: none;">🚴 Fleet</button>
@@ -616,6 +617,27 @@
                             <div style="display: flex; align-items: center;"><span style="width: 10px; height: 10px; background: #f59e0b; border-radius: 50%; margin-right: 8px;"></span> Destination (Customer)</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Agent: My Deliveries Content -->
+                <div id="agent-orders-content" class="content-pane">
+                    <h1 class="title-label" style="text-align: left; color: #1e1b4b;">My Deliveries</h1>
+                    <p class="label" style="color: #64748b; margin-bottom: 25px;">Track and manage your active assigned deliveries.</p>
+                    <div id="agent-orders-list"></div>
+                    
+                    <div id="agent-tracking-map-container" style="display: none; margin-top: 30px;">
+                        <h3 class="section-title">Delivery Route</h3>
+                        <div class="map-wrapper" style="height: 400px;">
+                            <div id="agent-map" style="height: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent: Delivery History Content -->
+                <div id="agent-history-content" class="content-pane">
+                    <h1 class="title-label" style="text-align: left; color: #1e1b4b;">Delivery History</h1>
+                    <p class="label" style="color: #64748b; margin-bottom: 25px;">Review all your successfully completed deliveries.</p>
+                    <div id="agent-history-list"></div>
                 </div>
 
                 <!-- Delivery Agent Portal -->

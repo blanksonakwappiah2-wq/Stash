@@ -109,4 +109,8 @@ public class OrderService {
     public List<Order> getOrdersByDeliveryAgent(Long agentId) {
         return orderRepository.findByDeliveryAgentId(agentId);
     }
+
+    public List<Order> getOrdersByDeliveryAgentIdAndStatus(Long agentId, OrderStatus status) {
+        return orderRepository.findByDeliveryAgentIdAndStatus(agentId, status);
+    }
 }
