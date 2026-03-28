@@ -137,3 +137,6 @@ Hibernate: insert into users (address,email,latitude,longitude,name,is_online,pa
 2026-03-28T19:05:58.888Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=59s971ms965µs).
 2026-03-28T19:26:58.444Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m38s379ms567µs100ns).
 2026-03-28T20:00:43.010Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=13m44s367ms851µs400ns).
+2026-03-28T20:28:11.722Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12m58s631ms111µs400ns).
+2026-03-28T20:32:04.029Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=52s300ms590µs100ns).
+2026-03-28T20:42:45.122Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m41s92ms873µs300ns).
