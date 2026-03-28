@@ -36,12 +36,13 @@ public class QuickbiteApplication {
 
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-            if (userRepository.findByEmail("manager@quickbite.com") == null) {
+            if (userRepository.findByEmail("blanksonakwappiah2@gmail.com") == null) {
                 User manager = new User();
                 manager.setName("Admin Manager");
-                manager.setEmail("manager@quickbite.com");
+                manager.setEmail("blanksonakwappiah2@gmail.com");
                 manager.setPassword(passwordEncoder.encode("Manager123"));
                 manager.setRole(UserRole.MANAGER);
+                manager.setEmailVerified(true);
                 userRepository.save(manager);
                 System.out.println("Seeded Manager account.");
             }
