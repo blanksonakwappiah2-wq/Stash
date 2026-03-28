@@ -124,3 +124,4 @@ Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u
 Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.latitude,u1_0.longitude,u1_0.name,u1_0.is_online,u1_0.password,u1_0.phone,u1_0.role from users u1_0 where u1_0.email=?
 Hibernate: insert into users (address,email,latitude,longitude,name,is_online,password,phone,role,id) values (?,?,?,?,?,?,?,?,?,default)
 2026-03-28T15:01:42.956Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m47s346ms579µs900ns).
+2026-03-28T15:13:36.397Z  WARN 11616 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m23s370ms708µs500ns).

@@ -79,7 +79,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/menu/**", "/api/menu").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                .requestMatchers("/", "/index.html", "/static/**", "/favicon.ico", "/error").permitAll()
+                .requestMatchers("/", "/index.html", "/style.css", "/main.js", "/static/**", "/favicon.ico", "/error").permitAll()
                 .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.FORWARD, jakarta.servlet.DispatcherType.ERROR).permitAll()
                 // Any other requests require authentication
                 .anyRequest().authenticated()
