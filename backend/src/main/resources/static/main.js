@@ -1338,7 +1338,6 @@ document.getElementById('save-profile-btn').addEventListener('click', saveProfil
 
 async function saveProfile() {
     const name = document.getElementById('profile-name').value.trim();
-    const address = document.getElementById('profile-address').value.trim();
     const phone = document.getElementById('profile-phone').value.trim();
     const password = document.getElementById('profile-password').value;
 
@@ -1351,7 +1350,6 @@ async function saveProfile() {
     const updateRequest = {
         name: name,
         email: currentUser.email,
-        address: address,
         phone: phone
     };
     if (password) updateRequest.password = password;
@@ -1365,7 +1363,6 @@ async function saveProfile() {
         if (response.ok) {
             const updatedUser = await response.json();
             currentUser.name = updatedUser.name;
-            currentUser.address = updatedUser.address;
             currentUser.phone = updatedUser.phone;
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
@@ -1740,6 +1737,10 @@ async function initAgentMap() {
     }
 }
 
+async function fetchAndShowAgentOrders() {
+    fetchAgentOrders();
+}
+
 async function initAgentMapForOrder(orderId) {
     document.getElementById('agent-tracking-map-container').style.display = 'block';
     
@@ -1846,12 +1847,12 @@ function updateAgentStatusUI() {
     
     const isOnline = currentUser.isOnline || false;
     if (isOnline) {
-        textEl.innerHTML = 'You are currently <strong style="color: #10b981;">Online</strong> and ready for orders.';
+        textEl.innerHTML = 'Status: <strong style="color: #10b981;">Online</strong>';
         btnEl.textContent = 'Go Offline';
         btnEl.style.background = '#ef4444';
         if (!agentLocationWatcher) startLocationTracking();
     } else {
-        textEl.innerHTML = 'You are currently <strong>Offline</strong>.';
+        textEl.innerHTML = 'Status: <strong style="color: #64748b;">Offline</strong>';
         btnEl.textContent = 'Go Online';
         btnEl.style.background = '#6366f1';
         stopLocationTracking();
@@ -2104,7 +2105,6 @@ async function fetchAgentHistory() {
                 <div>
                     <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${o.restaurantName}</p>
                     <p class="label" style="font-size: 0.85em; color: #64748b; margin: 2px 0;">To: ${o.customerName}</p>
-                    <p class="label" style="font-size: 0.85em; color: #94a3b8; margin: 2px 0;">📍 ${o.deliveryAddress}</p>
                 </div>
             </div>
         `).join('');
