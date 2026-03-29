@@ -191,6 +191,7 @@ function switchPane(paneId, navBtnId) {
         initManagerMap();
     } else if (paneId === 'agent-orders-content') {
         fetchAgentOrders();
+        setTimeout(initAgentMap, 100);
     } else if (paneId === 'agent-history-content') {
         fetchAgentHistory();
     }
@@ -219,12 +220,12 @@ function switchPane(paneId, navBtnId) {
     }
 
     // Special logic for agent portal
-    if (paneId === 'agent-content') {
+    if (paneId === 'agent-orders-content') {
         fetchAndShowAgentOrders();
         setTimeout(initAgentMap, 100);
     }
 
-    if (paneId === 'availabilities-content') {
+    if (paneId === 'agent-avail-content') {
         updateAgentStatusUI();
     }
 
@@ -243,7 +244,9 @@ function setupNavListeners() {
         { id: 'nav-browse-btn', pane: 'restaurants-content' },
         { id: 'nav-owner-btn', pane: 'owner-content' },
         { id: 'nav-owner-tracking-btn', pane: 'owner-tracking-content' },
-        { id: 'nav-agent-btn', pane: 'agent-content' },
+        { id: 'nav-agent-orders-btn', pane: 'agent-orders-content' },
+        { id: 'nav-agent-history-btn', pane: 'agent-history-content' },
+        { id: 'nav-agent-avail-btn', pane: 'agent-avail-content' },
         { id: 'nav-mgr-customers-btn', pane: 'mgr-customers-content' },
         { id: 'nav-mgr-owners-btn', pane: 'mgr-owners-content' },
         { id: 'nav-mgr-agents-btn', pane: 'mgr-agents-content' },
@@ -778,8 +781,9 @@ function updateNavigationForRole(role) {
         }
         setDisplay('nav-feedback-btn', 'flex');
     } else if (role === 'DELIVERY_AGENT') {
-        setDisplay('nav-agent-btn', 'flex');
-        setDisplay('nav-availabilities-btn', 'flex');
+        setDisplay('nav-agent-orders-btn', 'flex');
+        setDisplay('nav-agent-history-btn', 'flex');
+        setDisplay('nav-agent-avail-btn', 'flex');
         setDisplay('nav-feedback-btn', 'flex');
     }
 }
@@ -1724,16 +1728,17 @@ async function fetchAndShowAgents() {
 }
 
 // ── Delivery Agent Portal Logic ──────────────────────────────────────────────
-let agentMap = null;
-let agentLocationWatcher = null;
-let agentMarker = null;
-
-async function fetchAndShowAgentOrders() {
-    fetchAgentOrders();
+async function initAgentMap() {
+    if (!agentMap) {
+        agentMap = L.map('agent-map').setView([5.6037, -0.1870], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(agentMap);
+    }
+    
+    // Auto-start location tracking for agent if not already running
+    if (!agentLocationWatcher) {
+        startLocationTracking();
+    }
 }
-
-let agentOrderMap = null;
-let agentMarkersGroup = null;
 
 async function initAgentMapForOrder(orderId) {
     document.getElementById('agent-tracking-map-container').style.display = 'block';
@@ -2036,4 +2041,74 @@ function updateAgentPosition(lat, lng) {
     }
 
     console.log(`[SYNC] Agent location: ${lat}, ${lng}`);
+}
+
+async function fetchAgentOrders() {
+    try {
+        const response = await secureFetch(ORDER_URL + "/assigned");
+        if (!response || !response.ok) return;
+        const orders = await response.json();
+        const list = document.getElementById('agent-orders-list');
+        if (!list) return;
+
+        if (orders.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>';
+            return;
+        }
+
+        list.innerHTML = orders.map(o => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="category-badge" style="background: #fdf2f2; color: #dc2626;">Order #${o.id}</span>
+                    <span style="font-weight: 700; color: #1e1b4b;">$${o.totalAmount.toFixed(2)}</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${o.restaurantName}</p>
+                    <p class="label" style="font-size: 0.85em; color: #64748b; margin: 2px 0;">Customer: ${o.customerName}</p>
+                    <p class="label" style="font-size: 0.85em; color: #64748b; margin: 2px 0;">📍 ${o.deliveryAddress}</p>
+                </div>
+                <div class="button-group" style="margin-top: 15px;">
+                    <button class="login-button" style="padding: 8px 15px; font-size: 0.85em; background: #6366f1;" onclick="initAgentMapForOrder(${o.id})">🗺️ View Map</button>
+                    <select class="text-field" style="max-width: 150px; font-size: 0.8em; padding: 8px;" onchange="updateOrderStatus(${o.id}, this.value)">
+                        <option value="">Update Status</option>
+                        <option value="PICKED_UP" ${o.status === 'PICKED_UP' ? 'selected' : ''}>Picked Up</option>
+                        <option value="DELIVERED" ${o.status === 'DELIVERED' ? 'selected' : ''}>Delivered</option>
+                    </select>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load agent orders', e);
+    }
+}
+
+async function fetchAgentHistory() {
+    try {
+        const response = await secureFetch(ORDER_URL + "/history");
+        if (!response || !response.ok) return;
+        const history = await response.json();
+        const list = document.getElementById('agent-history-list');
+        if (!list) return;
+
+        if (history.length === 0) {
+            list.innerHTML = '<p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">You haven\'t completed any deliveries yet.</p>';
+            return;
+        }
+
+        list.innerHTML = history.map(o => `
+            <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 20px; opacity: 0.8;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 0.8em; color: #64748b;">Completed</span>
+                    <span style="font-weight: 700; color: #1e1b4b;">$${o.totalAmount.toFixed(2)}</span>
+                </div>
+                <div>
+                    <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${o.restaurantName}</p>
+                    <p class="label" style="font-size: 0.85em; color: #64748b; margin: 2px 0;">To: ${o.customerName}</p>
+                    <p class="label" style="font-size: 0.85em; color: #94a3b8; margin: 2px 0;">📍 ${o.deliveryAddress}</p>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Failed to load agent history', e);
+    }
 }

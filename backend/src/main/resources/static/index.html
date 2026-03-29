@@ -168,6 +168,10 @@
 
         <!-- Main App Layout (Hidden by default, shown after login) -->
         <div id="main-layout" class="layout-container">
+            <!-- [ ] Fix Delivery Agent Dashboard
+    - [ ] Standardize navigation and pane IDs in `index.html` and `main.js`
+    - [ ] Implement missing `initAgentMap` function in `main.js`
+    - [ ] Verify role-based navigation and data fetching -->
             <!-- Mobile Navigation Bar (Only for small screens) -->
             <div class="mobile-nav-bar">
                 <button id="mobile-menu-btn" class="menu-toggle-btn">☰</button>
@@ -189,8 +193,8 @@
                     <button id="nav-owner-btn" class="nav-item" style="display: none;">🏪 My Restaurant</button>
                     <button id="nav-owner-tracking-btn" class="nav-item" style="display: none;">📍 Live Tracking</button>
                     <button id="nav-agent-orders-btn" class="nav-item" style="display: none;">📦 My Deliveries</button>
-                    <button id="nav-agent-history-btn" class="nav-item" style="display: none;">📜 Delivery History</button>
-                    <button id="nav-agent-avail-btn" class="nav-item" style="display: none;">📅 Availabilities</button>
+                    <button id="nav-agent-history-btn" class="nav-item" style="display: none;">📜 History</button>
+                    <button id="nav-agent-avail-btn" class="nav-item" style="display: none;">📅 Availability</button>
                     <button id="nav-mgr-customers-btn" class="nav-item" style="display: none;">👥 Customers</button>
                     <button id="nav-mgr-owners-btn" class="nav-item" style="display: none;">🏪 Owners</button>
                     <button id="nav-mgr-agents-btn" class="nav-item" style="display: none;">🚴 Fleet</button>
@@ -598,35 +602,15 @@
                     <div id="agent-history-list"></div>
                 </div>
 
-                <!-- Delivery Agent Portal -->
-                <div id="agent-content" class="content-pane">
+                <!-- Agent: Availability Section -->
+                <div id="agent-avail-content" class="content-pane">
                     <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">📦 My Deliveries</h1>
-                        <p class="label" style="margin-bottom: 20px; color: #64748b;">View and manage your current deliveries. Use the map for navigation.</p>
-                        
-                        <div id="agent-map-container" style="height: 350px; width: 100%; border-radius: 15px; margin-bottom: 25px; border: 1px solid #e2e8f0; z-index: 1;">
-                            <div id="agent-delivery-map" style="height: 100%; width: 100%; border-radius: 15px;"></div>
-                        </div>
-
-                        <div id="assigned-orders-list" class="restaurant-grid">
+                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">📅 My Availability</h1>
+                        <div style="margin-top: 20px;">
                             <p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Availabilities Section -->
-                <div id="availabilities-content" class="content-pane">
-                    <div class="content-card section-card">
-                        <h1 class="title-label" style="text-align: left; color: #1e1b4b;">🕙 My Availabilities & Status</h1>
-                        <p class="label" style="margin-bottom: 25px; color: #64748b;">Manage your active status and request time-off permissions.</p>
-                        
-                        <div class="agent-status-card">
-                            <div class="status-info">
-                                <h3 style="color: #1e1b4b; margin: 0; font-size: 1.1em;">Work Status</h3>
-                                <p id="agent-status-text" style="color: #64748b; font-size: 0.9em; margin: 5px 0 0 0;">You are currently <strong>Offline</strong>.</p>
-                            </div>
-                            <button id="toggle-status-btn" class="login-button status-toggle-btn">Go Online</button>
-                        </div>
+                        <button id="toggle-status-btn" class="login-button status-toggle-btn">Go Online</button>
 
                         <div style="border-top: 1px solid #f1f5f9; padding-top: 30px;">
                             <h3 style="color: #1e1b4b; margin-bottom: 15px; font-size: 1.1em;">📅 Request Permission (Time-off)</h3>
