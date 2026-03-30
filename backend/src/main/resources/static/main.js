@@ -1389,6 +1389,16 @@ function updateNavigationForRole(role) {
         'DELIVERY_AGENT': ['nav-menu-btn', 'nav-agent-orders-btn', 'nav-agent-history-btn', 'nav-agent-avail-btn', 'nav-account-btn']
     };
 
+    // Update labels for specific roles
+    const menuBtn = document.getElementById('nav-menu-btn');
+    if (menuBtn) {
+        if (role === 'DELIVERY_AGENT' || role === 'RESTAURANT_OWNER') {
+            menuBtn.innerHTML = '💬 Feedback';
+        } else {
+            menuBtn.innerHTML = '🏠 Dashboard';
+        }
+    }
+
     document.querySelectorAll('.nav-item').forEach(item => item.style.display = 'none');
     const activeNavs = navItems[role] || navItems['CUSTOMER'];
     activeNavs.forEach(id => {
@@ -1450,7 +1460,6 @@ function loadProfileToUI() {
     if (!currentUser) return;
     document.getElementById('profile-name').value = currentUser.name || '';
     document.getElementById('profile-email').value = currentUser.email || '';
-    document.getElementById('profile-address').value = currentUser.address || '';
     document.getElementById('profile-phone').value = currentUser.phone || '';
     document.getElementById('profile-password').value = '';
 }
@@ -1679,12 +1688,16 @@ async function fetchAndShowCustomers() {
 
         list.innerHTML = customers.map(c => `
             <div class="content-card" style="border: 1px solid #e2e8f0; margin-bottom: 0;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3em; flex-shrink: 0;">👤</div>
-                    <div>
-                        <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${c.name}</p>
-                        <p class="label" style="font-size: 0.8em; color: #64748b; margin: 0;">${c.email}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3em; flex-shrink: 0;">👤</div>
+                        <div>
+                            <p class="label" style="font-weight: 700; color: #1e1b4b; margin: 0;">${c.name}</p>
+                            <p class="label" style="font-size: 0.8em; color: #64748b; margin: 0;">${c.email}</p>
+                            <p class="label" style="font-size: 0.75em; color: #94a3b8; margin: 2px 0;">User ID: ${c.id}</p>
+                        </div>
                     </div>
+                    <button class="login-button" style="padding: 8px 12px; font-size: 0.8em; background: #f8fafc; color: #6366f1; border: 1px solid #e2e8f0;" onclick="showCustomerHistory(${c.id})">View History</button>
                 </div>
             </div>
         `).join('');
@@ -1742,7 +1755,8 @@ async function fetchAndShowAgentOrders() {
 }
 
 async function initAgentMapForOrder(orderId) {
-    document.getElementById('agent-tracking-map-container').style.display = 'block';
+    const mapContainer = document.getElementById('agent-tracking-map-container');
+    if (mapContainer) mapContainer.style.display = 'block';
     
     if (!agentOrderMap) {
         agentOrderMap = L.map('agent-map').setView([5.6037, -0.1870], 13);
