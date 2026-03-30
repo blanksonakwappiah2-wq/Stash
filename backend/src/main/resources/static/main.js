@@ -236,7 +236,7 @@ function switchPane(paneId, navBtnId) {
         fetchAndShowCustomers();
     }
     if (paneId === 'mgr-locations-content') {
-        setTimeout(initMap, 100);
+        setTimeout(initManagerMap, 100);
     }
 }
 
@@ -2164,6 +2164,8 @@ async function fetchAgentHistory() {
     } catch (e) {
         console.error('Failed to load agent history', e);
     }
+}
+
 // Manager Map & Real-time Simulation
 function initManagerMap() {
     logToScreen("Initializing Manager Map...");
