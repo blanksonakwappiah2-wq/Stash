@@ -1602,10 +1602,6 @@ function initSession() {
             } else {
                 switchPane('home-content', 'nav-menu-btn');
             }
-                switchPane('agent-orders-content', 'nav-agent-orders-btn');
-            } else {
-                switchPane('home-content', 'nav-menu-btn');
-            }
 
             const welcomeTitle = document.querySelector('.welcome-title');
             if (welcomeTitle) welcomeTitle.textContent = `Welcome back, ${currentUser.name}!`;
@@ -1660,9 +1656,9 @@ window.addEventListener('load', () => {
         const toggleStatusBtn = document.getElementById('toggle-status-btn');
         if (toggleStatusBtn) toggleStatusBtn.addEventListener('click', toggleAgentOnlineStatus);
         
-        const submitPermBtn = document.getElementById('submit-perm-btn');
-        if (submitPermBtn) submitPermBtn.addEventListener('click', submitPermissionRequest);
-
+        logToScreen("-> Binding Global Action Buttons...");
+        const submitFeedbackBtn = document.getElementById('submit-feedback-btn');
+        if (submitFeedbackBtn) submitFeedbackBtn.addEventListener('click', submitFeedback);
 
         logToScreen("Initialization complete.");
     } catch (e) {
