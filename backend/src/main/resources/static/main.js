@@ -1336,8 +1336,9 @@ async function submitFeedback() {
     }
 }
 
-// Profile Logic
-document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+// Profile Logic (safely bound inside load handler, not top-level)
+const _saveProfileBtn = document.getElementById('save-profile-btn');
+if (_saveProfileBtn) _saveProfileBtn.addEventListener('click', saveProfile);
 
 async function saveProfile() {
     const name = document.getElementById('profile-name').value.trim();
