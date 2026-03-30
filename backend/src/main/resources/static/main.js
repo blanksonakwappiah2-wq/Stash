@@ -1405,6 +1405,47 @@ function updateNavigationForRole(role) {
     });
 }
 
+async function submitFeedback() {
+    const commentEl = document.getElementById('feedback-comment');
+    const msgEl = document.getElementById('feedback-message');
+    const btn = document.getElementById('submit-feedback-btn');
+    
+    if (!commentEl || !msgEl || !btn) return;
+
+    const comment = commentEl.value.trim();
+    if (!comment) {
+        showMessage('feedback-message', "Please enter a message.", false);
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = 'Sending...';
+    
+    try {
+        const response = await secureFetch('/api/feedback', {
+            method: 'POST',
+            body: JSON.stringify({
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userRole: currentUser.role,
+                comment: comment
+            })
+        });
+
+        if (response && response.ok) {
+            showMessage('feedback-message', "Feedback sent successfully! Thank you.", true);
+            commentEl.value = '';
+        } else {
+            showMessage('feedback-message', "Failed to send feedback. Try again.", false);
+        }
+    } catch (e) {
+        showMessage('feedback-message', "Connection error.", false);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Submit Feedback';
+    }
+}
+
 async function fetchAgentOrders() {
     try {
         const response = await secureFetch(ORDER_URL + `/agent/${currentUser.id}`);
@@ -2122,5 +2163,132 @@ async function fetchAgentHistory() {
         `).join('');
     } catch (e) {
         console.error('Failed to load agent history', e);
+    }
+// Manager Map & Real-time Simulation
+function initManagerMap() {
+    logToScreen("Initializing Manager Map...");
+    const mapEl = document.getElementById('mgr-map');
+    if (!mapEl) {
+        logToScreen("[ERROR] mgr-map element not found", true);
+        return;
+    }
+
+    if (mgrMap) {
+        mgrMap.remove();
+    }
+
+    // Default center
+    mgrMap = L.map('mgr-map').setView([51.505, -0.09], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(mgrMap);
+
+    fetchMapData();
+}
+
+async function fetchMapData() {
+    try {
+        const [usersRes, restsRes] = await Promise.all([
+            secureFetch(AUTH_URL),
+            secureFetch(RESTAURANT_URL)
+        ]);
+
+        if (!usersRes || !usersRes.ok || !restsRes || !restsRes.ok) return;
+
+        const allUsers = await usersRes.json();
+        const restaurants = await restsRes.json();
+
+        // 1. Plot Restaurants (Blue markers)
+        restaurants.forEach(rest => {
+            const lat = rest.latitude || 51.505 + (Math.random() - 0.5) * 0.05;
+            const lng = rest.longitude || -0.09 + (Math.random() - 0.5) * 0.05;
+            
+            L.circleMarker([lat, lng], {
+                color: '#6366f1',
+                fillColor: '#6366f1',
+                fillOpacity: 0.8,
+                radius: 8
+            }).addTo(mgrMap)
+              .bindPopup(`<strong>🏪 ${rest.name}</strong><br>${rest.address}`)
+              .bindTooltip(rest.name, { permanent: false, direction: 'top' });
+        });
+
+        // 2. Plot Customers (Amber markers)
+        allUsers.filter(u => u.role === 'CUSTOMER').forEach(cust => {
+            const lat = cust.latitude || 51.505 + (Math.random() - 0.5) * 0.08;
+            const lng = cust.longitude || -0.09 + (Math.random() - 0.5) * 0.08;
+            
+            L.circleMarker([lat, lng], {
+                color: '#f59e0b',
+                fillColor: '#f59e0b',
+                fillOpacity: 0.8,
+                radius: 6
+            }).addTo(mgrMap)
+              .bindPopup(`<strong>👤 Customer: ${cust.name}</strong>`)
+              .bindTooltip(cust.name, { permanent: false, direction: 'top' });
+        });
+
+        // 3. Plot Agents (Green markers) + Start Simulation
+        agentMarkers = {};
+        const agents = allUsers.filter(u => u.role === 'DELIVERY_AGENT');
+        
+        agents.forEach(agent => {
+            const lat = agent.latitude || 51.505 + (Math.random() - 0.5) * 0.1;
+            const lng = agent.longitude || -0.09 + (Math.random() - 0.5) * 0.1;
+            
+            const marker = L.circleMarker([lat, lng], {
+                color: '#10b981',
+                fillColor: '#10b981',
+                fillOpacity: 1,
+                radius: 10,
+                weight: 2
+            }).addTo(mgrMap)
+              .bindPopup(`<strong>🚴 Agent: ${agent.name}</strong>`)
+              .bindTooltip(`🚴 ${agent.name}`, { permanent: true, direction: 'right' });
+              
+            agentMarkers[agent.id] = {
+                marker: marker,
+                lat: lat,
+                lng: lng,
+                dx: (Math.random() - 0.5) * 0.001,
+                dy: (Math.random() - 0.5) * 0.001
+            };
+        });
+
+        startSimulation();
+
+    } catch (e) {
+        console.error("Map data fetch failed", e);
+    }
+}
+
+function startSimulation() {
+    if (simulationInterval) clearInterval(simulationInterval);
+    
+    simulationInterval = setInterval(() => {
+        Object.keys(agentMarkers).forEach(id => {
+            const data = agentMarkers[id];
+            data.lat += data.dx;
+            data.lng += data.dy;
+            
+            if (Math.abs(data.lat - 51.505) > 0.1) data.dx *= -1;
+            if (Math.abs(data.lng + 0.09) > 0.1) data.dy *= -1;
+            
+            data.marker.setLatLng([data.lat, data.lng]);
+        });
+    }, 1000);
+}
+
+function initMap() {
+    logToScreen("Initializing map simulation placeholder...");
+    const mapDiv = document.getElementById('map');
+    if (mapDiv) {
+        mapDiv.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <p class="label" style="color: #6366f1; font-weight: 700;">📍 Tracking Active Orders...</p>
+                <div style="margin-top: 10px; font-size: 0.8em; color: #64748b;">(Real-time simulation active)</div>
+            </div>
+        `;
     }
 }
