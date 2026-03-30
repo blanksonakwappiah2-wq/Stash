@@ -1385,18 +1385,13 @@ function updateNavigationForRole(role) {
     const navItems = {
         'CUSTOMER': ['nav-menu-btn', 'nav-browse-btn', 'nav-orders-btn', 'nav-tracking-btn', 'nav-account-btn'],
         'MANAGER': ['nav-mgr-customers-btn', 'nav-mgr-owners-btn', 'nav-mgr-agents-btn', 'nav-mgr-feedback-btn', 'nav-mgr-locations-btn', 'nav-mgr-permissions-btn', 'nav-account-btn'],
-        'RESTAURANT_OWNER': ['nav-menu-btn', 'nav-owner-btn', 'nav-owner-tracking-btn', 'nav-orders-btn', 'nav-account-btn'],
-        'DELIVERY_AGENT': ['nav-menu-btn', 'nav-agent-orders-btn', 'nav-agent-history-btn', 'nav-agent-avail-btn', 'nav-account-btn']
+        'RESTAURANT_OWNER': ['nav-menu-btn', 'nav-owner-btn', 'nav-owner-tracking-btn', 'nav-orders-btn', 'nav-feedback-btn', 'nav-account-btn'],
+        'DELIVERY_AGENT': ['nav-menu-btn', 'nav-agent-orders-btn', 'nav-agent-history-btn', 'nav-agent-avail-btn', 'nav-feedback-btn', 'nav-account-btn']
     };
 
-    // Update labels for specific roles
     const menuBtn = document.getElementById('nav-menu-btn');
     if (menuBtn) {
-        if (role === 'DELIVERY_AGENT' || role === 'RESTAURANT_OWNER') {
-            menuBtn.innerHTML = '💬 Feedback';
-        } else {
-            menuBtn.innerHTML = '🏠 Dashboard';
-        }
+        menuBtn.innerHTML = '🏠 Dashboard';
     }
 
     document.querySelectorAll('.nav-item').forEach(item => item.style.display = 'none');

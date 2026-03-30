@@ -610,7 +610,7 @@
                             <p class="label" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">No tasks assigned to you right now. ☕</p>
                         </div>
 
-                        <button id="toggle-status-btn" class="login-button status-toggle-btn">Go Online</button>
+                        <button id="toggle-status-btn" class="login-button status-toggle-btn" onclick="toggleAgentOnlineStatus()">Go Online</button>
 
                         <div style="border-top: 1px solid #f1f5f9; padding-top: 30px;">
                             <h3 style="color: #1e1b4b; margin-bottom: 15px; font-size: 1.1em;">📅 Request Permission (Time-off)</h3>
@@ -701,6 +701,19 @@
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label class="label" style="color: #1e1b4b;">How was your experience today?</label>
                             <textarea id="feedback-comment" class="text-field" placeholder="Tell us what you loved or how we can improve..." style="width: 100%; height: 150px; resize: none; background: #f8fafc; border-color: #e2e8f0; color: #1e1b4b;"></textarea>
+                        </div>
+                        
+                        <button id="submit-feedback-btn" class="login-button" style="width: 100%; padding: 18px;">Submit Feedback</button>
+                        <div id="feedback-message" class="message-label" style="display: none;"></div>
+                <!-- Global Pane: Feedback (for Agent/Owner) -->
+                <div id="feedback-content" class="content-pane">
+                    <div class="content-card" style="max-width: 700px; margin: 0 auto; padding: 40px;">
+                        <h1 class="section-title">💬 Send Feedback</h1>
+                        <p class="label" style="color: #64748b; margin-bottom: 30px;">Send a message or feedback directly to the manager.</p>
+                        
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label class="label" style="color: #1e1b4b;">Message</label>
+                            <textarea id="feedback-comment" class="text-field" placeholder="Type your message here..." style="width: 100%; height: 150px; resize: none; background: #f8fafc; border-color: #e2e8f0; color: #1e1b4b;"></textarea>
                         </div>
                         
                         <button id="submit-feedback-btn" class="login-button" style="width: 100%; padding: 18px;">Submit Feedback</button>
