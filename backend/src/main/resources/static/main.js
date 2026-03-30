@@ -1388,8 +1388,8 @@ function updateNavigationForRole(role) {
     const navItems = {
         'CUSTOMER': ['nav-menu-btn', 'nav-browse-btn', 'nav-orders-btn', 'nav-tracking-btn', 'nav-feedback-btn', 'nav-account-btn'],
         'MANAGER': ['nav-mgr-customers-btn', 'nav-mgr-owners-btn', 'nav-mgr-agents-btn', 'nav-mgr-feedback-btn', 'nav-mgr-locations-btn', 'nav-mgr-permissions-btn', 'nav-account-btn'],
-        'RESTAURANT_OWNER': ['nav-menu-btn', 'nav-owner-btn', 'nav-owner-tracking-btn', 'nav-orders-btn', 'nav-feedback-btn', 'nav-account-btn'],
-        'DELIVERY_AGENT': ['nav-menu-btn', 'nav-agent-orders-btn', 'nav-agent-history-btn', 'nav-agent-avail-btn', 'nav-feedback-btn', 'nav-account-btn']
+        'RESTAURANT_OWNER': ['nav-owner-btn', 'nav-owner-tracking-btn', 'nav-orders-btn', 'nav-feedback-btn', 'nav-account-btn'],
+        'DELIVERY_AGENT': ['nav-agent-orders-btn', 'nav-agent-history-btn', 'nav-agent-avail-btn', 'nav-feedback-btn', 'nav-account-btn']
     };
 
     const menuBtn = document.getElementById('nav-menu-btn');
@@ -1598,6 +1598,10 @@ function initSession() {
             } else if (currentUser.role === 'RESTAURANT_OWNER') {
                 switchPane('owner-content', 'nav-owner-btn');
             } else if (currentUser.role === 'DELIVERY_AGENT') {
+                switchPane('agent-orders-content', 'nav-agent-orders-btn');
+            } else {
+                switchPane('home-content', 'nav-menu-btn');
+            }
                 switchPane('agent-orders-content', 'nav-agent-orders-btn');
             } else {
                 switchPane('home-content', 'nav-menu-btn');
